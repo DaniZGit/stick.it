@@ -25,7 +25,7 @@
     "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
     "@pinia/nuxt": "^0.5.1",
     "@vueuse/nuxt": "^10.7.2",
-    "nuxt": "^3.10.2",
+    "nuxt": "^3.10.3",
     "nuxt-icon": "^0.6.8",
     "nuxt-primevue": "^0.3.0",
     "pinia": "^2.1.7"
