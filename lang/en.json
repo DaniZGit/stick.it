@@ -1,0 +1,25 @@
+{
+  "unexpected-error": "Something went wrong, please try again later",
+
+  "validation-min-length": "'{field}' must be at least {min} characters long",
+  "validation-required": "'{field}' is required",
+
+  "validation-email-required": "Email is required",
+  "validation-email-invalid": "Provided email is not valid",
+  "validation-email-unique": "Email is already taken",
+  "validation-username-required": "Username is required",
+  "validation-username-unique": "Username is already taken",
+  "validation-password-required": "Password is required",
+  "validation-password-invalid": "Password must have at least one uppercase letter, one number and one special character",
+  "login-invalid-credentials": "Email or password is wrong",
+  "validation-file-max-size": "Max allowed file size is ",
+  "validation-file-accepted-types": "Only .jpg, .jpeg, .png and .webp files are accepted",
+
+  "admin-album-created": "Album has been created",
+  "admin-album-deleted": "Album has been deleted",
+
+  "admin-album-create-title": "Title",
+  "admin-album-create-date-from": "Available From",
+  "admin-album-create-date-to": "Available To",
+  "admin-album-create-options": "Other options"
+}
