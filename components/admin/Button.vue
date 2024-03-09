@@ -2,7 +2,7 @@
   <Button
     :pt="preset"
     :class="attrs.class"
-    :type="attrs.type"
+    :type="type"
     :disabled="attrs.disabled"
     @click="emit('click', $event)"
   >
@@ -23,9 +23,11 @@
   const { color } = withDefaults(
     defineProps<{
       color?: "base" | "blue";
+      type?: string;
     }>(),
     {
       color: "base",
+      type: "button",
     }
   );
 

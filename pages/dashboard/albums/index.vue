@@ -52,10 +52,7 @@
         v-else
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 py-12 px-8 rounded-md bg-base-secondary"
       >
-        <NuxtLink
-          v-for="album in albums"
-          :to="`/dashboard/albums/${album.title}`"
-        >
+        <NuxtLink v-for="album in albums" :to="`/dashboard/albums/${album.id}`">
           <AdminItemAlbum
             v-bind="album"
             @deleted="onAlbumDelete"
@@ -69,7 +66,7 @@
         @created="onAlbumCreate"
         @creating="onAlbumCreating"
         @error="onAlbumCreateError"
-        @pending="(pending) => (creating = pending)"
+        @pending="(pending: boolean) => (creating = pending)"
       />
 
       <Loader
@@ -129,13 +126,13 @@
   };
 
   // delete album modal
-  const onAlbumDelete = (deletedAlbumTitle: string) => {
-    console.log(deletedAlbumTitle);
+  const onAlbumDelete = (deletedAlbumId: string) => {
+    console.log(deletedAlbumId);
 
     console.log(albums.value);
 
     const ind = albums.value.findIndex((album) => {
-      return album.title.toLowerCase() == deletedAlbumTitle.toLowerCase();
+      return album.id == deletedAlbumId;
     });
 
     // album was not found

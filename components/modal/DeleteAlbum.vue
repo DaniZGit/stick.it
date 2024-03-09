@@ -26,7 +26,11 @@
           class="rounded-md text-center"
         />
 
-        <AdminButton :disabled="input != 'delete'" class="flex px-8 rounded-md">
+        <AdminButton
+          type="submit"
+          :disabled="input != 'delete'"
+          class="flex px-8 rounded-md"
+        >
           Delete
         </AdminButton>
       </VeeForm>
@@ -38,7 +42,8 @@
   const { t } = useI18n();
   const isVisible = defineModel("visible", { type: Boolean });
 
-  const { title } = defineProps<{
+  const { id, title } = defineProps<{
+    id: string;
     title: string;
   }>();
 
@@ -54,7 +59,7 @@
     emit("deleting");
 
     try {
-      await $api<User>(`/v1/albums/${title}`, {
+      await $api<User>(`/v1/albums/${id}`, {
         method: "DELETE",
       });
 
@@ -62,7 +67,7 @@
       isVisible.value = false;
 
       // emit deleted event
-      emit("deleted", title);
+      emit("deleted", id);
     } catch (error) {
       // hide modal
       isVisible.value = false;

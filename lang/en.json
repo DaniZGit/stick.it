@@ -18,6 +18,7 @@
 
   "admin-album-created": "Album has been created",
   "admin-album-deleted": "Album has been deleted",
+  "admin-album-updated": "Album has been updated",
 
   "admin-album-create-title": "Title",
   "admin-album-create-date-from": "Available From",

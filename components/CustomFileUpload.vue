@@ -14,7 +14,7 @@
       >
         <div class="flex flex-col justify-center items-center gap-y-2">
           <div class="flex flex-col items-center">
-            <h1 class="text-xl">Thumbnail image</h1>
+            <h1 class="text-xl">{{ title }}</h1>
           </div>
           <div
             @click="!files.length ? chooseCallback() : clearCallback()"
@@ -28,20 +28,27 @@
               class="border-2"
             />
             <NuxtImg
+              v-else-if="url"
+              role="presentation"
+              :src="url"
+              width="250"
+              class="border-2"
+            />
+            <NuxtImg
               v-else
               role="presentation"
-              :src="'/images/upload-placeholder.jpg'"
+              src="/images/upload-placeholder.jpg"
               width="250"
               class="border-2"
             />
             <AdminProgressBar :value="progress" :showValue="false" />
           </div>
           <div v-if="files.length" class="flex flex-col items-center">
-            <span class="font-semibold">{{ files[0].name }}</span>
+            <span class="text-center font-semibold">{{ files[0].name }}</span>
             <div>{{ formatSize(files[0].size) }}</div>
             <AdminInlineMessage
               severity="error"
-              class="h-0 transition-[height] ease-out duration-100"
+              class="h-0 transition-[height] ease-out duration-100 text-center"
               :class="{
                 'h-[14px]': error,
               }"
@@ -88,8 +95,12 @@
   });
 
   defineProps({
+    title: String,
+    url: String,
     error: String,
   });
+
+  const emit = defineEmits(["select", "clear"]);
 
   const file = defineModel("file", { type: File });
   const progress = ref(0);
@@ -99,11 +110,14 @@
     file.value = _file;
 
     progress.value = 100;
+    emit("select", _file);
   };
 
   const onFileClear = () => {
     progress.value = 0;
     file.value = undefined;
+
+    emit("clear");
   };
 
   const formatSize = (bytes: number) => {

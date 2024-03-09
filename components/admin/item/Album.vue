@@ -20,10 +20,7 @@
         </AdminButton>
       </div>
     </div>
-    <div
-      class="w-full flex flex-col text-left"
-      :to="`/dashboard/albums/${title}`"
-    >
+    <div class="w-full flex flex-col text-left">
       <span class="text-lg font-bold">{{ title }}</span>
       <span class="text-sm"
         >{{ useDateFormat(date_from, "DD. MMM. YYYY").value }} -
@@ -34,6 +31,7 @@
     <!-- MODALS -->
     <ModalDeleteAlbum
       v-model:visible="showDeleteModal"
+      :id="id"
       :title="title"
       @deleted="onAlbumDeleted"
       @error="onAlbumDeleteError"
@@ -71,14 +69,14 @@
   const showDeleteModal = ref(false);
 
   const onAlbumDeleting = () => (deleting.value = true);
-  const onAlbumDeleted = (title: string) => {
-    emit("deleted", title);
+  const onAlbumDeleted = (id: string) => {
     deleting.value = false;
+    emit("deleted", id);
   };
 
-  const onAlbumDeleteError = (title: string) => {
-    emit("deleted-error", title);
+  const onAlbumDeleteError = (errorMessage: string) => {
     deleting.value = false;
+    emit("deleted-error", errorMessage);
   };
 </script>
 

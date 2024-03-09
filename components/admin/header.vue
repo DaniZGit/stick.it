@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-16 flex justify-between items-center px-8 border-b-2">
     <div>
-      <h1 class="text-xl font-bold">Albums</h1>
+      <h1 class="text-xl font-bold">{{ $route.path }}</h1>
     </div>
     <div>
       <Avatar
@@ -13,6 +13,10 @@
   </div>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+  defineProps({
+    title: String,
+  });
+</script>
 
 <style></style>

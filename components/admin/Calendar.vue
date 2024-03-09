@@ -2,7 +2,7 @@
   <div class="w-full relative transition-[height] duration-1000">
     <label v-if="label" :for="id">{{ label }}</label>
     <InputGroup>
-      <AdminInputGroupAddon v-if="icon">
+      <AdminInputGroupAddon v-if="icon" class="rounded-l-md">
         <Icon :name="icon" />
       </AdminInputGroupAddon>
       <Calendar
@@ -54,6 +54,6 @@
   const preset: CalendarPassThroughOptions = {
     root: "w-full",
     input:
-      "w-full bg-base-white focus:brightness-90 p-2 focus:outline-0 border-2 focus:border-base-black duration-300",
+      "w-full bg-base-white focus:brightness-90 p-2 focus:outline-0 border-2 focus:border-base-black rounded-r-md duration-300",
   };
 </script>
