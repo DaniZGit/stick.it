@@ -3,6 +3,7 @@
 
   "validation-min-length": "'{field}' must be at least {min} characters long",
   "validation-required": "'{field}' is required",
+  "validation-unique": "'{field}' already exists",
 
   "validation-email-required": "Email is required",
   "validation-email-invalid": "Provided email is not valid",

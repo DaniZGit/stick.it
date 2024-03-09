@@ -29,6 +29,20 @@ export const useParseFormErrors = (err: ApiValidationError) => {
 
   const mappedErrors: Array<FormValidationError> = [
     {
+      backend_field: "Title",
+      form_field: "title",
+      tags: [
+        {
+          type: Tag.REQUIRED,
+          message: t("validation-required", { field: "title" }),
+        },
+        {
+          type: Tag.UNIQUE,
+          message: t("validation-unique", { field: "Title" }),
+        },
+      ],
+    },
+    {
       backend_field: "Username",
       form_field: "username",
       tags: [

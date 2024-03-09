@@ -93,9 +93,15 @@
   const emit = defineEmits(["created", "creating", "error", "pending", ""]);
 
   // form stuff
+  const day = 1 * 24 * 60 * 60 * 1000; // * 1000 is because of thousands
   const { defineField, handleSubmit, errors, setErrors, resetForm } = useForm({
     validationSchema: AlbumCreateSchema,
+    initialValues: {
+      dateFrom: new Date(useTimestamp().value),
+      dateTo: new Date(useTimestamp({ offset: 7 * day }).value),
+    },
   });
+
   const [title] = defineField("title");
   const [dateFrom] = defineField("dateFrom");
   const [dateTo] = defineField("dateTo");

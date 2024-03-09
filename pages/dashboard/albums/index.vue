@@ -25,14 +25,13 @@
       </div>
     </div>
 
-    <div class="m-4 mt-0 p-4 h-full bg-base-secondary rounded-md">
-      <div v-if="pending">
-        <Loader
-          class="flex flex-col justify-center items-center gap-y-4 text-base-white"
-        >
-          <h1 class="uppercase text-3xl">Fetching albums</h1>
-          <Icon name="i-svg-spinners:blocks-scale" size="64" />
-        </Loader>
+    <div class="m-4 mt-0 p-4 h-full bg-base-secondary rounded-md relative">
+      <div
+        v-if="pending"
+        class="absolute top-0 right-0 bottom-0 left-0 flex flex-col justify-center items-center gap-y-4 bg-black bg-opacity-20 text-base-white"
+      >
+        <h1 class="uppercase text-3xl">Fetching albums</h1>
+        <Icon name="i-svg-spinners:blocks-scale" size="64" />
       </div>
       <div
         v-else-if="albums.length <= 0"

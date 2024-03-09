@@ -14,7 +14,7 @@
 
   const preset: InlineMessagePassThroughOptions = {
     root: "",
-    text: "text-sm text-red-500",
+    text: "text-md text-red-700",
     icon: "hidden",
   };
 </script>
