@@ -3,21 +3,16 @@
     <h1>home</h1>
     <div>
       {{ userStore.getUser() }}
-      {{ data }}
+      <div class="p-16 flex flex-col">
+        <NuxtLink to="/dashboard">DASHBOARD</NuxtLink>
+        <NuxtLink to="/auth/login">LOGIN</NuxtLink>
+      </div>
     </div>
-    <button @click="execute">click</button>
   </div>
 </template>
 
 <script lang="ts" setup>
   const userStore = useUserStore();
-  const { data, execute } = useFetch(
-    "https://jsonplaceholder.typicode.com/todos",
-    {
-      $fetch: useNuxtApp().$api,
-      immediate: false,
-    }
-  );
 </script>
 
 <style></style>

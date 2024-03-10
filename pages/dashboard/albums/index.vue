@@ -1,82 +1,87 @@
 <template>
-  <div class="flex flex-col gap-y-2 h-full">
+  <div class="flex flex-col h-full">
     <AdminHeader></AdminHeader>
 
-    <!-- Top Bar -->
-    <div class="flex justify-between p-4">
-      <div class="flex">
-        <InputGroup>
-          <AdminInputText placeholder="Search albums..." />
+    <div class="h-full overflow-y-auto">
+      <!-- Top Bar -->
+      <div class="flex justify-between p-4">
+        <div class="flex">
+          <InputGroup>
+            <AdminInputText placeholder="Search albums..." />
+            <AdminButton
+              class="border-2 border-l-0 border-base-inactive border-opacity-40 rounded-l-none p-2"
+            >
+              <Icon name="i-ic:round-search" size="16" />
+            </AdminButton>
+          </InputGroup>
+        </div>
+        <div>
           <AdminButton
-            class="border-2 border-l-0 border-base-inactive border-opacity-40 rounded-l-none p-2"
+            class="h-full px-8 text-md rounded-md"
+            color="blue"
+            @click="showCreateModal = true"
           >
-            <Icon name="i-ic:round-search" size="16" />
+            Create
           </AdminButton>
-        </InputGroup>
+        </div>
       </div>
-      <div>
-        <AdminButton
-          class="h-full px-8 text-md rounded-md"
-          color="blue"
-          @click="showCreateModal = true"
+
+      <div class="m-4 mt-0 p-4 h-full bg-base-secondary rounded-md relative">
+        <div
+          v-if="pending"
+          class="absolute top-0 right-0 bottom-0 left-0 flex flex-col justify-center items-center gap-y-4 bg-black bg-opacity-20 text-base-white"
         >
-          Create
-        </AdminButton>
-      </div>
-    </div>
-
-    <div class="m-4 mt-0 p-4 h-full bg-base-secondary rounded-md relative">
-      <div
-        v-if="pending"
-        class="absolute top-0 right-0 bottom-0 left-0 flex flex-col justify-center items-center gap-y-4 bg-black bg-opacity-20 text-base-white"
-      >
-        <h1 class="uppercase text-3xl">Fetching albums</h1>
-        <Icon name="i-svg-spinners:blocks-scale" size="64" />
-      </div>
-      <div
-        v-else-if="albums.length <= 0"
-        class="flex justify-center items-center h-full"
-      >
-        <h2 class="text-3xl text-base-black">
-          No albums yet, try
-          <a
-            class="text-base-blue underline hover:cursor-pointer hover:brightness-50"
-            @click.prevent="showCreateModal = true"
+          <h1 class="uppercase text-3xl">Fetching albums</h1>
+          <Icon name="i-svg-spinners:blocks-scale" size="64" />
+        </div>
+        <div
+          v-else-if="albums.length <= 0"
+          class="flex justify-center items-center h-full"
+        >
+          <h2 class="text-3xl text-base-black">
+            No albums yet, try
+            <a
+              class="text-base-blue underline hover:cursor-pointer hover:brightness-50"
+              @click.prevent="showCreateModal = true"
+            >
+              creating</a
+            >
+            one
+          </h2>
+        </div>
+        <div
+          v-else
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 py-12 px-8 rounded-md bg-base-secondary"
+        >
+          <NuxtLink
+            v-for="album in albums"
+            :to="`/dashboard/albums/${album.id}`"
           >
-            creating</a
-          >
-          one
-        </h2>
-      </div>
-      <div
-        v-else
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 py-12 px-8 rounded-md bg-base-secondary"
-      >
-        <NuxtLink v-for="album in albums" :to="`/dashboard/albums/${album.id}`">
-          <AdminItemAlbum
-            v-bind="album"
-            @deleted="onAlbumDelete"
-            @deleted-error="onAlbumDeleteError"
-          ></AdminItemAlbum>
-        </NuxtLink>
-      </div>
-      <!-- Create modal -->
-      <ModalCreateAlbum
-        v-model:visible="showCreateModal"
-        @created="onAlbumCreate"
-        @creating="onAlbumCreating"
-        @error="onAlbumCreateError"
-        @pending="(pending: boolean) => (creating = pending)"
-      />
+            <AdminItemAlbum
+              v-bind="album"
+              @deleted="onAlbumDelete"
+              @deleted-error="onAlbumDeleteError"
+            ></AdminItemAlbum>
+          </NuxtLink>
+        </div>
+        <!-- Create modal -->
+        <ModalCreateAlbum
+          v-model:visible="showCreateModal"
+          @created="onAlbumCreate"
+          @creating="onAlbumCreating"
+          @error="onAlbumCreateError"
+          @pending="(pending: boolean) => (creating = pending)"
+        />
 
-      <Loader
-        v-if="creating"
-        class="flex flex-col justify-center items-center gap-y-4 text-base-white z-[9999]"
-      >
-        <h1 class="uppercase text-3xl">Creating album...</h1>
-        <Icon name="i-svg-spinners:blocks-scale" size="64" />
-      </Loader>
-      <CustomToast ref="toast"></CustomToast>
+        <Loader
+          v-if="creating"
+          class="flex flex-col justify-center items-center gap-y-4 text-base-white z-[9999]"
+        >
+          <h1 class="uppercase text-3xl">Creating album...</h1>
+          <Icon name="i-svg-spinners:blocks-scale" size="64" />
+        </Loader>
+        <CustomToast ref="toast"></CustomToast>
+      </div>
     </div>
   </div>
 </template>

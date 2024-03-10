@@ -40,6 +40,8 @@ export const useUserStore = defineStore(
     return { user, getUser, getToken, setUser, logout, isLoggedIn };
   },
   {
-    persist: true,
+    persist: {
+      storage: persistedState.localStorage,
+    },
   }
 );
