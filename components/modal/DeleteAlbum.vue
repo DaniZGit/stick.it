@@ -47,7 +47,11 @@
     title: string;
   }>();
 
-  const emit = defineEmits(["deleted", "deleting", "error"]);
+  const emit = defineEmits<{
+    deleted: [id: string];
+    error: [message: string];
+    pending: [value: boolean];
+  }>();
 
   // form stuff
   const { defineField, handleSubmit } = useForm();
@@ -56,7 +60,7 @@
   // delete request
   const { $api } = useNuxtApp();
   const onSubmit = handleSubmit(async (values) => {
-    emit("deleting");
+    emit("pending", true);
 
     try {
       await $api<User>(`/v1/albums/${id}`, {
@@ -75,6 +79,8 @@
       // emit error event
       emit("error", t("unexpected-error"));
     }
+
+    emit("pending", false);
   });
 </script>
 

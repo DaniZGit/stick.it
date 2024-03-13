@@ -23,5 +23,7 @@
   "admin-album-create-title": "Title",
   "admin-album-create-date-from": "Available From",
   "admin-album-create-date-to": "Available To",
-  "admin-album-create-options": "Other options"
+  "admin-album-create-options": "Other options",
+
+  "admin-mismatched-response": "Mismatch in response data"
 }

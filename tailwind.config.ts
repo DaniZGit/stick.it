@@ -40,6 +40,10 @@ export default <Partial<Config>>{
         "surface-900": "rgb(var(--surface-900))",
         "surface-950": "rgb(var(--surface-950))",
       },
+      aspectRatio: {
+        thumbnail: "3 / 4",
+        package: "5 / 6",
+      },
     },
   },
 };

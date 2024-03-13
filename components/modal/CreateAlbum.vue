@@ -90,7 +90,11 @@
 
   const { t } = useI18n();
   const isVisible = defineModel("visible", { type: Boolean });
-  const emit = defineEmits(["created", "creating", "error", "pending", ""]);
+  const emit = defineEmits<{
+    created: [album: ApiAlbum];
+    error: [message: string];
+    pending: [value: boolean];
+  }>();
 
   // form stuff
   const day = 1 * 24 * 60 * 60 * 1000; // * 1000 is because of thousands
@@ -123,7 +127,7 @@
     emit("pending", true);
 
     try {
-      const album = await $api<Album>("/v1/albums", {
+      const response = await $api<{ album: ApiAlbum }>("/v1/albums", {
         method: "POST",
         body: body,
       });
@@ -131,8 +135,11 @@
       // hide modal
       isVisible.value = false;
 
-      // emit created
-      emit("created", album);
+      if (response.album) {
+        emit("created", response.album);
+      } else {
+        emit("error", t("admin-mismatched-response"));
+      }
     } catch (error) {
       const handledErrors = useHandleFormErrors(error as FetchError<ApiError>);
 

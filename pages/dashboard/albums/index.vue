@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-full">
+  <div class="h-full flex flex-col">
     <AdminHeader></AdminHeader>
 
     <div class="h-full overflow-y-auto">
@@ -26,7 +26,7 @@
         </div>
       </div>
 
-      <div class="m-4 mt-0 p-4 h-full bg-base-secondary rounded-md relative">
+      <div class="h-full m-4 mt-0 p-4 bg-base-secondary rounded-md relative">
         <div
           v-if="pending"
           class="absolute top-0 right-0 bottom-0 left-0 flex flex-col justify-center items-center gap-y-4 bg-black bg-opacity-20 text-base-white"
@@ -61,6 +61,7 @@
               v-bind="album"
               @deleted="onAlbumDelete"
               @deleted-error="onAlbumDeleteError"
+              @deleting="onAlbumDeleting"
             ></AdminItemAlbum>
           </NuxtLink>
         </div>
@@ -68,16 +69,20 @@
         <ModalCreateAlbum
           v-model:visible="showCreateModal"
           @created="onAlbumCreate"
-          @creating="onAlbumCreating"
           @error="onAlbumCreateError"
-          @pending="(pending: boolean) => (creating = pending)"
+          @pending="onAlbumCreating"
         />
 
         <Loader
-          v-if="creating"
+          v-if="creating || deleting"
           class="flex flex-col justify-center items-center gap-y-4 text-base-white z-[9999]"
         >
-          <h1 class="uppercase text-3xl">Creating album...</h1>
+          <h1 v-if="creating" class="uppercase text-3xl">
+            {{ $t("admin-album-creating") }}
+          </h1>
+          <h1 v-else class="uppercase text-3xl">
+            {{ $t("admin-album-deleting") }}
+          </h1>
           <Icon name="i-svg-spinners:blocks-scale" size="64" />
         </Loader>
         <CustomToast ref="toast"></CustomToast>
@@ -97,17 +102,25 @@
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
 
-  const albums = ref<Array<Album>>([]);
+  const albums = ref<Array<ApiAlbum>>([]);
 
   // fetch albums on load
   const pending = ref(true);
   onMounted(async () => {
     try {
-      albums.value = await $api<Array<Album>>("/v1/albums", {
+      const response = await $api<{
+        albums: Array<ApiAlbum>;
+      }>("/v1/albums", {
         params: {
           limit: 12,
         },
       });
+
+      if (response.albums) {
+        albums.value = response.albums;
+      } else {
+        toast.value?.show("error", t("admin-mismatched-response"));
+      }
       console.log(albums.value);
     } catch (error) {
       toast.value?.show("error", t("unexpected-error"));
@@ -120,7 +133,7 @@
   const showCreateModal = ref(false);
   const creating = ref(false);
   const onAlbumCreating = () => (creating.value = true);
-  const onAlbumCreate = (createdAlbum: Album) => {
+  const onAlbumCreate = (createdAlbum: ApiAlbum) => {
     albums.value.push(createdAlbum);
     toast.value?.show("success", t("admin-album-created"));
   };
@@ -131,11 +144,9 @@
   };
 
   // delete album modal
+  const deleting = ref(false);
+  const onAlbumDeleting = (status: boolean) => (deleting.value = status);
   const onAlbumDelete = (deletedAlbumId: string) => {
-    console.log(deletedAlbumId);
-
-    console.log(albums.value);
-
     const ind = albums.value.findIndex((album) => {
       return album.id == deletedAlbumId;
     });

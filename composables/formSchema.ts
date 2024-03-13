@@ -77,9 +77,23 @@ export const useFormSchema = () => {
     })
   );
 
+  const AlbumPageCreateSchema = toTypedSchema(
+    zod.object({
+      file: zod
+        .any()
+        .refine((file) => {
+          if (!file || file.size <= MAX_FILE_SIZE) return true;
+        }, t("validation-file-max-size"))
+        .refine((file) => {
+          if (!file || ACCEPTED_IMAGE_TYPES.includes(file?.type)) return true;
+        }, t("validation-file-accepted-types")),
+    })
+  );
+
   return {
     RegisterSchema,
     LoginSchema,
     AlbumCreateSchema,
+    AlbumPageCreateSchema,
   };
 };

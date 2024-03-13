@@ -4,7 +4,7 @@
   >
     <div class="w-full relative">
       <NuxtImg
-        :src="useUrl(file.url)"
+        :src="useUrl(file?.url)"
         class="w-full h-full"
         style="aspect-ratio: 6/7"
       />
@@ -35,32 +35,19 @@
       :title="title"
       @deleted="onAlbumDeleted"
       @error="onAlbumDeleteError"
-      @deleting="onAlbumDeleting"
+      @pending="onAlbumDeleting"
     ></ModalDeleteAlbum>
-
-    <!-- Delete modal loader -->
-    <Loader
-      v-if="deleting"
-      class="flex flex-col justify-center items-center gap-y-4 text-base-white z-[9999]"
-    >
-      <h1 class="uppercase text-3xl">
-        Deleting album <span class="font-bold">{{ title }}</span>
-      </h1>
-      <Icon name="i-svg-spinners:blocks-scale" size="64" />
-    </Loader>
   </div>
 </template>
 
 <script lang="ts" setup>
-  const deleting = ref(false);
-
   const { title } = defineProps<{
-    id: Album["id"];
-    title: Album["title"];
-    created_at: Album["created_at"];
-    date_from: Album["date_from"];
-    date_to: Album["date_to"];
-    file: Album["file"];
+    id: ApiAlbum["id"];
+    title: ApiAlbum["title"];
+    created_at: ApiAlbum["created_at"];
+    date_from: ApiAlbum["date_from"];
+    date_to: ApiAlbum["date_to"];
+    file: ApiAlbum["file"];
   }>();
 
   const emit = defineEmits(["deleted", "deleted-error", "deleting"]);
@@ -68,14 +55,12 @@
   // delete album modal
   const showDeleteModal = ref(false);
 
-  const onAlbumDeleting = () => (deleting.value = true);
+  const onAlbumDeleting = (status: boolean) => emit("deleting", status);
   const onAlbumDeleted = (id: string) => {
-    deleting.value = false;
     emit("deleted", id);
   };
 
   const onAlbumDeleteError = (errorMessage: string) => {
-    deleting.value = false;
     emit("deleted-error", errorMessage);
   };
 </script>
