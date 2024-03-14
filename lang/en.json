@@ -1,5 +1,6 @@
 {
   "unexpected-error": "Something went wrong, please try again later",
+  "admin-mismatched-response": "Mismatch in response data",
 
   "validation-min-length": "'{field}' must be at least {min} characters long",
   "validation-required": "'{field}' is required",
@@ -25,5 +26,8 @@
   "admin-album-create-date-to": "Available To",
   "admin-album-create-options": "Other options",
 
-  "admin-mismatched-response": "Mismatch in response data"
+  "admin-sticker-add-option": "New sticker",
+  "admin-sticker-remove-option": "Remove sticker",
+  "admin-sticker-add-gif-option": "New GIF sticker",
+  "admin-sticker-add-audio-option": "New Audio sticker"
 }
