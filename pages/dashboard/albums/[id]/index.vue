@@ -110,11 +110,15 @@
                   :key="page.id"
                   class="w-full sm:w-1/2 lg:w-1/4 2xl:w-1/6 flex-shrink-0 flex py-2"
                 >
-                  <AdminItemPage
-                    :sort_order="page.sort_order"
-                    :file="page.file"
-                  ></AdminItemPage>
-                  <!-- the add between line -->
+                  <NuxtLink
+                    :to="`/dashboard/albums/${album.id}/pages/${page.id}`"
+                  >
+                    <AdminItemPage
+                      :sort_order="page.sort_order"
+                      :file="page.file"
+                    ></AdminItemPage>
+                  </NuxtLink>
+                  <!-- the 'add between' line -->
                   <div
                     class="flex flex-col items-center opacity-0 hover:opacity-100 hover:cursor-pointer py-2"
                     @click="toggleCreatePageModal(page.sort_order + 1)"

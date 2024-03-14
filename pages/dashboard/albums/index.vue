@@ -132,7 +132,7 @@
   // album create modal
   const showCreateModal = ref(false);
   const creating = ref(false);
-  const onAlbumCreating = () => (creating.value = true);
+  const onAlbumCreating = (status: boolean) => (creating.value = status);
   const onAlbumCreate = (createdAlbum: ApiAlbum) => {
     albums.value.push(createdAlbum);
     toast.value?.show("success", t("admin-album-created"));
