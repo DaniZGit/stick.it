@@ -8,9 +8,3 @@ type ApiAlbum = {
   file: ApiFile | null;
   pages: Array<ApiPage>;
 };
-
-type ApiFile = {
-  id: string;
-  name: string;
-  url: string;
-};

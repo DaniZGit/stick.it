@@ -17,7 +17,7 @@
                 :name="option.icon"
                 size="42"
                 class="border-2 border-transparent rounded-md hover:border-black hover:cursor-pointer"
-                @click="onAddSticker"
+                @click="showCreateStickerModal = true"
               />
             </div>
           </div>
@@ -45,15 +45,28 @@
         </div>
       </div>
     </div>
+    <!-- Create modal -->
+    <ModalCreateSticker
+      :page-id="$route.params.id"
+      v-model:visible="showCreateStickerModal"
+      @created="onStickerCreated"
+      @error="onStickerCreateError"
+      @pending="onStickerCreating"
+    />
+    <CustomToast ref="toast"></CustomToast>
   </div>
 </template>
 
 <script lang="ts" setup>
+  import type CustomToast from "~/components/CustomToast.vue";
+
   definePageMeta({
     layout: "dashboard",
   });
 
   const { t } = useI18n();
+  const toast = ref<InstanceType<typeof CustomToast> | null>(null);
+
   const options = [
     {
       icon: "i-fluent:sticker-add-20-filled",
@@ -73,16 +86,31 @@
     },
   ];
 
-  const stickers = ref<Array<Number>>([]);
-  const onAddSticker = (e: PointerEvent) => {
-    console.log(e);
-    stickers.value.push(stickers.value.length + 1);
-  };
-
+  const stickers = ref<Array<ApiSticker>>([]);
   const onSelect = (targets: Array<any>) => {
     if (targets.length != 1) return;
 
     console.log(targets[0]);
+  };
+
+  // sticker create modal
+  const showCreateStickerModal = ref(false);
+  const creating = ref(false);
+  const onStickerCreating = (status: boolean) => {
+    creating.value = status;
+  };
+
+  const onStickerCreated = (createdPage: ApiSticker) => {
+    if (!stickers.value) return;
+
+    stickers.value.push(createdPage);
+
+    toast.value?.show("success", t("admin-sticker-created"));
+  };
+
+  const onStickerCreateError = (errorMessage: string) => {
+    // display error message
+    toast.value?.show("error", errorMessage);
   };
 </script>
 

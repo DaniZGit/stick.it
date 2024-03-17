@@ -161,15 +161,14 @@
       <Icon name="i-svg-spinners:blocks-scale" size="64" />
     </Loader>
     <CustomToast ref="toast"></CustomToast>
-    <ModalCreateAlbumPage
+    <ModalCreatePage
       :album-id="$route.params.id"
       :sort-order="pageOrder"
       v-model:visible="showCreatePageModal"
-      @created="onAlbumPageCreated"
-      @error="onAlbumPageCreateError"
-      @pending="onAlbumPageCreating"
-    >
-    </ModalCreateAlbumPage>
+      @created="onPageCreated"
+      @error="onPageCreateError"
+      @pending="onPageCreating"
+    />
   </div>
 </template>
 
@@ -269,7 +268,7 @@
     updating.value = false;
   });
 
-  // album create modal
+  // page create modal
   const showCreatePageModal = ref(false);
   const creating = ref(false);
   const pageOrder = ref(0);
@@ -288,10 +287,10 @@
     showCreatePageModal.value = true;
   };
 
-  const onAlbumPageCreating = (status: boolean) => {
+  const onPageCreating = (status: boolean) => {
     creating.value = status;
   };
-  const onAlbumPageCreated = (createdPage: ApiPage) => {
+  const onPageCreated = (createdPage: ApiPage) => {
     if (!album.value) return;
 
     album.value.pages?.push(createdPage);
@@ -301,10 +300,10 @@
       return a.sort_order - b.sort_order;
     });
 
-    toast.value?.show("success", t("admin-album-page-created"));
+    toast.value?.show("success", t("admin-page-created"));
   };
 
-  const onAlbumPageCreateError = (errorMessage: string) => {
+  const onPageCreateError = (errorMessage: string) => {
     // display error message
     toast.value?.show("error", errorMessage);
   };
