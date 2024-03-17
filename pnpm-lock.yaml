@@ -23,6 +23,9 @@ dependencies:
   vue3-moveable:
     specifier: ^0.28.0
     version: 0.28.0
+  vue3-selecto:
+    specifier: ^1.12.3
+    version: 1.12.3
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -7753,6 +7756,12 @@ packages:
     dependencies:
       framework-utils: 1.1.0
       moveable: 0.53.0
+    dev: false
+
+  /vue3-selecto@1.12.3:
+    resolution: {integrity: sha512-zIQLwuvjTNaivITLbBAnm6Sh8BFRG8QocNZLzKvqRIqnpRa2lvlIw9+l1wdI/84msh8cSNIdiWsgote62cgtHA==}
+    dependencies:
+      selecto: 1.26.3
     dev: false
 
   /vue@3.4.21:

@@ -4,51 +4,11 @@
 
     <div class="h-full grid grid-cols-12 bg-base-tertiary p-4 relative">
       <div class="h-full col-span-9 flex justify-center gap-x-2">
-        <div ref="container" class="relative aspect-thumbnail bg-base-white">
-          <div class="target w-[100px] aspect-thumbnail bg-base-tertiary"></div>
-          <div
-            class="titi w-[100px] aspect-thumbnail bg-base-tertiary mt-4"
-          ></div>
-          <Moveable
-            :target="['.target', '.titi']"
-            :individual-groupable="true"
-            :container="container"
-            :draggable="true"
-            :rotatable="true"
-            :throttle-rotate="90"
-            :snappable="true"
-            :snap-container="container"
-            :snap-threshold="25"
-            :snap-grid-height="40"
-            :snap-grid-width="40"
-            :snap-directions="{
-              top: true,
-              left: true,
-              bottom: true,
-              right: true,
-            }"
-            :bounds="{
-              left: 0,
-              top: 0,
-              right: 0,
-              bottom: 0,
-              position: 'css',
-            }"
-            :is-display-snap-digit="true"
-            :is-display-inner-snap-digit="false"
-            :elementGuidelines="['.target', '.titi', '.element3']"
-            :snap-gap="true"
-            :element-snap-directions="{
-              top: true,
-              left: true,
-              bottom: true,
-              right: true,
-              center: true,
-              middle: true,
-            }"
-            @drag="onDrag"
-            @rotate="onRotate"
-          />
+        <div class="relative aspect-thumbnail bg-base-white">
+          <AdminEditorPage
+            :items="stickers"
+            @select="onSelect"
+          ></AdminEditorPage>
         </div>
         <div class="h-full flex flex-col justify-between">
           <div class="flex flex-col gap-y-2">
@@ -57,6 +17,7 @@
                 :name="option.icon"
                 size="42"
                 class="border-2 border-transparent rounded-md hover:border-black hover:cursor-pointer"
+                @click="onAddSticker"
               />
             </div>
           </div>
@@ -88,16 +49,11 @@
 </template>
 
 <script lang="ts" setup>
-  import Moveable from "vue3-moveable";
-
   definePageMeta({
     layout: "dashboard",
   });
 
   const { t } = useI18n();
-  const container = ref<HTMLElement | null>(null);
-  const moveable = ref(null);
-
   const options = [
     {
       icon: "i-fluent:sticker-add-20-filled",
@@ -117,49 +73,17 @@
     },
   ];
 
-  const bounds = computed((): DOMRect | undefined => {
-    return container.value?.getBoundingClientRect();
-  });
-
-  const onDrag = ({
-    target,
-    transform,
-    left,
-    top,
-    right,
-    bottom,
-    beforeDelta,
-    beforeDist,
-    delta,
-    dist,
-    clientX,
-    clientY,
-  }) => {
-    //console.log("onDrag: ", e.target)
-    console.log("onDrag left, top", left, top);
-    target!.style.left = `${left}px`;
-    target!.style.top = `${top}px`;
-    target!.style.transform = transform;
-  };
-
-  const onRotate = ({ target, transform }) => {
-    console.log("rottattig", transform);
-    target!.style.transform = transform;
-  };
-
-  const onBound = (e) => {
+  const stickers = ref<Array<Number>>([]);
+  const onAddSticker = (e: PointerEvent) => {
     console.log(e);
+    stickers.value.push(stickers.value.length + 1);
   };
 
-  // onMounted(() => {
-  //   nextTick(() => {
-  //     console.log("onMounted nextTick", moveable.value);
-  //     // moveable.value.updateSelectors();
-  //     // moveable.value.forceUpdate();
-  //     // moveable.value.updateTarget();
-  //     // moveable.value.updateRect();
-  //   });
-  // });
+  const onSelect = (targets: Array<any>) => {
+    if (targets.length != 1) return;
+
+    console.log(targets[0]);
+  };
 </script>
 
 <style></style>
