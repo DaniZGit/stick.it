@@ -96,7 +96,7 @@
   };
 
   const onRotate = (e: OnRotate) => {
-    target.style.transform = e.transform;
+    e.target.style.transform = e.transform;
   };
 
   const onClickGroup = (e: OnClickGroup) => {
