@@ -2,7 +2,7 @@
   <div>
     <h1>home</h1>
     <div>
-      {{ userStore.getUser() }}
+      {{ userStore.user }}
       <div class="p-16 flex flex-col">
         <NuxtLink to="/dashboard">DASHBOARD</NuxtLink>
         <NuxtLink to="/auth/login">LOGIN</NuxtLink>

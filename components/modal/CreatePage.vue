@@ -54,7 +54,6 @@
   const [file] = defineField("file");
 
   // create request
-  const { $api } = useNuxtApp();
   const onSubmit = handleSubmit(async (values) => {
     const body = new FormData();
     body.append("sort_order", props.sortOrder.toString());
@@ -67,7 +66,7 @@
     emit("pending", true);
 
     try {
-      const response = await $api<{ page: ApiPage }>(`/v1/pages`, {
+      const response = await useApi<{ page: ApiPage }>(`/v1/pages`, {
         method: "POST",
         body: body,
       });

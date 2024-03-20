@@ -75,7 +75,6 @@
   const [type] = defineField("type");
 
   // create request
-  const { $api } = useNuxtApp();
   const onSubmit = handleSubmit(async (values) => {
     const body = new FormData();
     body.append("page_id", props.pageId);
@@ -87,7 +86,7 @@
     emit("pending", true);
 
     try {
-      const response = await $api<{ sticker: ApiSticker }>(`/v1/stickers`, {
+      const response = await useApi<{ sticker: ApiSticker }>(`/v1/stickers`, {
         method: "POST",
         body: body,
       });

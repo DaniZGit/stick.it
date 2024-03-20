@@ -181,7 +181,6 @@
     layout: "dashboard",
   });
 
-  const { $api } = useNuxtApp();
   const { t } = useI18n();
   const route = useRoute();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
@@ -191,7 +190,7 @@
   const pending = ref(true);
   onMounted(async () => {
     try {
-      const response = await $api<{ album: ApiAlbum }>(
+      const response = await useApi<{ album: ApiAlbum }>(
         `/v1/albums/${route.params.id}`
       );
       if (!response.album) {
@@ -242,7 +241,7 @@
 
     updating.value = true;
     try {
-      const response = await $api<{ album: ApiAlbum }>(
+      const response = await useApi<{ album: ApiAlbum }>(
         `/v1/albums/${route.params.id}`,
         {
           method: "PUT",

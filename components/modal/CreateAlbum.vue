@@ -113,7 +113,6 @@
   const [file] = defineField("file");
 
   // create request
-  const { $api } = useNuxtApp();
   const onSubmit = handleSubmit(async (values) => {
     const body = new FormData();
     body.append("title", values.title);
@@ -127,7 +126,7 @@
     emit("pending", true);
 
     try {
-      const response = await $api<{ album: ApiAlbum }>("/v1/albums", {
+      const response = await useApi<{ album: ApiAlbum }>("/v1/albums", {
         method: "POST",
         body: body,
       });

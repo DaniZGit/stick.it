@@ -98,7 +98,6 @@
     layout: "dashboard",
   });
 
-  const { $api } = useNuxtApp();
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
 
@@ -108,7 +107,7 @@
   const pending = ref(true);
   onMounted(async () => {
     try {
-      const response = await $api<{
+      const response = await useApi<{
         albums: Array<ApiAlbum>;
       }>("/v1/albums", {
         params: {

@@ -116,10 +116,9 @@
   const [password] = defineField("password");
 
   // register request
-  const { $api } = useNuxtApp();
   const onSubmit = handleSubmit(async (values) => {
     try {
-      const data = await $api<User>("/v1/register", {
+      const data = await useApi<User>("/v1/register", {
         method: "POST",
         body: values,
       });

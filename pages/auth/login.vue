@@ -82,7 +82,6 @@
   import { FetchError } from "ofetch";
   import type CustomToast from "~/components/CustomToast.vue";
 
-  const { $api } = useNuxtApp();
   const { t } = useI18n();
   const route = useRoute();
   const userStore = useUserStore();
@@ -102,7 +101,7 @@
   // login request
   const onSubmit = handleSubmit(async (values) => {
     try {
-      const data = await $api<User>("/v1/login", {
+      const data = await useApi<User>("/v1/login", {
         method: "POST",
         body: values,
       });

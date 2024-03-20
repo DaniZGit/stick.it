@@ -58,12 +58,11 @@
   const [input] = defineField("input");
 
   // delete request
-  const { $api } = useNuxtApp();
   const onSubmit = handleSubmit(async (values) => {
     emit("pending", true);
 
     try {
-      await $api<User>(`/v1/albums/${id}`, {
+      await useApi<User>(`/v1/albums/${id}`, {
         method: "DELETE",
       });
 
