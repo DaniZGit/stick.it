@@ -75,6 +75,13 @@
       label: "Albums",
       icon: "i-ic:baseline-menu-book",
       to: "/dashboard/albums",
+      items: [
+        {
+          label: "Rarities",
+          icon: "i-simple-icons:civicrm",
+          to: "/dashboard/rarities",
+        },
+      ],
     },
     {
       label: "Shop",
@@ -97,7 +104,14 @@
     {
       label: "Users",
       icon: "i-ic:baseline-people-outline",
-      to: "/dashboard/users",
+      to: "/dashboard/roles",
+      items: [
+        {
+          label: "Roles",
+          icon: "i-oui:app-users-roles",
+          to: "/dashboard/roles",
+        },
+      ],
     },
   ]);
 

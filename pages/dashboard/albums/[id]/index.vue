@@ -230,6 +230,8 @@
 
   const updating = ref(false);
   const onSubmit = handleSubmit(async (values) => {
+    if (!album.value) return;
+
     console.log(values);
     const body = new FormData();
     body.append("title", values.title);
@@ -253,7 +255,10 @@
         return;
       }
 
-      album.value = response.album;
+      // omit pages property, because PUT endpoint does not return all album data
+      const { pages, ...rest } = response.album;
+      album.value = { ...rest, pages: album.value.pages };
+
       toast.value?.show("success", t("admin-album-updated"));
     } catch (error) {
       const handledErrors = useHandleFormErrors(error as FetchError<ApiError>);

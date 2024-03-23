@@ -29,7 +29,7 @@
 
   const preset: DialogPassThroughOptions = {
     root: ({ props }) => ({
-      class: ["w-2/5 bg-base-white rounded-md max-h-[90dvh]"],
+      class: ["z-[9999] w-2/5 bg-base-white rounded-md max-h-[90dvh]"],
     }),
     content: "bg-base-white",
     footer: "bg-base-white",

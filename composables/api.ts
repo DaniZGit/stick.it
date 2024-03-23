@@ -5,7 +5,7 @@ export const useApi = <
   TError extends NitroFetchRequest = NitroFetchRequest
 >(
   ...options: Parameters<typeof $fetch<TData, TError>>
-) => {
+): ReturnType<typeof $fetch<TData, TError>> => {
   const route = useRoute();
   const userStore = useUserStore();
 

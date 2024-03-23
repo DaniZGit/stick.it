@@ -47,7 +47,7 @@
     </div>
     <!-- Create modal -->
     <ModalCreateSticker
-      :page-id="$route.params.id"
+      :page-id="$route.params.pageId"
       v-model:visible="showCreateStickerModal"
       @created="onStickerCreated"
       @error="onStickerCreateError"
@@ -64,6 +64,7 @@
     layout: "dashboard",
   });
 
+  const route = useRoute();
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
 
@@ -87,6 +88,24 @@
   ];
 
   const stickers = ref<Array<ApiSticker>>([]);
+  onMounted(async () => {
+    try {
+      const response = await useApi<{
+        metadata: ApiMetadata;
+        stickers: Array<ApiSticker>;
+      }>(`v1/pages/${route.params.pageId}/stickers`);
+
+      if (!response.stickers) {
+        toast.value?.show("error", t("unexpected-error"));
+        return;
+      }
+
+      stickers.value = response.stickers;
+    } catch (error) {
+      toast.value?.show("error", t("unexpected-error"));
+    }
+  });
+
   const onSelect = (targets: Array<any>) => {
     if (targets.length != 1) return;
 
@@ -100,10 +119,10 @@
     creating.value = status;
   };
 
-  const onStickerCreated = (createdPage: ApiSticker) => {
+  const onStickerCreated = (createdSticker: ApiSticker) => {
     if (!stickers.value) return;
 
-    stickers.value.push(createdPage);
+    stickers.value.push(createdSticker);
 
     toast.value?.show("success", t("admin-sticker-created"));
   };

@@ -31,5 +31,14 @@
   "admin-sticker-add-option": "New sticker",
   "admin-sticker-remove-option": "Remove sticker",
   "admin-sticker-add-gif-option": "New GIF sticker",
-  "admin-sticker-add-audio-option": "New Audio sticker"
+  "admin-sticker-add-audio-option": "New Audio sticker",
+  "admin-sticker-create-title": "Title",
+  "admin-sticker-create-rarity": "Rarity",
+  "admin-sticker-create-type": "Type",
+  "admin-sticker-type-image": "Image",
+  "admin-sticker-type-gif": "GIF",
+  "admin-sticker-type-audio": "Audio",
+
+  "admin-role-column-id": "ID",
+  "admin-role-column-title": "Title"
 }

@@ -108,6 +108,19 @@ export const useFormSchema = () => {
       type: zod.string({
         required_error: t("validation-required", { field: "type" }),
       }),
+      rarity: zod.string({
+        required_error: t("validation-required", { field: "rarity" }),
+      }),
+    })
+  );
+
+  const RarityCreateSchema = toTypedSchema(
+    zod.object({
+      title: zod
+        .string({
+          required_error: t("validation-required", { field: "title" }),
+        })
+        .min(3, t("validation-min-length", { field: "Title", min: 3 })),
     })
   );
 
@@ -117,5 +130,6 @@ export const useFormSchema = () => {
     AlbumCreateSchema,
     PageCreateSchema,
     StickerCreateSchema,
+    RarityCreateSchema,
   };
 };

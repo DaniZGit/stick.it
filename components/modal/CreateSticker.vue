@@ -4,7 +4,7 @@
     :header="`Create sticker`"
     :modal="true"
     :draggable="false"
-    @hide="resetForm"
+    @hide="setDefaults"
   >
     <div class="flex flex-col gap-4">
       <VeeForm
@@ -22,18 +22,37 @@
             <AdminInputText
               id="title"
               name="title"
-              :label="$t('admin-album-create-title')"
-              placeholder="Fifa 1991"
+              :label="$t('admin-sticker-create-title')"
+              placeholder="Lion"
               v-model="title"
-              icon="ic:outline-email"
+              icon="i-mdi:card-text-outline"
               :error="errors.title"
             />
 
-            <SelectButton
-              v-model="type"
-              :options="['image', 'gif', 'audio']"
-              aria-labelledby="basic"
+            <AdminSelectButton
+              v-model="rarity"
+              :options="rarities"
+              option-label="title"
+              option-value="id"
+              :id="rarity"
+              :name="rarity"
+              :label="$t('admin-sticker-create-rarity')"
               class="text-left"
+              icon="i-mdi:radio-button-checked"
+              :error="errors.rarity"
+            />
+
+            <AdminSelectButton
+              v-model="type"
+              :options="types"
+              option-label="title"
+              option-value="value"
+              :id="type"
+              :name="type"
+              :label="$t('admin-sticker-create-type')"
+              class="text-left"
+              icon="i-mdi:radio-button-checked"
+              :error="errors.type"
             />
           </div>
         </div>
@@ -62,22 +81,73 @@
     pending: [value: boolean];
   }>();
 
+  const rarities = ref<Array<ApiRarity>>([]);
+  const types = <Array<{ title: string; value: ApiStickerType }>>[
+    {
+      title: t("admin-sticker-type-image"),
+      value: "image",
+    },
+    {
+      title: t("admin-sticker-type-gif"),
+      value: "gif",
+    },
+    {
+      title: t("admin-sticker-type-audio"),
+      value: "audio",
+    },
+  ];
+
+  // load rarities
+  onMounted(async () => {
+    try {
+      const response = await useApi<{
+        metadata: ApiMetadata;
+        rarities: Array<ApiRarity>;
+      }>(`v1/rarities`);
+
+      if (!response.rarities) {
+        emit("error", t("unexpected-error"));
+        return;
+      }
+
+      rarities.value = response.rarities;
+
+      // populate form with default values
+      setDefaults();
+    } catch (error) {
+      emit("error", t("unexpected-error"));
+    }
+  });
+
   // form stuff
-  const { defineField, handleSubmit, errors, setErrors, resetForm } = useForm({
+  const {
+    defineField,
+    handleSubmit,
+    errors,
+    setErrors,
+    resetForm,
+    setFieldValue,
+  } = useForm({
     validationSchema: StickerCreateSchema,
     initialValues: {
-      type: "image",
+      type: types[0].value,
     },
   });
 
   const [file] = defineField("file");
   const [title] = defineField("title");
   const [type] = defineField("type");
+  const [rarity] = defineField("rarity");
 
   // create request
   const onSubmit = handleSubmit(async (values) => {
     const body = new FormData();
     body.append("page_id", props.pageId);
+    body.append("title", values.title);
+    body.append("type", values.type);
+    body.append("top", "0.0");
+    body.append("left", "0.0");
+    body.append("rarity_id", values.rarity);
     body.append("file", values.file);
 
     console.log(values);
@@ -113,6 +183,14 @@
 
     emit("pending", false);
   });
+
+  const setDefaults = () => {
+    resetForm();
+
+    if (rarities.value.length) {
+      setFieldValue("rarity", rarities.value[0].id);
+    }
+  };
 </script>
 
 <style></style>

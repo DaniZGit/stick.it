@@ -4,5 +4,9 @@ type ApiSticker = {
   created_at: string;
   left: Number;
   top: Number;
-  type: String;
+  type: ApiStickerType;
+  file: ApiFile | null;
+  rarity_id: string;
 };
+
+type ApiStickerType = "image" | "gif" | "audio";
