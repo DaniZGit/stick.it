@@ -225,4 +225,56 @@
       top,
     };
   };
+
+  onKeyStroke(["w", "W", "ArrowUp"], () => {
+    if (!moveableRef.value) return;
+
+    moveableRef.value.request(
+      "draggable",
+      {
+        deltaX: 0,
+        deltaY: -1,
+      },
+      true
+    );
+  });
+
+  onKeyStroke(["s", "S", "ArrowDown"], () => {
+    if (!moveableRef.value) return;
+
+    moveableRef.value.request(
+      "draggable",
+      {
+        deltaX: 0,
+        deltaY: 1,
+      },
+      true
+    );
+  });
+
+  onKeyStroke(["a", "A", "ArrowLeft"], () => {
+    if (!moveableRef.value) return;
+
+    moveableRef.value.request(
+      "draggable",
+      {
+        deltaX: -1,
+        deltaY: 0,
+      },
+      true
+    );
+  });
+
+  onKeyStroke(["d", "D", "ArrowRight"], () => {
+    if (!moveableRef.value) return;
+
+    moveableRef.value.request(
+      "draggable",
+      {
+        deltaX: 1,
+        deltaY: 0,
+      },
+      true
+    );
+  });
 </script>

@@ -9,6 +9,8 @@
     <div class="flex flex-col gap-4 px-16">
       <AdminFormSticker
         :url="undefined"
+        buttonLabel="Create"
+        buttonClass="!w-1/2"
         @submit="onSubmit"
         @error="emit('error', t('unexpected-error'))"
       ></AdminFormSticker>

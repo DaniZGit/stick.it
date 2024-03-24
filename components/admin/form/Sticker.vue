@@ -1,5 +1,5 @@
 <template>
-  <VeeForm class="flex flex-col gap-16 py-4" method="post" @submit="onSubmit">
+  <VeeForm class="flex flex-col gap-8 py-4" method="post" @submit="onSubmit">
     <div class="flex flex-col gap-y-2 transition-all duration-200">
       <CustomFileUpload
         v-model:file="file"
@@ -46,8 +46,12 @@
       </div>
     </div>
 
-    <AdminButton type="submit" class="self-center rounded-md w-1/2">
-      Create
+    <AdminButton
+      type="submit"
+      class="self-center rounded-md w-full py-1 px-2"
+      :class="buttonClass"
+    >
+      {{ buttonLabel }}
     </AdminButton>
   </VeeForm>
 </template>
@@ -78,6 +82,8 @@
 
   const props = defineProps<{
     url: string | undefined;
+    buttonLabel: string;
+    buttonClass: string;
   }>();
 
   // load rarities

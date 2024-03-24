@@ -55,6 +55,7 @@
             <AdminFormSticker
               ref="updateStickerForm"
               :url="selectedSticker?.file?.url"
+              buttonLabel="Update"
               @submit="onStickerUpdate"
               @error="toast?.show('error', t('unexpected-error'))"
             ></AdminFormSticker>
