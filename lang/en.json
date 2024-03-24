@@ -38,6 +38,8 @@
   "admin-sticker-type-image": "Image",
   "admin-sticker-type-gif": "GIF",
   "admin-sticker-type-audio": "Audio",
+  "admin-sticker-created": "Sticker has been created",
+  "admin-sticker-updated": "Sticker has been updated",
 
   "admin-role-column-id": "ID",
   "admin-role-column-title": "Title"

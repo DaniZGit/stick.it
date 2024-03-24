@@ -2,8 +2,8 @@ type ApiSticker = {
   id: string;
   title: string;
   created_at: string;
-  left: Number;
-  top: Number;
+  left: number;
+  top: number;
   type: ApiStickerType;
   file: ApiFile | null;
   rarity_id: string;
