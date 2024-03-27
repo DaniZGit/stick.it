@@ -116,15 +116,15 @@
     try {
       const response = await useApi<{
         metadata: ApiMetadata;
-        stickers: Array<ApiSticker>;
-      }>(`v1/pages/${route.params.pageId}/stickers`);
+        page: ApiPage;
+      }>(`v1/pages/${route.params.pageId}`);
 
-      if (!response.stickers) {
+      if (!response.page) {
         toast.value?.show("error", t("unexpected-error"));
         return;
       }
 
-      stickers.value = response.stickers;
+      stickers.value = response.page.stickers;
       console.log("stickers", stickers.value);
     } catch (error) {
       toast.value?.show("error", t("unexpected-error"));
