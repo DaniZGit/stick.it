@@ -7,24 +7,22 @@
     @hide="form?.resetValues"
   >
     <div class="flex flex-col gap-4 px-16">
-      <AdminFormSticker
+      <AdminFormCreateSticker
         :url="undefined"
-        buttonLabel="Create"
-        buttonClass="!w-1/2"
         @submit="onSubmit"
         @error="emit('error', t('unexpected-error'))"
-      ></AdminFormSticker>
+      ></AdminFormCreateSticker>
     </div>
   </AdminDialog>
 </template>
 
 <script lang="ts" setup>
-  import type { AdminFormSticker } from "#build/components";
+  import type { AdminFormCreateSticker } from "#build/components";
   import type { FetchError } from "ofetch";
 
   const { t } = useI18n();
   const isVisible = defineModel("visible", { type: Boolean });
-  const form = ref<InstanceType<typeof AdminFormSticker> | null>(null);
+  const form = ref<InstanceType<typeof AdminFormCreateSticker> | null>(null);
 
   const props = defineProps<{
     pageId: string;
@@ -37,13 +35,18 @@
   }>();
 
   // create request
-  const onSubmit = async (values: StickerForm) => {
+  const onSubmit = async (values: CreateStickerForm) => {
     const body = new FormData();
     body.append("page_id", props.pageId);
     body.append("title", values.title);
     body.append("type", values.type);
     body.append("top", "0.0");
     body.append("left", "0.0");
+    body.append("width", JSON.stringify(12));
+    body.append("height", JSON.stringify(16));
+    body.append("numerator", JSON.stringify(3));
+    body.append("denominator", JSON.stringify(4));
+    body.append("rotation", "0.0");
     body.append("rarity_id", values.rarity);
     body.append("file", values.file);
 

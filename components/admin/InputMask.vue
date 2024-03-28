@@ -5,16 +5,15 @@
       <AdminInputGroupAddon v-if="icon" class="rounded-l-md">
         <Icon :name="icon" />
       </AdminInputGroupAddon>
-      <InputNumber
-        v-model="value"
+      <InputMask
+        v-model="model"
         :id="id"
         :name="name"
+        :mask="mask"
+        :slot-char="slotChar"
         :placeholder="placeholder"
         :pt="preset"
         :class="attrs.class"
-        :useGrouping="false"
-        :min="min"
-        :max="max"
         autocomplete="off"
       />
     </InputGroup>
@@ -31,37 +30,30 @@
 </template>
 
 <script lang="ts" setup>
-  import type { InputNumberPassThroughOptions } from "primevue/inputnumber";
+  import type { InputMaskPassThroughOptions } from "primevue/inputmask";
 
   const attrs = useAttrs();
   defineOptions({
     inheritAttrs: false,
   });
 
-  const value = defineModel();
-  const { icon } = defineProps({
+  const model = defineModel();
+  defineProps({
     id: String,
     name: String,
     placeholder: String,
+    mask: String,
+    slotChar: String,
     label: String,
-    min: Number,
-    max: Number,
     icon: String,
     error: String,
   });
 
-  const preset: InputNumberPassThroughOptions = {
-    root: "w-full",
-    input: {
-      root: ({ props }) => ({
-        class: [
-          "w-full bg-base-white focus:brightness-90 p-2 focus:outline-0 border-2 focus:border-base-black rounded-r-md duration-300",
-          {
-            "rounded-l-md": !icon || !icon.length,
-          },
-        ],
-      }),
-    },
+  const preset: InputMaskPassThroughOptions = {
+    root: ({}) => ({
+      class:
+        "w-full bg-base-white focus:brightness-90 p-2 focus:outline-0 border-2 focus:border-base-black rounded-r-md duration-300",
+    }),
   };
 </script>
 

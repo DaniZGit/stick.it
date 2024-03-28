@@ -1,8 +1,8 @@
 <template>
   <div
     ref="container"
-    class="w-full h-auto aspect-thumbnail relative bg-base-white+ bg-cover"
-    :style="`background-image: url(${useUrl(undefined)});`"
+    class="h-full w-auto aspect-thumbnail relative bg-base-white bg-cover"
+    :style="`background-image: url(${useUrl(pageFileUrl)});`"
   >
     <Moveable
       ref="moveableRef"
@@ -41,12 +41,17 @@
       :snap-rotation-threshold="10"
       :snap-rotation-degrees="[0, 90, 180, 270]"
       :is-display-grid-guidelines="true"
+      :resizable="true"
+      :keep-ratio="true"
       @drag="onDrag"
       @rotate="onRotate"
+      @rotate-end="onRotateEnd"
       @clickGroup="onClickGroup"
       @dragGroup="onDragGroup"
       @renderGroup="onRenderGroup"
       @dragEnd="onDragEnd"
+      @resize="onResize"
+      @resize-end="onResizeEnd"
     />
 
     <VueSelecto
@@ -66,13 +71,15 @@
         v-for="(item, i) in items"
         :key="i"
         :item-id="item.id"
-        class="target w-[15%] aspect-thumbnail bg-base-tertiary hover:cursor-pointer"
-        :class="`target-${i}`"
+        class="absolute target bg-transparent hover:cursor-pointer"
+        :class="[
+          `target-${i} w-[${item.width}] !aspect-[${item.numerator}/${item.denominator}]`,
+        ]"
         :id="`target-${i}`"
       >
         <NuxtImg
           :src="useUrl(item.file?.url)"
-          class="w-full aspect-thumbnail"
+          class="w-full h-auto fill-white"
         ></NuxtImg>
       </div>
     </div>
@@ -87,7 +94,10 @@
     type OnDragEnd,
     type OnDragGroup,
     type OnRenderGroup,
+    type OnResize,
+    type OnResizeEnd,
     type OnRotate,
+    type OnRotateEnd,
   } from "vue3-moveable";
   import VueSelecto from "vue3-selecto";
 
@@ -103,9 +113,15 @@
     default: [],
   });
 
+  defineProps<{
+    pageFileUrl: string | undefined;
+  }>();
+
   const emit = defineEmits<{
-    select: [items: any];
-    dragEnd: [e: any];
+    select: [event: any, items: any];
+    dragEnd: [e: OnDragEnd];
+    rotateEnd: [e: OnRotateEnd];
+    resizeEnd: [e: OnResizeEnd];
   }>();
 
   const onDrag = (e: OnDrag) => {
@@ -114,6 +130,12 @@
 
   const onRotate = (e: OnRotate) => {
     e.target.style.transform = e.transform;
+  };
+
+  const onResize = (e: OnResize) => {
+    e.target.style.width = `${e.width}px`;
+    e.target.style.height = `${e.height}px`;
+    e.target.style.transform = e.drag.transform;
   };
 
   const onClickGroup = (e: OnClickGroup) => {
@@ -157,11 +179,30 @@
     }
     targets.value = e.selected;
 
-    emit("select", e.selected);
+    console.log(e);
+    emit("select", e, e.selected);
   };
 
   const onDragEnd = (e: OnDragEnd) => {
     emit("dragEnd", e);
+  };
+
+  const onRotateEnd = (e: OnRotateEnd) => {
+    emit("rotateEnd", e);
+  };
+
+  const onResizeEnd = (e: OnResizeEnd) => {
+    emit("resizeEnd", e);
+
+    // force drag event, so that we update top and left position
+    moveableRef.value?.request(
+      "draggable",
+      {
+        deltaX: 0,
+        deltaY: 0,
+      },
+      true
+    );
   };
 
   // guidelines
@@ -175,32 +216,84 @@
     return classes;
   });
 
-  // whenever container's height changes, update sticker positions
+  // whenever container's size changes, update sticker positions
   // this will set sticker's initial position on first load as well
-  watch(containerHeight, async (newHeight, oldHeight) => {
-    console.log("initializing values");
+  watch(
+    [containerWidth, containerHeight],
+    async ([newWidth, oldWidth], [newHeight, oldHeight]) => {
+      console.log("initializing values");
+      reRenderItems();
+    }
+  );
+
+  const reRenderItems = () => {
     items.value.forEach((item, i) => {
       const leftPercentage = item.left;
       const topPercentage = item.top;
 
       // convert from percentages to pixels - moveable works with pixels
       const pos = calculateInitialPosition(leftPercentage, topPercentage);
+      console.log(item);
 
       const el = document.getElementById(`target-${i}`);
+
       if (el) {
-        el.setAttribute(
-          "style",
-          `
-              transform: translate(
-                ${pos.left.toString()}px,
-                ${pos.top.toString()}px
-              );
-              position: absolute;
-            `
+        if (item.title == "Scooters") {
+          console.log("scooters", el.getBoundingClientRect());
+        }
+        // set current el as moveable target
+        moveableRef.value?.setState({
+          target: [el],
+        });
+        // force re-render
+        moveableRef.value?.forceUpdate();
+
+        // set size
+        if (container.value) {
+          const widthInPixels =
+            (item.width * container.value.getBoundingClientRect().width) / 100;
+          const heightInPixels =
+            (item.height * container.value.getBoundingClientRect().height) /
+            100;
+
+          moveableRef.value?.request(
+            "resizable",
+            {
+              offsetWidth: widthInPixels,
+              offsetHeight: heightInPixels,
+            },
+            true
+          );
+        }
+
+        // set rotation
+        // we must set this before we set the position
+        moveableRef.value?.request(
+          "rotatable",
+          {
+            rotate: item.rotation,
+          },
+          true
         );
+
+        // set position
+        moveableRef.value?.request(
+          "draggable",
+          {
+            x: pos.left,
+            y: pos.top,
+          },
+          true
+        );
+
+        // unselect target
+        moveableRef.value?.setState({
+          target: [],
+        });
       }
+      console.log("item:", item.top, item.left, item.rotation);
     });
-  });
+  };
 
   const calculateInitialPosition = (
     leftPercentage: number,

@@ -1,10 +1,15 @@
 type ApiSticker = {
+  created_at: string;
   id: string;
   title: string;
-  created_at: string;
+  type: ApiStickerType;
   left: number;
   top: number;
-  type: ApiStickerType;
+  width: number;
+  height: number;
+  numerator: number;
+  denominator: number;
+  rotation: number;
   file: ApiFile | null;
   rarity_id: string;
 };

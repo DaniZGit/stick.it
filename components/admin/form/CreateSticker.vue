@@ -46,13 +46,14 @@
       </div>
     </div>
 
-    <AdminButton
-      type="submit"
-      class="self-center rounded-md w-full py-1 px-2"
-      :class="buttonClass"
-    >
-      {{ buttonLabel }}
-    </AdminButton>
+    <slot name="actions">
+      <AdminButton
+        type="submit"
+        class="self-center rounded-md w-full py-1 px-2"
+      >
+        Create
+      </AdminButton>
+    </slot>
   </VeeForm>
 </template>
 
@@ -76,14 +77,12 @@
   ];
 
   const emit = defineEmits<{
-    submit: [values: StickerForm];
+    submit: [values: CreateStickerForm];
     error: [message: String];
   }>();
 
   const props = defineProps<{
     url: string | undefined;
-    buttonLabel: string;
-    buttonClass: string;
   }>();
 
   // load rarities
@@ -132,7 +131,7 @@
     emit("submit", values);
   });
 
-  const resetValues = (values: StickerForm | undefined = undefined) => {
+  const resetValues = (values: CreateStickerForm | undefined = undefined) => {
     resetForm();
 
     if (values) {

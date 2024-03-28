@@ -22,7 +22,7 @@
 
   const { color } = withDefaults(
     defineProps<{
-      color?: "base" | "blue";
+      color?: "base" | "blue" | "red";
       type?: string;
     }>(),
     {
@@ -40,6 +40,8 @@
             color == "base",
           "bg-base-blue text-base-white border-base-blue hover:bg-base-blue-hover":
             color == "blue",
+          "bg-red-500 text-base-white border-red-500 hover:bg-red-700":
+            color == "red",
         },
         {
           "brightness-90": attrs.disabled,
