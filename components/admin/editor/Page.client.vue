@@ -42,7 +42,7 @@
       :snap-rotation-degrees="[0, 90, 180, 270]"
       :is-display-grid-guidelines="true"
       :resizable="true"
-      :keep-ratio="true"
+      :keep-ratio="false"
       @drag="onDrag"
       @rotate="onRotate"
       @rotate-end="onRotateEnd"
@@ -68,18 +68,18 @@
     ></VueSelecto>
     <div class="elements selecto-area">
       <div
-        v-for="(item, i) in items"
+        v-for="(item, i) in props.items"
         :key="i"
         :item-id="item.id"
         class="absolute target bg-transparent hover:cursor-pointer"
         :class="[
-          `target-${i} w-[${item.width}] !aspect-[${item.numerator}/${item.denominator}]`,
+          `target-${i} w-[${item.width}%] aspect-[${item.numerator}/${item.denominator}]`,
         ]"
         :id="`target-${i}`"
       >
         <NuxtImg
           :src="useUrl(item.file?.url)"
-          class="w-full h-auto fill-white"
+          class="w-full h-full fill-white"
         ></NuxtImg>
       </div>
     </div>
@@ -108,12 +108,9 @@
 
   const selectoRef = ref<InstanceType<typeof VueSelecto> | null>(null);
   const targets = ref<Array<HTMLElement>>([]);
-  const items = defineModel("items", {
-    type: Array<ApiSticker>,
-    default: [],
-  });
 
-  defineProps<{
+  const props = defineProps<{
+    items: Array<ApiSticker>;
     pageFileUrl: string | undefined;
   }>();
 
@@ -133,8 +130,17 @@
   };
 
   const onResize = (e: OnResize) => {
-    e.target.style.width = `${e.width}px`;
-    e.target.style.height = `${e.height}px`;
+    const itemId = e.target.getAttribute("item-id");
+    if (!itemId) return;
+
+    const item = props.items.find((item) => item.id == itemId);
+    if (!item) return;
+
+    const width = e.width;
+    const height = (e.width / item.numerator) * item.denominator;
+
+    e.target.style.width = `${width}px`;
+    e.target.style.height = `${height}px`;
     e.target.style.transform = e.drag.transform;
   };
 
@@ -177,10 +183,21 @@
         moveable.dragStart(e.inputEvent);
       });
     }
-    targets.value = e.selected;
+
+    const unselectedItems = e.removed as Array<HTMLElement>;
+    const selectedItems = e.selected as Array<HTMLElement>;
+    // lower previous selected item z-index
+    unselectedItems.forEach((target) => {
+      target.style.zIndex = "20";
+    });
+    // increase current selected item z-index
+    selectedItems.forEach((target) => {
+      target.style.zIndex = "25";
+    });
 
     console.log(e);
-    emit("select", e, e.selected);
+    targets.value = selectedItems;
+    emit("select", e, selectedItems);
   };
 
   const onDragEnd = (e: OnDragEnd) => {
@@ -209,9 +226,9 @@
   const getGuidelines = computed(() => {
     const classes = [".container"];
 
-    if (!items.value) return classes;
+    if (!props.items) return classes;
 
-    classes.push(...items.value.map((item, index) => `.target-${index}`));
+    classes.push(...props.items.map((item, index) => `.target-${index}`));
 
     return classes;
   });
@@ -219,28 +236,23 @@
   // whenever container's size changes, update sticker positions
   // this will set sticker's initial position on first load as well
   watch(
-    [containerWidth, containerHeight],
-    async ([newWidth, oldWidth], [newHeight, oldHeight]) => {
+    [props.items, containerWidth, containerHeight],
+    async () => {
       console.log("initializing values");
-      reRenderItems();
+      setTimeout(() => {
+        reRenderItems();
+      }, 0);
+    },
+    {
+      deep: false, // make sure its set to false - otherwies too many changes happen in the props.items array and the site crashes
     }
   );
 
   const reRenderItems = () => {
-    items.value.forEach((item, i) => {
-      const leftPercentage = item.left;
-      const topPercentage = item.top;
-
-      // convert from percentages to pixels - moveable works with pixels
-      const pos = calculateInitialPosition(leftPercentage, topPercentage);
+    props.items.forEach((item, i) => {
       console.log(item);
-
       const el = document.getElementById(`target-${i}`);
-
       if (el) {
-        if (item.title == "Scooters") {
-          console.log("scooters", el.getBoundingClientRect());
-        }
         // set current el as moveable target
         moveableRef.value?.setState({
           target: [el],
@@ -277,14 +289,21 @@
         );
 
         // set position
-        moveableRef.value?.request(
-          "draggable",
-          {
-            x: pos.left,
-            y: pos.top,
-          },
-          true
-        );
+        if (container.value) {
+          // convert from percentages to pixels - moveable works with pixels
+          const left =
+            (item.left / 100) * container.value.getBoundingClientRect().width;
+          const top =
+            (item.top / 100) * container.value.getBoundingClientRect().height;
+          moveableRef.value?.request(
+            "draggable",
+            {
+              x: left,
+              y: top,
+            },
+            true
+          );
+        }
 
         // unselect target
         moveableRef.value?.setState({
@@ -293,30 +312,6 @@
       }
       console.log("item:", item.top, item.left, item.rotation);
     });
-  };
-
-  const calculateInitialPosition = (
-    leftPercentage: number,
-    topPercentage: number
-  ) => {
-    console.log("calculating");
-    if (!container.value) return { left: 0, top: 0 };
-
-    console.log(leftPercentage, topPercentage);
-    console.log(
-      container.value.getBoundingClientRect().width,
-      container.value.getBoundingClientRect().height
-    );
-
-    const left =
-      (leftPercentage / 100) * container.value?.getBoundingClientRect().width;
-    const top =
-      (topPercentage / 100) * container.value?.getBoundingClientRect().height;
-
-    return {
-      left,
-      top,
-    };
   };
 
   onKeyStroke(["w", "W", "ArrowUp"], () => {
@@ -369,5 +364,74 @@
       },
       true
     );
+  });
+
+  const updateSelectedTargetTransform = (values: MoveableTransform) => {
+    if (!moveableRef.value || !container.value) return;
+
+    moveableRef.value.request(
+      "resizable",
+      {
+        offsetWidth: values.width,
+        offsetHeight: values.height,
+      },
+      true
+    );
+
+    moveableRef.value.request(
+      "rotatable",
+      {
+        rotate: values.rotation,
+      },
+      true
+    );
+  };
+
+  const updateSelectedTargetPosition = (values: MoveablePosition) => {
+    moveableRef.value?.request(
+      "draggable",
+      {
+        x: values.left,
+        y: values.top,
+      },
+      true
+    );
+  };
+
+  const setSelectedTarget = (selectedTarget: ApiSticker | null) => {
+    // if no target, unselect all
+    if (!selectedTarget) {
+      moveableRef.value?.setState({
+        target: [],
+      });
+      moveableRef.value?.forceUpdate();
+
+      return;
+    }
+
+    // look for target to select
+    props.items.forEach((item, i) => {
+      if (item.id == selectedTarget?.id) {
+        console.log("setting selected target", item);
+        const el = document.getElementById(`target-${i}`);
+        if (el) {
+          // set current el as moveable target
+          moveableRef.value?.setState({
+            target: [el],
+          });
+          moveableRef.value?.forceUpdate();
+          console.log("found target");
+        }
+
+        return;
+      }
+    });
+  };
+
+  defineExpose({
+    updateSelectedTargetTransform,
+    updateSelectedTargetPosition,
+    container,
+    setSelectedTarget,
   });
 </script>

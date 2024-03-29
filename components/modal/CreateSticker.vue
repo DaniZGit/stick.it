@@ -42,10 +42,10 @@
     body.append("type", values.type);
     body.append("top", "0.0");
     body.append("left", "0.0");
-    body.append("width", JSON.stringify(12));
-    body.append("height", JSON.stringify(16));
-    body.append("numerator", JSON.stringify(3));
-    body.append("denominator", JSON.stringify(4));
+    body.append("width", JSON.stringify(25.73));
+    body.append("height", JSON.stringify(27.02));
+    body.append("numerator", JSON.stringify(5));
+    body.append("denominator", JSON.stringify(7));
     body.append("rotation", "0.0");
     body.append("rarity_id", values.rarity);
     body.append("file", values.file);

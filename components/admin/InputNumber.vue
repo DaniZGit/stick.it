@@ -15,7 +15,9 @@
         :useGrouping="false"
         :min="min"
         :max="max"
+        :show-buttons="showButtons"
         autocomplete="off"
+        @update:modelValue="emit('change')"
       />
     </InputGroup>
     <AdminInlineMessage
@@ -38,28 +40,47 @@
     inheritAttrs: false,
   });
 
+  const emit = defineEmits<{
+    change: [];
+  }>();
+
   const value = defineModel();
-  const { icon } = defineProps({
+  const { icon, showButtons } = defineProps({
     id: String,
     name: String,
     placeholder: String,
     label: String,
     min: Number,
     max: Number,
+    showButtons: Boolean,
     icon: String,
     error: String,
   });
 
   const preset: InputNumberPassThroughOptions = {
-    root: "w-full",
+    root: "w-full flex",
     input: {
       root: ({ props }) => ({
         class: [
-          "w-full bg-base-white focus:brightness-90 p-2 focus:outline-0 border-2 focus:border-base-black rounded-r-md duration-300",
+          "w-full bg-base-white focus:brightness-90 p-2 focus:outline-0 border-2 focus:border-base-black duration-300",
           {
             "rounded-l-md": !icon || !icon.length,
+            "rounded-r-md": !showButtons,
           },
         ],
+      }),
+    },
+    buttonGroup: ({ state }) => ({
+      class: ["shrink flex flex-col justify-between bg-base-tertiary"],
+    }),
+    incrementButton: {
+      root: ({ context }) => ({
+        class: ["flex p-1 bg-base-white hover:brightness-90 duration-200"],
+      }),
+    },
+    decrementButton: {
+      root: ({ context }) => ({
+        class: ["flex p-1 bg-base-white hover:brightness-90 duration-200"],
       }),
     },
   };

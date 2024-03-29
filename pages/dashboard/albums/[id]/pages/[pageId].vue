@@ -9,7 +9,8 @@
         <div class="relative aspect-thumbnail">
           <AdminEditorPage
             v-if="page"
-            v-model:items="stickers"
+            ref="pageEditorRef"
+            :items="stickers"
             :page-file-url="page?.file?.url"
             @select="onSelect"
             @drag-end="onDragEnd"
@@ -43,7 +44,9 @@
       <div
         class="h-full col-span-3 p-4 flex flex-col items-center bg-white overflow-y-auto"
       >
-        <h2 class="text-xl font-bold">Stickers</h2>
+        <div class="flex justify-center items-center gap-x-2">
+          <h2 class="text-xl font-bold">Stickers</h2>
+        </div>
         <div class="h-full w-full">
           <div
             v-if="!selectedSticker"
@@ -62,6 +65,7 @@
               :url="selectedSticker?.file?.url"
               class="h-full justify-between"
               @submit="onStickerUpdate"
+              @transform-change="onStickerTransformChange"
               @delete="onStickerDelete"
               @error="toast?.show('error', t('unexpected-error'))"
             >
@@ -83,7 +87,10 @@
 </template>
 
 <script lang="ts" setup>
-  import type { AdminFormUpdateSticker } from "#build/components";
+  import type {
+    AdminFormUpdateSticker,
+    AdminEditorPage,
+  } from "#build/components";
   import type { OnDragEnd, OnResizeEnd, OnRotateEnd } from "vue3-moveable";
   import type CustomToast from "~/components/CustomToast.vue";
   import type { FetchError } from "ofetch";
@@ -95,6 +102,7 @@
   const updateStickerForm = ref<InstanceType<
     typeof AdminFormUpdateSticker
   > | null>(null);
+  const pageEditorRef = ref<InstanceType<typeof AdminEditorPage> | null>(null);
   const route = useRoute();
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
@@ -133,8 +141,9 @@
       }
 
       page.value = response.page;
-      stickers.value = response.page.stickers;
-      console.log("stickers", stickers.value);
+
+      // create a clone of stickers - we do not want to modify the original page object
+      stickers.value = structuredClone(response.page.stickers);
     } catch (error) {
       toast.value?.show("error", t("unexpected-error"));
     }
@@ -143,6 +152,20 @@
   const selectedSticker = ref<ApiSticker | null>(null);
   const onSelect = (e: any, targets: Array<HTMLElement | SVGElement>) => {
     if (targets.length != 1) {
+      // prompt user to first save current sticker
+      if (selectedSticker.value && isSelectedStickerDirty()) {
+        // if cancel, re-select current sticker
+        // otherwise reset values
+        if (confirm(t("admin-sticker-update-cancelation")) != true) {
+          setTimeout(() => {
+            pageEditorRef.value?.setSelectedTarget(selectedSticker.value);
+          }, 0);
+          return;
+        } else {
+          restoreSelectedStickerValues();
+        }
+      }
+
       selectedSticker.value = null;
       return;
     }
@@ -150,6 +173,17 @@
     const item = targets[0];
     if (item.hasAttribute("item-id")) {
       const id = item.getAttribute("item-id");
+      if (
+        selectedSticker.value &&
+        selectedSticker.value.id != id &&
+        isSelectedStickerDirty()
+      ) {
+        // prompt user to first save current sticker
+        if (confirm(t("admin-sticker-update-cancelation")) == true) {
+          restoreSelectedStickerValues();
+        }
+      }
+
       const sticker = stickers.value.find((s) => s.id == id);
 
       if (sticker) {
@@ -198,9 +232,15 @@
     if (selectedSticker.value) {
       const moveableRect = e.moveable.getRect();
       selectedSticker.value.rotation = moveableRect.rotation;
-      updateStickerForm.value?.resetValues({
-        rotation: selectedSticker.value.rotation,
-      });
+
+      // we do not want to apply changes to the form again
+      // since the changed values are coming from the form input fields
+      // could end up in endless loop otherwise
+      if (!moveableTargetChangedByForm.value) {
+        updateStickerForm.value?.resetValues({
+          rotation: selectedSticker.value.rotation,
+        });
+      }
       console.log("rotated", moveableRect);
     }
   };
@@ -223,15 +263,131 @@
       selectedSticker.value.width = width;
       selectedSticker.value.height = height;
 
-      updateStickerForm.value?.resetValues({
-        width: moveableRect.offsetWidth,
-        height: moveableRect.offsetHeight,
-      });
+      // we do not want to apply changes to the form again
+      // since the changed values are coming from the form input fields
+      // could end up in endless loop otherwise
+      if (!moveableTargetChangedByForm.value) {
+        updateStickerForm.value?.resetValues({
+          width: moveableRect.offsetWidth,
+          height: moveableRect.offsetHeight,
+        });
+      }
       console.log(e.moveable);
       console.log("resized", moveableRect);
       console.log("container", containerRect);
       console.log("moveable", moveableRect);
     }
+  };
+
+  // once we change the moveable item, we will trigger all moveable event such as onDragEnd, onResizeEnd, onRotateEnd
+  // with the variable below we specify that the change is coming from the form itself and not by
+  // resizing/rotating the moveable item with mouse
+  const moveableTargetChangedByForm = ref(false);
+  // Update sticker form values change
+  const onStickerTransformChange = (values: UpdateStickerForm) => {
+    if (
+      !selectedSticker.value ||
+      !pageEditorRef.value ||
+      !pageEditorRef.value.container
+    )
+      return;
+
+    // update selected sticker values
+    selectedSticker.value.numerator = values.numerator;
+    selectedSticker.value.denominator = values.denominator;
+
+    // update moveable item
+    console.log("transform change from form", values);
+    moveableTargetChangedByForm.value = true;
+    pageEditorRef.value.updateSelectedTargetTransform({
+      width: values.width,
+      height: values.height,
+      rotation: values.rotation,
+    });
+    moveableTargetChangedByForm.value = false;
+
+    console.log(selectedSticker.value);
+    console.log(stickers.value);
+  };
+
+  const isSelectedStickerDirty = () => {
+    console.log("dirtyyyyy");
+
+    if (!selectedSticker.value) return false;
+
+    const ogSticker = page.value?.stickers.find((sticker) => {
+      return sticker.id == selectedSticker.value?.id;
+    });
+
+    if (!ogSticker) return false;
+
+    console.log("expression check");
+    return (
+      ogSticker.top.toFixed(2) != selectedSticker.value.top.toFixed(2) ||
+      ogSticker.left.toFixed(2) != selectedSticker.value.left.toFixed(2) ||
+      ogSticker.width != selectedSticker.value.width ||
+      ogSticker.height != selectedSticker.value.height ||
+      ogSticker.numerator != selectedSticker.value.numerator ||
+      ogSticker.denominator != selectedSticker.value.denominator
+    );
+  };
+
+  const restoreSelectedStickerValues = () => {
+    console.log("restoring sticker values");
+
+    if (!selectedSticker.value) return;
+
+    const sticker = page.value?.stickers.find(
+      (sticker) => sticker.id == selectedSticker.value?.id
+    );
+
+    if (!sticker || !pageEditorRef.value) return;
+
+    const container = pageEditorRef.value.container as HTMLElement;
+    const widthInPixels =
+      (sticker.width * container.getBoundingClientRect().width) / 100;
+    const heightInPixels =
+      (sticker.height * container.getBoundingClientRect().height) / 100;
+    console.log(selectedSticker.value);
+    console.log(sticker);
+    console.log(page.value);
+
+    // update fields
+    const stickerInd = stickers.value.findIndex((s) => s.id == sticker.id);
+    if (stickerInd >= 0) {
+      stickers.value[stickerInd] = { ...sticker };
+      selectedSticker.value = { ...sticker };
+    }
+
+    // update form fields
+    updateStickerForm.value?.resetValues({
+      title: sticker.title,
+      rarity: sticker.rarity_id,
+      type: sticker.type,
+      width: widthInPixels,
+      height: heightInPixels,
+      numerator: sticker.numerator,
+      denominator: sticker.denominator,
+      rotation: sticker.rotation,
+    });
+
+    // update moveable target
+    moveableTargetChangedByForm.value = true;
+    pageEditorRef.value.updateSelectedTargetTransform({
+      width: widthInPixels,
+      height: heightInPixels,
+      rotation: sticker.rotation,
+    });
+
+    // convert from percentages to pixels - moveable works with pixels
+    const left = (sticker.left / 100) * container.getBoundingClientRect().width;
+    const top = (sticker.top / 100) * container.getBoundingClientRect().height;
+
+    pageEditorRef.value.updateSelectedTargetPosition({
+      left: left,
+      top: top,
+    });
+    moveableTargetChangedByForm.value = false;
   };
 
   // sticker create modal
@@ -244,6 +400,10 @@
   const onStickerCreated = (createdSticker: ApiSticker) => {
     if (!stickers.value) return;
 
+    // update og stickers array
+    page.value?.stickers.push(createdSticker);
+
+    // update stickers array
     stickers.value.push(createdSticker);
 
     toast.value?.show("success", t("admin-sticker-created"));
@@ -282,14 +442,26 @@
       );
 
       if (response.sticker) {
+        // update og stickers array
+        if (page.value) {
+          const index = page.value.stickers.findIndex(
+            (s) => s.id == response.sticker.id
+          );
+          if (index >= 0) {
+            page.value.stickers[index] = { ...response.sticker };
+          }
+        }
+
         // update stickers array
-        const ind = stickers.value.findIndex(
+        const index = stickers.value.findIndex(
           (s) => s.id == response.sticker.id
         );
-
-        if (ind >= 0) {
-          stickers.value[ind] = response.sticker;
+        if (index >= 0) {
+          stickers.value[index] = { ...response.sticker };
         }
+
+        // update current selected sticker
+        selectedSticker.value = { ...response.sticker };
       }
 
       toast.value?.show("info", t("admin-sticker-updated"));
@@ -324,6 +496,8 @@
         stickers.value.splice(ind, 1);
         selectedSticker.value = null;
       }
+
+      pageEditorRef.value?.setSelectedTarget(null);
 
       toast.value?.show("success", t("admin-sticker-deleted"));
     } catch (error) {

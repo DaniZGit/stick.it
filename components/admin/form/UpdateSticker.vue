@@ -52,7 +52,10 @@
               :label="$t('admin-sticker-create-width')"
               placeholder="245px"
               v-model="width"
+              show-buttons
+              :min="1"
               icon="i-material-symbols:width"
+              @change="updateHeight"
             />
 
             <AdminInputNumber
@@ -61,7 +64,10 @@
               :label="$t('admin-sticker-create-height')"
               placeholder="245px"
               v-model="height"
+              :min="1"
+              show-buttons
               icon="i-material-symbols:height"
+              @change="updateWidth"
             />
           </div>
           <AdminInlineMessage
@@ -83,8 +89,10 @@
               placeholder="3"
               icon="i-material-symbols:width"
               v-model="numerator"
-              :min="0"
+              :min="1"
               :max="100"
+              show-buttons
+              @change="updateHeight"
             />
 
             <AdminInputNumber
@@ -93,8 +101,10 @@
               placeholder="4"
               icon="i-material-symbols:height"
               v-model="denominator"
-              :min="0"
+              :min="1"
               :max="100"
+              show-buttons
+              @change="updateWidth"
             />
           </div>
           <AdminInlineMessage
@@ -113,13 +123,15 @@
           name="rotation"
           :label="$t('admin-sticker-create-rotation')"
           placeholder="245px"
-          v-model="rotation"
           icon="i-material-symbols:width"
+          v-model="rotation"
+          show-buttons
+          @change="emit('transformChange', values as UpdateStickerForm)"
         />
       </div>
     </div>
 
-    <div class="flex flex-col gap-y-2">
+    <div class="flex flex-col gap-y-2 pb-4">
       <AdminButton
         type="submit"
         class="self-center rounded-md w-full py-1 px-2"
@@ -161,6 +173,7 @@
   const emit = defineEmits<{
     submit: [values: UpdateStickerForm];
     delete: [];
+    transformChange: [values: UpdateStickerForm];
     error: [message: String];
   }>();
 
@@ -191,15 +204,25 @@
     }
   });
 
+  const updateWidth = () => {
+    width.value = (height.value / denominator.value) * numerator.value;
+    emit("transformChange", values as UpdateStickerForm);
+  };
+
+  const updateHeight = () => {
+    height.value = (width.value / numerator.value) * denominator.value;
+    emit("transformChange", values as UpdateStickerForm);
+  };
+
   // form stuff
   const {
     defineField,
     handleSubmit,
     errors,
     setErrors,
-    resetForm,
     setFieldValue,
     setValues,
+    values,
   } = useForm({
     validationSchema: StickerUpdateSchema,
   });

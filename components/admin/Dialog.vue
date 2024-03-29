@@ -28,8 +28,9 @@
   });
 
   const preset: DialogPassThroughOptions = {
+    mask: "bg-base-black bg-opacity-50 backdrop-blur-sm !z-[9999]",
     root: ({ props }) => ({
-      class: ["z-[9999] w-2/5 bg-base-white rounded-md max-h-[90dvh]"],
+      class: ["!z-[9999] w-2/5 bg-base-white rounded-md max-h-[90dvh]"],
     }),
     content: "bg-base-white",
     footer: "bg-base-white",

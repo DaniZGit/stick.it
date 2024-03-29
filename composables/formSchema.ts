@@ -157,7 +157,7 @@ export const useFormSchema = () => {
         .number({
           required_error: t("validation-required", { field: "width" }),
         })
-        .min(1, t("validation-number-min-length", { field: "Width", min: 0 })),
+        .min(1, t("validation-number-min-length", { field: "Width", min: 1 })),
       height: zod
         .number({
           required_error: t("validation-required", { field: "height" }),
@@ -169,11 +169,11 @@ export const useFormSchema = () => {
         })
         .min(
           1,
-          t("validation-number-min-length", { field: "Numerator", min: 0 })
+          t("validation-number-min-length", { field: "Numerator", min: 1 })
         )
         .max(
           100,
-          t("validation-number-max-length", { field: "Numerator", max: 0 })
+          t("validation-number-max-length", { field: "Numerator", max: 100 })
         ),
       denominator: zod
         .number({
@@ -185,7 +185,7 @@ export const useFormSchema = () => {
         )
         .max(
           100,
-          t("validation-number-max-length", { field: "denominator ", max: 0 })
+          t("validation-number-max-length", { field: "denominator ", max: 100 })
         ),
       rotation: zod.number({
         required_error: t("validation-required", { field: "rotation" }),
