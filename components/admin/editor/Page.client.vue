@@ -68,10 +68,10 @@
     ></VueSelecto>
     <div class="elements selecto-area">
       <div
-        v-for="(item, i) in props.items"
-        :key="i"
+        v-for="(item, i) in items"
+        :key="item.id"
         :item-id="item.id"
-        class="absolute target bg-transparent hover:cursor-pointer"
+        class="absolute target bg-transparent hover:cursor-pointer z-[25]"
         :class="[
           `target-${i} w-[${item.width}%] aspect-[${item.numerator}/${item.denominator}]`,
         ]"
@@ -233,10 +233,10 @@
     return classes;
   });
 
-  // whenever container's size changes, update sticker positions
+  // whenever items length changes or container's size changes, update sticker positions
   // this will set sticker's initial position on first load as well
   watch(
-    [props.items, containerWidth, containerHeight],
+    [() => props.items.length, containerWidth, containerHeight],
     async () => {
       console.log("initializing values");
       setTimeout(() => {
@@ -244,7 +244,7 @@
       }, 0);
     },
     {
-      deep: false, // make sure its set to false - otherwies too many changes happen in the props.items array and the site crashes
+      deep: false, // make sure its set to false - otherwies too many changes happen in the items array and the site crashes
     }
   );
 

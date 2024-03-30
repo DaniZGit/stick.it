@@ -45,6 +45,7 @@
   "admin-sticker-type-audio": "Audio",
   "admin-sticker-created": "Sticker has been created",
   "admin-sticker-updated": "Sticker has been updated",
+  "admin-sticker-deleted": "Sticker has been deleted",
 
   "admin-sticker-delete-confirmation": "Are you sure yout want to delete this sticker?",
   "admin-sticker-update-cancelation": "Sticker changes have not been saved, do you still wish to continue?",

@@ -179,7 +179,14 @@
         isSelectedStickerDirty()
       ) {
         // prompt user to first save current sticker
-        if (confirm(t("admin-sticker-update-cancelation")) == true) {
+        // if cancel, re-select current sticker
+        // otherwise reset values
+        if (confirm(t("admin-sticker-update-cancelation")) != true) {
+          setTimeout(() => {
+            pageEditorRef.value?.setSelectedTarget(selectedSticker.value);
+          }, 0);
+          return;
+        } else {
           restoreSelectedStickerValues();
         }
       }
