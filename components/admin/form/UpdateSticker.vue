@@ -16,6 +16,7 @@
           v-model="title"
           icon="i-mdi:card-text-outline"
           :error="errors.title"
+          @change="emit('fieldChange', values)"
         />
 
         <AdminSelectButton
@@ -29,6 +30,7 @@
           class="text-left"
           icon="i-mdi:radio-button-checked"
           :error="errors.rarity"
+          @change="emit('fieldChange', values)"
         />
 
         <AdminSelectButton
@@ -42,6 +44,7 @@
           class="text-left"
           icon="i-mdi:radio-button-checked"
           :error="errors.type"
+          @change="emit('fieldChange', values)"
         />
 
         <div class="flex flex-col">
@@ -174,6 +177,7 @@
     submit: [values: UpdateStickerForm];
     delete: [];
     transformChange: [values: UpdateStickerForm];
+    fieldChange: [values: any];
     error: [message: String];
   }>();
 

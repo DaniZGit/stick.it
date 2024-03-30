@@ -66,6 +66,7 @@
               class="h-full justify-between"
               @submit="onStickerUpdate"
               @transform-change="onStickerTransformChange"
+              @field-change="onStickerFieldChange"
               @delete="onStickerDelete"
               @error="toast?.show('error', t('unexpected-error'))"
             >
@@ -330,6 +331,9 @@
 
     console.log("expression check");
     return (
+      ogSticker.title != selectedSticker.value.title ||
+      ogSticker.type != selectedSticker.value.type ||
+      ogSticker.rarity_id != selectedSticker.value.rarity_id ||
       ogSticker.top.toFixed(2) != selectedSticker.value.top.toFixed(2) ||
       ogSticker.left.toFixed(2) != selectedSticker.value.left.toFixed(2) ||
       ogSticker.width != selectedSticker.value.width ||
@@ -510,6 +514,16 @@
     } catch (error) {
       toast.value?.show("error", t("unexpected-error"));
     }
+  };
+
+  // sticker field change
+  const onStickerFieldChange = async (values: any) => {
+    if (!selectedSticker.value) return;
+
+    console.log("fields changed", values);
+    selectedSticker.value.title = values.title;
+    selectedSticker.value.type = values.type;
+    selectedSticker.value.rarity_id = values.rarity;
   };
 </script>
 

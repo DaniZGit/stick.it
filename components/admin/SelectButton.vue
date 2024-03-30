@@ -15,6 +15,7 @@
         :class="attrs.class"
         :option-label="optionLabel"
         :option-value="optionValue"
+        @change="emit('change', $event)"
       >
       </SelectButton>
     </InputGroup>
@@ -32,12 +33,15 @@
 
 <script lang="ts" setup>
   import type { SelectButtonPassThroughOptions } from "primevue/selectbutton";
-  import { any, string } from "zod";
 
   const attrs = useAttrs();
   defineOptions({
     inheritAttrs: false,
   });
+
+  const emit = defineEmits<{
+    change: [e: any];
+  }>();
 
   const model = defineModel();
   defineProps({

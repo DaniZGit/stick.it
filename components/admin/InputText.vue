@@ -13,6 +13,7 @@
         :pt="preset"
         :class="attrs.class"
         autocomplete="off"
+        @change="emit('change', $event)"
       />
     </InputGroup>
     <AdminInlineMessage
@@ -34,6 +35,10 @@
   defineOptions({
     inheritAttrs: false,
   });
+
+  const emit = defineEmits<{
+    change: [e: any];
+  }>();
 
   const model = defineModel();
   defineProps({
