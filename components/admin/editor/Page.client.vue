@@ -314,7 +314,7 @@
     });
   };
 
-  onKeyStroke(["w", "W", "ArrowUp"], () => {
+  onKeyStroke(["ArrowUp"], () => {
     if (!moveableRef.value) return;
 
     moveableRef.value.request(
@@ -327,7 +327,7 @@
     );
   });
 
-  onKeyStroke(["s", "S", "ArrowDown"], () => {
+  onKeyStroke(["ArrowDown"], () => {
     if (!moveableRef.value) return;
 
     moveableRef.value.request(
@@ -340,7 +340,7 @@
     );
   });
 
-  onKeyStroke(["a", "A", "ArrowLeft"], () => {
+  onKeyStroke(["ArrowLeft"], () => {
     if (!moveableRef.value) return;
 
     moveableRef.value.request(
@@ -353,7 +353,7 @@
     );
   });
 
-  onKeyStroke(["d", "D", "ArrowRight"], () => {
+  onKeyStroke(["ArrowRight"], () => {
     if (!moveableRef.value) return;
 
     moveableRef.value.request(
