@@ -1,7 +1,6 @@
 type CreateStickerForm = {
   title: string;
   type: string;
-  rarity: string;
   file?: any;
 };
 
@@ -13,6 +12,9 @@ type UpdateStickerForm = {
   denominator: number;
   rotation: number;
   type: string;
-  rarity: string;
+  file?: any;
+};
+
+type CreateStickerRarityForm = {
   file?: any;
 };

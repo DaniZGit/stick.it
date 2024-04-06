@@ -90,7 +90,7 @@
   defineExpose({ show });
 
   const preset: ToastPassThroughOptions = {
-    root: "",
+    root: "!z-[9999]",
     container: "bg-transparent",
     message: "bg-transparent rounded-md flex flex-col gap-y-2",
     text: "bg-base-white",

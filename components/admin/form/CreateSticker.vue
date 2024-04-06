@@ -19,19 +19,6 @@
         />
 
         <AdminSelectButton
-          v-model="rarity"
-          :options="rarities"
-          option-label="title"
-          option-value="id"
-          :id="rarity"
-          :name="rarity"
-          :label="$t('admin-sticker-create-rarity')"
-          class="text-left"
-          icon="i-mdi:radio-button-checked"
-          :error="errors.rarity"
-        />
-
-        <AdminSelectButton
           v-model="type"
           :options="types"
           option-label="title"
@@ -85,29 +72,6 @@
     url: string | undefined;
   }>();
 
-  // load rarities
-  const rarities = ref<Array<ApiRarity>>([]);
-  onMounted(async () => {
-    try {
-      const response = await useApi<{
-        metadata: ApiMetadata;
-        rarities: Array<ApiRarity>;
-      }>(`v1/rarities`);
-
-      if (!response.rarities) {
-        emit("error", t("unexpected-error"));
-        return;
-      }
-
-      rarities.value = response.rarities;
-
-      // reset form values
-      resetValues();
-    } catch (error) {
-      emit("error", t("unexpected-error"));
-    }
-  });
-
   // form stuff
   const {
     defineField,
@@ -119,11 +83,13 @@
     setValues,
   } = useForm({
     validationSchema: StickerCreateSchema,
+    initialValues: {
+      type: "image",
+    },
   });
 
   const [title] = defineField("title");
   const [type] = defineField("type");
-  const [rarity] = defineField("rarity");
   const [file] = defineField("file");
 
   // create request
@@ -136,8 +102,7 @@
 
     if (values) {
       setValues(values);
-    } else if (rarities.value.length) {
-      setFieldValue("rarity", rarities.value[0].id);
+    } else {
       setFieldValue("type", "image");
     }
   };

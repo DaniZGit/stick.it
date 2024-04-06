@@ -9,7 +9,7 @@
           name="i-mdi:close-circle-outline"
           size="32"
           class="hover:cursor-pointer"
-          @click="closeCallback"
+          @click="onClick(closeCallback)"
         />
       </div>
       <div class="overflow-y-auto">
@@ -26,6 +26,15 @@
   defineOptions({
     inheritAttrs: false,
   });
+
+  const emit = defineEmits<{
+    close: [];
+  }>();
+
+  const onClick = (closeCallback: Function) => {
+    closeCallback();
+    emit("close");
+  };
 
   const preset: DialogPassThroughOptions = {
     mask: "bg-base-black bg-opacity-50 backdrop-blur-sm !z-[9999]",

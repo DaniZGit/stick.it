@@ -125,9 +125,6 @@ export const useFormSchema = () => {
       type: zod.string({
         required_error: t("validation-required", { field: "type" }),
       }),
-      rarity: zod.string({
-        required_error: t("validation-required", { field: "rarity" }),
-      }),
     })
   );
 
@@ -193,9 +190,26 @@ export const useFormSchema = () => {
       type: zod.string({
         required_error: t("validation-required", { field: "type" }),
       }),
-      rarity: zod.string({
-        required_error: t("validation-required", { field: "rarity" }),
-      }),
+    })
+  );
+
+  const StickerRarityCreateSchema = toTypedSchema(
+    zod.object({
+      file: zod
+        .any()
+        .refine((file) => {
+          if (!file || file.size <= MAX_FILE_SIZE) return true;
+        }, t("validation-file-max-size"))
+        .refine((file) => {
+          if (
+            !file ||
+            ACCEPTED_IMAGE_TYPES.concat(
+              ACCEPTED_AUDIO_TYPES,
+              ACCEPTED_GIF_TYPES
+            ).includes(file?.type)
+          )
+            return true;
+        }, t("validation-file-accepted-types")),
     })
   );
 
@@ -216,6 +230,7 @@ export const useFormSchema = () => {
     PageCreateSchema,
     StickerCreateSchema,
     StickerUpdateSchema,
+    StickerRarityCreateSchema,
     RarityCreateSchema,
   };
 };

@@ -12,6 +12,8 @@ type ApiSticker = {
   rotation: number;
   file: ApiFile | null;
   rarity_id: string;
+  page_id: string;
+  rarity: ApiRarity | null;
 };
 
 type ApiStickerType = "image" | "gif" | "audio";

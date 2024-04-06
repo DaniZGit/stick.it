@@ -5,10 +5,10 @@
     <div
       class="h-full row-span-11 grid grid-cols-12 bg-base-tertiary p-4 relative"
     >
-      <div class="h-full col-span-9 flex justify-center gap-x-2">
+      <div class="h-full col-span-8 flex justify-center gap-x-2">
         <div class="relative aspect-thumbnail">
           <AdminEditorPage
-            v-if="page"
+            v-if="page?.stickers"
             ref="pageEditorRef"
             :items="stickers"
             :page-file-url="page?.file?.url"
@@ -42,7 +42,7 @@
       </div>
 
       <div
-        class="h-full col-span-3 p-4 flex flex-col items-center bg-white overflow-y-auto"
+        class="h-full col-span-4 p-4 flex flex-col items-center bg-white overflow-y-auto"
       >
         <div class="flex justify-center items-center gap-x-2">
           <h2 class="text-xl font-bold">Stickers</h2>
@@ -59,9 +59,10 @@
               <span class="text-sm">{{ option.description }}</span>
             </div>
           </div>
-          <div v-show="selectedSticker" class="h-full px-4">
+          <div class="h-full px-4">
             <AdminFormUpdateSticker
               ref="updateStickerForm"
+              :selected-sticker="selectedSticker"
               :url="selectedSticker?.file?.url"
               class="h-full justify-between"
               @submit="onStickerUpdate"
@@ -203,9 +204,9 @@
         console.log(container);
         console.log(sticker);
 
+        console.log("setting form values");
         updateStickerForm.value?.resetValues({
           title: sticker.title,
-          rarity: sticker.rarity_id,
           type: sticker.type,
           width: widthInPixels,
           height: heightInPixels,
@@ -373,7 +374,6 @@
     // update form fields
     updateStickerForm.value?.resetValues({
       title: sticker.title,
-      rarity: sticker.rarity_id,
       type: sticker.type,
       width: widthInPixels,
       height: heightInPixels,
@@ -439,9 +439,10 @@
     body.append("numerator", JSON.stringify(values.numerator));
     body.append("denominator", JSON.stringify(values.denominator));
     body.append("rotation", JSON.stringify(selectedSticker.value?.rotation));
-    body.append("rarity_id", values.rarity);
     body.append("file", values.file);
-    body.append("file_id", selectedSticker.value?.file?.id ?? "");
+    // current file id - if exists
+    if (selectedSticker.value?.file?.id)
+      body.append("file_id", selectedSticker.value?.file?.id ?? "");
 
     try {
       const response = await useApi<{ sticker: ApiSticker }>(

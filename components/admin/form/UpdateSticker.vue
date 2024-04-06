@@ -19,19 +19,21 @@
           @change="emit('fieldChange', values)"
         />
 
-        <AdminSelectButton
-          v-model="rarity"
-          :options="rarities"
-          option-label="title"
-          option-value="id"
-          :id="rarity"
-          :name="rarity"
+        <AdminAutoComplete
+          v-model="createdRarities"
+          :items="rarities"
+          id="rarities"
+          name="rarities"
+          placeholder="Pick a rarity"
           :label="$t('admin-sticker-create-rarity')"
           class="text-left"
           icon="i-mdi:radio-button-checked"
-          :error="errors.rarity"
-          @change="emit('fieldChange', values)"
-        />
+          @complete="emit('fieldChange', values)"
+          @select="onRaritySelect"
+          @edit="onRarityEditClick"
+          @remove="onRarityRemoveClick"
+        >
+        </AdminAutoComplete>
 
         <AdminSelectButton
           v-model="type"
@@ -151,12 +153,44 @@
         Delete
       </AdminButton>
     </div>
+    <ModalCreateRaritySticker
+      v-model:visible="showCreateModal"
+      :sticker="selectedSticker"
+      :rarity-id="selectedRarity?.id"
+      @created="onRarityCreate"
+      @error="onRarityCreateError"
+      @pending="(state: boolean) => rarityCreating = state"
+      @cancel="onRarityCreateCancel"
+    >
+    </ModalCreateRaritySticker>
+
+    <ModalEditRaritySticker
+      v-model:visible="showEditModal"
+      :sticker="getSelectedRaritySticker"
+      @edited="onRarityEdit"
+      @error="onRarityEditError"
+      @pending="(state: boolean) => rarityEditing = state"
+    >
+    </ModalEditRaritySticker>
+
+    <ModalDeleteStickerRarity
+      v-model:visible="showDeleteModal"
+      :sticker="getSelectedRaritySticker"
+      @deleted="onRarityDelete"
+      @error="onRarityDeleteError"
+      @pending="(state: boolean) => rarityDeleting = state"
+    >
+    </ModalDeleteStickerRarity>
+    <CustomToast ref="toast"></CustomToast>
   </VeeForm>
 </template>
 
 <script lang="ts" setup>
+  import type CustomToast from "~/components/CustomToast.vue";
+
   const { StickerUpdateSchema } = useFormSchema();
   const { t } = useI18n();
+  const toast = ref<InstanceType<typeof CustomToast> | null>(null);
 
   const types = <Array<{ title: string; value: ApiStickerType }>>[
     {
@@ -183,11 +217,19 @@
 
   const props = defineProps<{
     url: string | undefined;
+    selectedSticker: ApiSticker | null;
   }>();
 
   // load rarities
   const rarities = ref<Array<ApiRarity>>([]);
+  const createdRarities = ref<Array<ApiRarity>>([]);
   onMounted(async () => {
+    fetchRarities();
+  });
+
+  // loads all available rarities
+  const fetchRarities = async () => {
+    console.log("fetching rarities");
     try {
       const response = await useApi<{
         metadata: ApiMetadata;
@@ -206,14 +248,43 @@
     } catch (error) {
       emit("error", t("unexpected-error"));
     }
-  });
+  };
+
+  // loads sticker created rarities
+  const rarityStickers = ref<Array<ApiSticker>>([]);
+  const fetchStickerRarities = async () => {
+    if (!props.selectedSticker) return;
+
+    console.log("fetching sticker rarities");
+    try {
+      const response = await useApi<{
+        stickers: Array<ApiSticker>;
+      }>(`v1/stickers/${props.selectedSticker.id}/rarities`);
+
+      if (!response.stickers) {
+        emit("error", t("unexpected-error"));
+        return;
+      }
+
+      rarityStickers.value = response.stickers;
+      createdRarities.value = response.stickers
+        .filter((s) => s.rarity)
+        .map((s) => s.rarity) as Array<ApiRarity>;
+    } catch (error) {
+      emit("error", t("unexpected-error"));
+    }
+  };
 
   const updateWidth = () => {
+    if (!height.value || !denominator.value || !numerator.value) return;
+
     width.value = (height.value / denominator.value) * numerator.value;
     emit("transformChange", values as UpdateStickerForm);
   };
 
   const updateHeight = () => {
+    if (!width.value || !denominator.value || !numerator.value) return;
+
     height.value = (width.value / numerator.value) * denominator.value;
     emit("transformChange", values as UpdateStickerForm);
   };
@@ -238,7 +309,6 @@
   const [numerator] = defineField("numerator");
   const [denominator] = defineField("denominator");
   const [rotation] = defineField("rotation");
-  const [rarity] = defineField("rarity");
   const [file] = defineField("file");
 
   // create request
@@ -249,10 +319,10 @@
   const resetValues = (
     values: Partial<UpdateStickerForm> | undefined = undefined
   ) => {
+    console.log("values", values);
     if (values) {
       setValues(values);
     } else if (rarities.value.length) {
-      setFieldValue("rarity", rarities.value[0].id);
       setFieldValue("type", "image");
       setFieldValue("width", 12);
       setFieldValue("height", 16);
@@ -266,6 +336,109 @@
     setErrors,
     resetValues,
   });
+
+  // rarity create modal
+  const showCreateModal = ref(false);
+  const selectedRarity = ref<ApiRarity | null>(null);
+  const rarityCreating = ref(false);
+  const onRaritySelect = (e: { event: any; value: ApiRarity }) => {
+    console.log("rarity", e);
+    selectedRarity.value = e.value;
+    showCreateModal.value = true;
+  };
+
+  const onRarityCreate = (sticker: ApiSticker) => {
+    console.log("created rarity", sticker);
+    rarityStickers.value.push(sticker);
+    toast.value?.show("success", t("admin-sticker-rarity-deleted"));
+  };
+
+  const onRarityCreateCancel = () => {
+    createdRarities.value.pop();
+  };
+
+  const onRarityCreateError = (errorMessage: string) => {
+    createdRarities.value.pop();
+    toast.value?.show("error", errorMessage);
+  };
+
+  // rarity edit modal
+  const showEditModal = ref(false);
+  const rarityEditing = ref(false);
+  const onRarityEditClick = (rarity: ApiRarity) => {
+    console.log(rarity);
+    showEditModal.value = true;
+    selectedRarity.value = rarity;
+  };
+
+  const onRarityEdit = (sticker: ApiSticker) => {
+    console.log("edited sticker", sticker);
+    const index = rarityStickers.value.findIndex((s) => s.id == sticker.id);
+
+    if (index >= 0) {
+      rarityStickers.value[index] = sticker;
+    }
+
+    console.log("index", index, rarityStickers.value);
+  };
+
+  const onRarityEditError = (errorMessage: string) => {
+    toast.value?.show("error", errorMessage);
+  };
+
+  // rarity delete modal
+  const showDeleteModal = ref(false);
+  const rarityDeleting = ref(false);
+  const onRarityRemoveClick = (rarity: ApiSticker) => {
+    console.log("deleting rarity sticker", rarity);
+    showDeleteModal.value = true;
+    selectedRarity.value = rarity;
+  };
+
+  const onRarityDelete = (deletedSticker: ApiSticker) => {
+    console.log("dleteed");
+    /* delete rarity sticker */
+    let ind = rarityStickers.value.findIndex((sticker) => {
+      return sticker.id == deletedSticker.id;
+    });
+    // sticker was not found
+    if (ind < 0) return;
+    rarityStickers.value.splice(ind, 1);
+
+    /* delete rarity */
+    ind = createdRarities.value.findIndex((rarity) => {
+      return rarity.id == deletedSticker.rarity_id;
+    });
+    // rarity was not found
+    if (ind < 0) return;
+    createdRarities.value.splice(ind, 1);
+
+    // display success message
+    toast.value?.show("success", t("admin-sticker-rarity-deleted"));
+  };
+
+  const onRarityDeleteError = (errorMessage: string) => {
+    console.log("err");
+    toast.value?.show("error", errorMessage);
+  };
+
+  const getSelectedRaritySticker = computed(() => {
+    console.log(rarityStickers.value);
+    console.log(selectedRarity.value);
+    return rarityStickers.value.find(
+      (s) => s.rarity?.id == selectedRarity.value?.id
+    );
+  });
+
+  watch(
+    () => props.selectedSticker?.id,
+    (newId, oldId) => {
+      if (newId) {
+        // load selected sticker rarities
+        fetchStickerRarities();
+      }
+    }
+  );
 </script>
 
 <style></style>

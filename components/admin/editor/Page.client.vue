@@ -206,6 +206,16 @@
 
   const onRotateEnd = (e: OnRotateEnd) => {
     emit("rotateEnd", e);
+
+    // force drag event, so that we update top and left position
+    moveableRef.value?.request(
+      "draggable",
+      {
+        deltaX: 0,
+        deltaY: 0,
+      },
+      true
+    );
   };
 
   const onResizeEnd = (e: OnResizeEnd) => {
@@ -415,6 +425,8 @@
         console.log("setting selected target", item);
         const el = document.getElementById(`target-${i}`);
         if (el) {
+          setTimeout(() => el.focus(), 0);
+
           // set current el as moveable target
           moveableRef.value?.setState({
             target: [el],

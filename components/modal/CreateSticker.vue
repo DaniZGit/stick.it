@@ -47,7 +47,6 @@
     body.append("numerator", JSON.stringify(5));
     body.append("denominator", JSON.stringify(7));
     body.append("rotation", "0.0");
-    body.append("rarity_id", values.rarity);
     body.append("file", values.file);
 
     emit("pending", true);
