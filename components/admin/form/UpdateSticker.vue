@@ -350,7 +350,7 @@
   const onRarityCreate = (sticker: ApiSticker) => {
     console.log("created rarity", sticker);
     rarityStickers.value.push(sticker);
-    toast.value?.show("success", t("admin-sticker-rarity-deleted"));
+    toast.value?.show("success", t("admin-sticker-rarity-created"));
   };
 
   const onRarityCreateCancel = () => {

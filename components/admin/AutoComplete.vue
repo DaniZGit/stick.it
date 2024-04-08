@@ -110,7 +110,7 @@
     dropdownButton: {
       root: "!bg-base-white rounded-l-none !ring-0 !focus:ring-0",
     },
-    panel: "!bg-base-tertiary !ring-0",
+    panel: "!bg-base-tertiary !ring-0 !z-[9999]",
     itemGroup: "!hover:brightness-90",
     item: "!bg-base-tertiary !text-base-black hover:brightness-90 hover:!text-base-blue !font-bold hover:!font-bold",
     emptyMessage: "!text-base-black",

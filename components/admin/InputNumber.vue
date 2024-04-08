@@ -16,6 +16,8 @@
         :min="min"
         :max="max"
         :show-buttons="showButtons"
+        :maxFractionDigits="maxFractionDigits"
+        :step="step"
         autocomplete="off"
         @update:modelValue="emit('change')"
       />
@@ -52,6 +54,14 @@
     label: String,
     min: Number,
     max: Number,
+    maxFractionDigits: {
+      type: Number,
+      default: 2,
+    },
+    step: {
+      type: Number,
+      default: 1,
+    },
     showButtons: Boolean,
     icon: String,
     error: String,

@@ -50,6 +50,15 @@
   "admin-sticker-delete-confirmation": "Are you sure yout want to delete this sticker?",
   "admin-sticker-update-cancelation": "Sticker changes have not been saved, do you still wish to continue?",
 
+  "admin-pack-edit-title": "Title",
+  "admin-pack-create-price": "Price",
+  "admin-pack-created": "Pack has been created",
+  "admin-pack-edited": "Pack has been updated",
+  "admin-pack-deleted": "Pack has been deleted",
+  "admin-pack-rarity-created": "Pack rarity has been created",
+  "admin-pack-rarity-updated": "Pack rarity has been updated",
+  "admin-pack-rarity-deleted": "Pack rarity has been deleted",
+
   "admin-role-column-id": "ID",
   "admin-role-column-title": "Title"
 }

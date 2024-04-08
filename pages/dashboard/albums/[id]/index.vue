@@ -148,8 +148,49 @@
                 </h3>
               </div>
             </div>
+
+            <!-- Packs -->
+            <div>
+              <div class="flex justify-between items-center p-2">
+                <h2 class="font-bold">Packs</h2>
+                <AdminButton
+                  color="blue"
+                  class="py-2 px-6 rounded-md"
+                  @click="showCreatePackModal = true"
+                >
+                  Create
+                </AdminButton>
+              </div>
+              <div
+                v-if="packs.length > 0"
+                class="flex gap-x-4 overflow-x-auto px-2 py-4 bg-base-secondary"
+                style="flex-wrap: nowrap !important"
+              >
+                <AdminItemPack
+                  v-for="pack in packs"
+                  :key="pack.id"
+                  :pack="pack"
+                  class="w-full sm:w-1/2 lg:w-1/4 2xl:w-1/6 flex-shrink-0 flex hover:cursor-pointer group"
+                  @click="onPackClick(pack)"
+                >
+                </AdminItemPack>
+              </div>
+              <div
+                v-else
+                class="flex justify-center items-center min-h-[225px] bg-base-secondary"
+              >
+                <h3 class="text-lg">
+                  No packs yet, try
+                  <span
+                    class="text-base-blue underline hover:cursor-pointer"
+                    @click="showCreatePackModal = true"
+                    >creating</span
+                  >
+                  one
+                </h3>
+              </div>
+            </div>
           </div>
-          {{ pageOrder }}
         </div>
       </div>
     </div>
@@ -168,6 +209,23 @@
       @created="onPageCreated"
       @error="onPageCreateError"
       @pending="onPageCreating"
+    />
+
+    <ModalCreatePack
+      :album-id="$route.params.id"
+      v-model:visible="showCreatePackModal"
+      @created="onPackCreated"
+      @error="onPackCreateError"
+      @pending="onPackCreating"
+    />
+
+    <ModalEditPack
+      :pack="selectedPack"
+      v-model:visible="showEditPackModal"
+      @edited="onPackEdited"
+      @deleted="onPackDeleted"
+      @error="onPackEditError"
+      @pending="onPackEditing"
     />
   </div>
 </template>
@@ -188,7 +246,13 @@
   // fetch album on load
   const album = ref<ApiAlbum>();
   const pending = ref(true);
-  onMounted(async () => {
+  onMounted(() => {
+    fetchAlbum();
+    fetchPacks();
+  });
+
+  const fetchAlbum = async () => {
+    pending.value = true;
     try {
       const response = await useApi<{ album: ApiAlbum }>(
         `/v1/albums/${route.params.id}`
@@ -212,9 +276,32 @@
       toast.value?.show("error", t("unexpected-error"));
       // router.push({ path: "/dashboard/albums" });
     }
-
     pending.value = false;
-  });
+  };
+
+  const packs = ref<Array<ApiPack>>([]);
+  const loadingPacks = ref(false);
+  const fetchPacks = async () => {
+    console.log("fetchin packs");
+    loadingPacks.value = true;
+    try {
+      const response = await useApi<{ packs: Array<ApiPack> }>(
+        `/v1/albums/${route.params.id}/packs`
+      );
+      if (!response.packs) {
+        toast.value?.show("error", t("admin-response-mismatch"));
+        return;
+      }
+
+      packs.value = response.packs;
+      console.log(packs.value);
+    } catch (error) {
+      console.log(error);
+      toast.value?.show("error", t("unexpected-error"));
+      // router.push({ path: "/dashboard/albums" });
+    }
+    loadingPacks.value = false;
+  };
 
   // form stuff
   const { AlbumCreateSchema } = useFormSchema();
@@ -309,6 +396,58 @@
 
   const onPageCreateError = (errorMessage: string) => {
     // display error message
+    toast.value?.show("error", errorMessage);
+  };
+
+  // pack create modal
+  const showCreatePackModal = ref(false);
+  const creatingPack = ref(false);
+  const onPackCreating = (status: boolean) => {
+    creatingPack.value = status;
+  };
+  const onPackCreated = (createdPack: ApiPack) => {
+    packs.value.push(createdPack);
+    toast.value?.show("success", t("admin-pack-created"));
+  };
+
+  const onPackCreateError = (errorMessage: string) => {
+    toast.value?.show("error", errorMessage);
+  };
+
+  // pack edit modal
+  const showEditPackModal = ref(false);
+  const editingPack = ref(false);
+  const selectedPack = ref<ApiPack | null>(null);
+  const onPackClick = (pack: ApiPack) => {
+    selectedPack.value = pack;
+    showEditPackModal.value = true;
+  };
+
+  const onPackEditing = (status: boolean) => {
+    editingPack.value = status;
+  };
+
+  const onPackEdited = (editedPack: ApiPack) => {
+    const index = packs.value.findIndex((p) => p.id == editedPack.id);
+    console.log(index, editedPack);
+    if (index >= 0) {
+      packs.value[index] = editedPack;
+    }
+
+    toast.value?.show("success", t("admin-pack-edited"));
+  };
+
+  const onPackDeleted = (deletedPack: ApiPack) => {
+    const index = packs.value.findIndex((p) => p.id == deletedPack.id);
+
+    if (index >= 0) {
+      packs.value.splice(index, 1);
+    }
+
+    toast.value?.show("success", t("admin-pack-deleted"));
+  };
+
+  const onPackEditError = (errorMessage: string) => {
     toast.value?.show("error", errorMessage);
   };
 </script>
