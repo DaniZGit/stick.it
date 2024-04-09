@@ -29,6 +29,8 @@
   "admin-album-create-options": "Other options",
 
   "admin-page-created": "Page has been created",
+  "admin-page-edited": "Page has been edited",
+  "admin-page-deleted": "Page has been deleted",
 
   "admin-sticker-add-option": "New sticker",
   "admin-sticker-remove-option": "Remove sticker",

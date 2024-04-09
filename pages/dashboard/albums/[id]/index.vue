@@ -101,38 +101,21 @@
                 </AdminButton>
               </div>
               <div
-                v-if="album?.pages && album.pages.length > 0"
-                class="flex overflow-x-auto px-2"
+                v-if="album && album.pages.length > 0"
+                class="flex gap-x-4 overflow-x-auto px-2 py-4 bg-base-secondary"
                 style="flex-wrap: nowrap !important"
               >
-                <div
+                <AdminItemPage
                   v-for="page in album.pages"
                   :key="page.id"
-                  class="w-full sm:w-1/2 lg:w-1/4 2xl:w-1/6 flex-shrink-0 flex py-2"
+                  :page="page"
+                  :albumId="album.id"
+                  @create="toggleCreatePageModal"
+                  @edit="toggleEditPageModal(page)"
                 >
-                  <NuxtLink
-                    :to="`/dashboard/albums/${album.id}/pages/${page.id}`"
-                  >
-                    <AdminItemPage
-                      :sort_order="page.sort_order"
-                      :file="page.file"
-                    ></AdminItemPage>
-                  </NuxtLink>
-                  <!-- the 'add between' line -->
-                  <div
-                    class="flex flex-col items-center opacity-0 hover:opacity-100 hover:cursor-pointer py-2"
-                    @click="toggleCreatePageModal(page.sort_order + 1)"
-                  >
-                    <hr class="border-2 border-base-blue rounded-full grow" />
-                    <Icon
-                      name="i-mdi:add-circle"
-                      class="text-base-blue"
-                      size="16"
-                    />
-                    <hr class="border-2 border-base-blue rounded-full grow" />
-                  </div>
-                </div>
+                </AdminItemPage>
               </div>
+
               <div
                 v-else
                 class="flex justify-center items-center min-h-[225px] bg-base-secondary"
@@ -202,6 +185,7 @@
       <Icon name="i-svg-spinners:blocks-scale" size="64" />
     </Loader>
     <CustomToast ref="toast"></CustomToast>
+    <!-- Page modals -->
     <ModalCreatePage
       :album-id="$route.params.id"
       :sort-order="pageOrder"
@@ -211,6 +195,16 @@
       @pending="onPageCreating"
     />
 
+    <ModalEditPage
+      :page="selectedPage"
+      v-model:visible="showEditPageModal"
+      @edited="onPageEdited"
+      @deleted="onPageDeleted"
+      @error="onPageEditError"
+      @pending="onPageEditing"
+    />
+
+    <!-- Pack modals -->
     <ModalCreatePack
       :album-id="$route.params.id"
       v-model:visible="showCreatePackModal"
@@ -395,6 +389,48 @@
   };
 
   const onPageCreateError = (errorMessage: string) => {
+    // display error message
+    toast.value?.show("error", errorMessage);
+  };
+
+  // page edit modal
+  const showEditPageModal = ref(false);
+  const editing = ref(false);
+  const selectedPage = ref<ApiPage | null>(null);
+  const toggleEditPageModal = (page: ApiPage) => {
+    selectedPage.value = page;
+    showEditPageModal.value = true;
+  };
+
+  const onPageEditing = (status: boolean) => {
+    editing.value = status;
+  };
+
+  const onPageEdited = (editedPage: ApiPage) => {
+    if (!album.value) return;
+
+    const index = album.value.pages.findIndex((p) => p.id == editedPage.id);
+
+    if (index >= 0) {
+      album.value.pages[index] = editedPage;
+    }
+
+    toast.value?.show("success", t("admin-page-edited"));
+  };
+
+  const onPageDeleted = (deletedPage: ApiPage) => {
+    if (!album.value) return;
+
+    const index = album.value.pages.findIndex((p) => p.id == deletedPage.id);
+
+    if (index >= 0) {
+      album.value.pages.splice(index, 1);
+    }
+
+    toast.value?.show("success", t("admin-page-deleted"));
+  };
+
+  const onPageEditError = (errorMessage: string) => {
     // display error message
     toast.value?.show("error", errorMessage);
   };

@@ -9,7 +9,7 @@
         </div>
         <NuxtImg
           :src="useUrl(pack.file?.url)"
-          class="aspect-thumbnail w-full"
+          class="aspect-thumbnail w-full rounded-md"
         ></NuxtImg>
         <div
           class="bg-base-tertiary flex items-center justify-center gap-x-1 py-1 group-hover:shadow-md"
