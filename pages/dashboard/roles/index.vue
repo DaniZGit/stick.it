@@ -1,8 +1,8 @@
 <template>
-  <div class="h-full flex flex-col">
-    <AdminHeader></AdminHeader>
+  <div class="h-full grid grid-rows-12 grid-flow-row">
+    <AdminHeader class="row-span-1"></AdminHeader>
 
-    <div class="h-full overflow-y-auto">
+    <div class="h-full row-span-11">
       <!-- Top Bar -->
       <AdminDataTable
         :items="roles"

@@ -1,9 +1,9 @@
 <template>
-  <div class="h-full flex flex-col">
-    <AdminHeader></AdminHeader>
+  <div class="h-full grid grid-rows-12 grid-flow-row">
+    <AdminHeader class="row-span-1"></AdminHeader>
 
-    <div class="h-full overflow-y-auto">
-      <div class="h-full m-4 p-4 bg-base-secondary rounded-md relative">
+    <div class="h-full row-span-11">
+      <div class="h-full p-4 bg-base-secondary rounded-md relative">
         <div
           v-if="pending"
           class="absolute top-0 right-0 bottom-0 left-0 flex flex-col justify-center items-center gap-y-4 bg-black bg-opacity-20 text-base-white"
@@ -16,7 +16,7 @@
         <div v-else class="h-full grid grid-cols-12 gap-x-4">
           <!-- Album details -->
           <VeeForm
-            class="col-span-4 flex flex-col gap-y-4 p-2 bg-base-white rounded-md"
+            class="col-span-4 flex flex-col gap-y-4 p-2 bg-base-white rounded-md overflow-y-auto"
             @submit="onSubmit"
           >
             <div>
@@ -153,8 +153,8 @@
                   v-for="pack in packs"
                   :key="pack.id"
                   :pack="pack"
-                  class="w-full sm:w-1/2 lg:w-1/4 2xl:w-1/6 flex-shrink-0 flex hover:cursor-pointer group"
-                  @click="onPackClick(pack)"
+                  class="w-full sm:w-1/2 lg:w-1/4 2xl:w-1/6 flex-shrink-0 flex group"
+                  @edit="onPackClick(pack)"
                 >
                 </AdminItemPack>
               </div>

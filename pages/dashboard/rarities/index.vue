@@ -1,13 +1,16 @@
 <template>
-  <div class="h-full flex flex-col">
-    <AdminHeader></AdminHeader>
+  <div class="h-full grid grid-rows-12 grid-flow-row">
+    <AdminHeader class="row-span-1"></AdminHeader>
 
-    <div class="h-full overflow-y-auto">
+    <div class="h-full row-span-11">
       <!-- Top Bar -->
       <div class="flex justify-between p-4">
         <div class="flex">
           <InputGroup>
-            <AdminInputText placeholder="Search albums..." />
+            <AdminInputText
+              class="!rounded-r-none"
+              placeholder="Search albums..."
+            />
             <AdminButton
               class="border-2 border-l-0 border-base-inactive border-opacity-40 rounded-l-none p-2"
             >

@@ -1,19 +1,20 @@
 <template>
-  <div class="h-full flex flex-col">
-    <AdminHeader></AdminHeader>
+  <div class="h-full grid grid-rows-12 grid-flow-row">
+    <AdminHeader class="row-span-1"></AdminHeader>
 
-    <div class="h-full overflow-y-auto">
+    <div class="h-full row-span-11 grid grid-rows-12">
       <!-- Top Bar -->
-      <div class="flex justify-between p-4">
-        <div class="flex">
-          <InputGroup>
-            <AdminInputText placeholder="Search albums..." />
-            <AdminButton
-              class="border-2 border-l-0 border-base-inactive border-opacity-40 rounded-l-none p-2"
-            >
-              <Icon name="i-ic:round-search" size="16" />
-            </AdminButton>
-          </InputGroup>
+      <div class="row-span-1 flex justify-between p-4">
+        <div class="h-full flex">
+          <AdminInputText
+            class="h-full !rounded-r-none py-auto"
+            placeholder="Search albums..."
+          />
+          <AdminButton
+            class="border-2 border-l-0 border-base-inactive border-opacity-40 rounded-l-none p-2"
+          >
+            <Icon name="i-ic:round-search" size="16" />
+          </AdminButton>
         </div>
         <div>
           <AdminButton
@@ -26,7 +27,7 @@
         </div>
       </div>
 
-      <div class="h-full m-4 mt-0 p-4 bg-base-secondary rounded-md relative">
+      <div class="row-span-11 h-full p-4 bg-base-secondary rounded-md relative">
         <div
           v-if="pending"
           class="absolute top-0 right-0 bottom-0 left-0 flex flex-col justify-center items-center gap-y-4 bg-black bg-opacity-20 text-base-white"
