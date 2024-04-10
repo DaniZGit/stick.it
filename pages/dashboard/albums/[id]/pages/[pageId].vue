@@ -77,7 +77,7 @@
       </div>
     </div>
     <!-- Create modal -->
-    <ModalCreateSticker
+    <AdminModalCreateSticker
       :page-id="$route.params.pageId"
       v-model:visible="showCreateStickerModal"
       @created="onStickerCreated"

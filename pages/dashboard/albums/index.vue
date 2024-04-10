@@ -67,7 +67,7 @@
           </NuxtLink>
         </div>
         <!-- Create modal -->
-        <ModalCreateAlbum
+        <AdminModalCreateAlbum
           v-model:visible="showCreateModal"
           @created="onAlbumCreate"
           @error="onAlbumCreateError"

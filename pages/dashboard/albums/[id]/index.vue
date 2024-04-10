@@ -186,7 +186,7 @@
     </Loader>
     <CustomToast ref="toast"></CustomToast>
     <!-- Page modals -->
-    <ModalCreatePage
+    <AdminModalCreatePage
       :album-id="$route.params.id"
       :sort-order="pageOrder"
       v-model:visible="showCreatePageModal"
@@ -195,7 +195,7 @@
       @pending="onPageCreating"
     />
 
-    <ModalEditPage
+    <AdminModalEditPage
       :page="selectedPage"
       v-model:visible="showEditPageModal"
       @edited="onPageEdited"
@@ -205,7 +205,7 @@
     />
 
     <!-- Pack modals -->
-    <ModalCreatePack
+    <AdminModalCreatePack
       :album-id="$route.params.id"
       v-model:visible="showCreatePackModal"
       @created="onPackCreated"
@@ -213,7 +213,7 @@
       @pending="onPackCreating"
     />
 
-    <ModalEditPack
+    <AdminModalEditPack
       :pack="selectedPack"
       v-model:visible="showEditPackModal"
       @edited="onPackEdited"

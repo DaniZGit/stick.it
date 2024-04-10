@@ -29,14 +29,14 @@
     </div>
 
     <!-- MODALS -->
-    <ModalDeleteAlbum
+    <AdminModalDeleteAlbum
       v-model:visible="showDeleteModal"
       :id="id"
       :title="title"
       @deleted="onAlbumDeleted"
       @error="onAlbumDeleteError"
       @pending="onAlbumDeleting"
-    ></ModalDeleteAlbum>
+    ></AdminModalDeleteAlbum>
   </div>
 </template>
 

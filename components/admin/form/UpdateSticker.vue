@@ -153,7 +153,7 @@
         Delete
       </AdminButton>
     </div>
-    <ModalCreateRaritySticker
+    <AdminModalCreateRaritySticker
       v-model:visible="showCreateModal"
       :sticker="selectedSticker"
       :rarity-id="selectedRarity?.id"
@@ -162,25 +162,25 @@
       @pending="(state: boolean) => rarityCreating = state"
       @cancel="onRarityCreateCancel"
     >
-    </ModalCreateRaritySticker>
+    </AdminModalCreateRaritySticker>
 
-    <ModalEditRaritySticker
+    <AdminModalEditRaritySticker
       v-model:visible="showEditModal"
       :sticker="getSelectedRaritySticker"
       @edited="onRarityEdit"
       @error="onRarityEditError"
       @pending="(state: boolean) => rarityEditing = state"
     >
-    </ModalEditRaritySticker>
+    </AdminModalEditRaritySticker>
 
-    <ModalDeleteStickerRarity
+    <AdminModalDeleteStickerRarity
       v-model:visible="showDeleteModal"
       :sticker="getSelectedRaritySticker"
       @deleted="onRarityDelete"
       @error="onRarityDeleteError"
       @pending="(state: boolean) => rarityDeleting = state"
     >
-    </ModalDeleteStickerRarity>
+    </AdminModalDeleteStickerRarity>
     <CustomToast ref="toast"></CustomToast>
   </VeeForm>
 </template>

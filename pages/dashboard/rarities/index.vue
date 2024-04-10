@@ -39,7 +39,7 @@
       >
       </AdminDataTable>
     </div>
-    <ModalCreateRarity
+    <AdminModalCreateRarity
       v-model:visible="showCreateModal"
       @created="onRarityCreate"
       @error="onRarityCreateError"
