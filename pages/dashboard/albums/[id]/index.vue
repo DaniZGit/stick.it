@@ -101,7 +101,7 @@
                 </AdminButton>
               </div>
               <div
-                v-if="album && album.pages.length > 0"
+                v-if="album && album.pages"
                 class="flex gap-x-4 overflow-x-auto px-2 py-4 bg-base-secondary"
                 style="flex-wrap: nowrap !important"
               >
