@@ -15,6 +15,11 @@ export default <Partial<Config>>{
         "base-active": "#000000",
         "base-inactive": "#aaadcd",
 
+        "app-primary": "#0a1b99",
+        "app-secondary": "#ffffff",
+        "app-tertiary": "#6366f1",
+        "app-gold": "#cd8324",
+
         /* PrimeVue preset colors */
         "primary-50": "rgb(var(--primary-50))",
         "primary-100": "rgb(var(--primary-100))",
