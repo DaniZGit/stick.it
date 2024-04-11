@@ -1,6 +1,9 @@
 <template>
   <div class="h-full flex flex-col">
-    <AppFilterAlbums :loading="loading"></AppFilterAlbums>
+    <AppFilterAlbums
+      :albums-count="albums?.length"
+      :loading="loading"
+    ></AppFilterAlbums>
     <div v-if="loading" class="grid grid-cols-2 gap-y-4 gap-x-4 py-2 px-4">
       <AppSkeletonAlbum v-for="(n, i) in [1, 2, 3, 4, 5, 6]"></AppSkeletonAlbum>
     </div>
