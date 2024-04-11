@@ -11,15 +11,10 @@
     </div>
     <div
       v-else-if="!albums || !albums?.length"
-      class="h-full flex justify-center items-center px-4"
+      class="w-full h-full flex flex-col justify-center items-center gap-y-2 text-center text-xl font-bold p-4"
     >
-      <span class="text-2xl text-center">
-        Seems like our albums are gone!
-        <NuxtLink to="/albums" external class="underline text-app-gold"
-          >Refresh</NuxtLink
-        >
-        the page to get them back
-      </span>
+      <Icon name="i-mdi:emoji-robot-confused-outline" size="64" />
+      <span> Seems like the albums are gone </span>
     </div>
     <div v-else class="grid grid-cols-2 gap-y-4 gap-x-4 py-2 px-4">
       <AppItemAlbum
