@@ -4,6 +4,13 @@
       <AppSkeletonAlbum></AppSkeletonAlbum>
     </div>
     <div
+      v-else-if="!album"
+      class="w-full h-full flex flex-col justify-center items-center gap-y-2 text-center text-xl font-bold p-4"
+    >
+      <Icon name="i-mdi:emoji-robot-confused-outline" size="64" />
+      <span> Seems like this album doesn't exist </span>
+    </div>
+    <div
       v-else
       class="w-full h-full p-4 flex flex-col justify-between gap-y-4 aspect-thumbnail relative"
     >
