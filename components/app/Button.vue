@@ -14,7 +14,7 @@
   const preset: ButtonPassThroughOptions = {
     root: ({ props }) => ({
       class: [
-        "!bg-app-primary focus:!bg-app-primary-focus !text-app-secondary border-2 border-app-secondary !ring-0 focus:!ring-0",
+        "!bg-app-primary focus:!bg-app-primary-focus !text-app-secondary !ring-app-secondary !ring-offset-0 focus:!ring-2",
       ],
     }),
   };

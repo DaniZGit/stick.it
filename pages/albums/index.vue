@@ -5,7 +5,9 @@
       :loading="loading"
     ></AppFilterAlbums>
     <div v-if="loading" class="grid grid-cols-2 gap-y-4 gap-x-4 py-2 px-4">
-      <AppSkeletonAlbum v-for="(n, i) in [1, 2, 3, 4, 5, 6]"></AppSkeletonAlbum>
+      <AppSkeletonAlbumItem
+        v-for="n in [1, 2, 3, 4, 5, 6]"
+      ></AppSkeletonAlbumItem>
     </div>
     <div
       v-else-if="!albums || !albums?.length"
