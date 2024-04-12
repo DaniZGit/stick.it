@@ -43,6 +43,18 @@
             show-buttons
             :error="errors.price"
           />
+
+          <AdminInputNumber
+            id="amount"
+            name="amount"
+            :label="$t('admin-pack-create-amount')"
+            placeholder="5"
+            icon="i-material-symbols:height"
+            v-model="amount"
+            :min="0"
+            show-buttons
+            :error="errors.amount"
+          />
         </div>
 
         <AdminButton type="submit" class="self-center rounded-md w-1/2">
@@ -80,6 +92,7 @@
 
   const [title] = defineField("title");
   const [price] = defineField("price");
+  const [amount] = defineField("amount");
   const [file] = defineField("file");
 
   // create request
@@ -87,6 +100,7 @@
     const body = new FormData();
     body.append("title", values.title);
     body.append("price", values.price.toString());
+    body.append("amount", values.amount.toString());
     body.append("album_id", props.albumId);
     body.append("file", values.file);
 

@@ -220,6 +220,7 @@
       @deleted="onPackDeleted"
       @error="onPackEditError"
       @pending="onPackEditing"
+      @close="selectedPack = null"
     />
   </div>
 </template>
@@ -455,6 +456,7 @@
   const editingPack = ref(false);
   const selectedPack = ref<ApiPack | null>(null);
   const onPackClick = (pack: ApiPack) => {
+    console.log("selected pack", pack);
     selectedPack.value = pack;
     showEditPackModal.value = true;
   };

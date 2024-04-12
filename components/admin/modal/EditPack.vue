@@ -4,7 +4,7 @@
     header="Edit album"
     :modal="true"
     :draggable="false"
-    @hide="resetForm"
+    @hide="emit('close')"
   >
     <div class="flex flex-col gap-4">
       <VeeForm
@@ -45,6 +45,18 @@
             :error="errors.price"
           />
 
+          <AdminInputNumber
+            id="amount"
+            name="amount"
+            :label="$t('admin-pack-create-amount')"
+            placeholder="5"
+            icon="i-material-symbols:height"
+            v-model="amount"
+            :min="0"
+            show-buttons
+            :error="errors.amount"
+          />
+
           <div class="flex flex-col gap-y-2">
             <div class="flex gap-x-2 items-center">
               <label for="">Drop chances</label>
@@ -55,7 +67,7 @@
                   :label="$t('admin-pack-create-price')"
                   placeholder="Add a rarity"
                   icon="i-material-symbols:height"
-                  v-model="selectedPackRarity"
+                  v-model="selectedPackRarityId"
                   :options="getAvailableRarities"
                   option-label="title"
                   option-value="id"
@@ -65,7 +77,7 @@
                 <AdminButton
                   class="py-0 px-1.5"
                   @click="onPackRarityAdd"
-                  :disabled="!selectedPackRarity"
+                  :disabled="!selectedPackRarityId"
                   >+</AdminButton
                 >
               </div>
@@ -76,7 +88,7 @@
                 :key="packRarity.id"
                 class="grid grid-cols-12 gap-x-2"
               >
-                <span class="col-span-2">{{
+                <span class="col-span-2 flex items-center">{{
                   getPackRarityTitle(packRarity)
                 }}</span>
                 <div
@@ -146,6 +158,7 @@
     deleted: [pack: ApiPack];
     error: [message: string];
     pending: [value: boolean];
+    close: [];
   }>();
 
   onMounted(() => {
@@ -167,33 +180,37 @@
         return;
       }
 
-      rarities.value = response.rarities;
+      // add base rarity
+      rarities.value.push({
+        id: "null",
+        title: "Base",
+      });
+      // add other rarities
+      rarities.value.push(...response.rarities);
     } catch (error) {
       emit("error", t("unexpected-error"));
     }
   };
 
   // form stuff
-  const { defineField, handleSubmit, errors, setErrors, resetForm, setValues } =
-    useForm({
-      validationSchema: PackCreateSchema,
-      initialValues: {
-        title: props.pack?.title,
-        price: props.pack?.price,
-      },
-    });
+  const { defineField, handleSubmit, errors, setErrors, setValues } = useForm({
+    validationSchema: PackCreateSchema,
+  });
 
   const [title] = defineField("title");
   const [price] = defineField("price");
+  const [amount] = defineField("amount");
   const [file] = defineField("file");
-  const selectedPackRarity = ref(null);
+  const selectedPackRarityId = ref<string>("");
 
   // edit request
   const onSubmit = handleSubmit((values) => {
     const body = new FormData();
     body.append("title", values.title);
     body.append("price", values.price.toString());
+    body.append("amount", values.amount.toString());
     body.append("file", values.file);
+    body.append("file_id", props.pack?.file_id?.toString() ?? "");
 
     console.log("editing pack");
 
@@ -246,6 +263,19 @@
       fetchPackRarities();
     }
   });
+
+  watch(
+    () => props.pack,
+    (newPack, oldPack) => {
+      if (newPack) {
+        setValues({
+          title: newPack.title,
+          price: newPack.price,
+          amount: newPack.amount,
+        });
+      }
+    }
+  );
 
   // delete pack
   const onPackDelete = async () => {
@@ -303,7 +333,11 @@
 
   const getAvailableRarities = computed(() => {
     return rarities.value.filter((r) => {
-      return packRarities.value.find((pr) => r.id == pr.rarity_id) == undefined;
+      return (
+        packRarities.value.find(
+          (pr) => r.id == pr.rarity_id || (r.id == "null" && !pr.rarity_id)
+        ) == undefined
+      );
     });
   });
 
@@ -317,9 +351,13 @@
   };
 
   const getPackRarityTitle = (packRarity: ApiPackRarity) => {
-    const rarity = rarities.value.find((r) => r.id == packRarity.rarity_id);
+    const rarity = rarities.value.find(
+      (r) =>
+        r.id == packRarity.rarity_id ||
+        (r.id == "null" && !packRarity.rarity_id)
+    );
 
-    return rarity?.title ?? "";
+    return rarity?.title ?? "Unknown";
   };
 
   // create pack rarity
@@ -331,7 +369,10 @@
           method: "POST",
           body: {
             pack_id: props.pack?.id,
-            rarity_id: selectedPackRarity.value,
+            rarity_id:
+              selectedPackRarityId.value == "null"
+                ? null
+                : selectedPackRarityId.value,
             drop_chance: 0,
           },
         }
@@ -354,7 +395,7 @@
       }
     }
 
-    selectedPackRarity.value = null;
+    selectedPackRarityId.value = "";
   };
 
   // update pack rarity

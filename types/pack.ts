@@ -3,6 +3,7 @@ type ApiPack = {
   created_at: string;
   title: string;
   price: number;
+  amount: number;
   album_id: string;
   file_id: string | null;
   file: ApiFile | null;

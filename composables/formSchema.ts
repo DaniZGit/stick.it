@@ -250,6 +250,11 @@ export const useFormSchema = () => {
           required_error: t("validation-required", { field: "price" }),
         })
         .min(0, t("validation-number-min-length", { field: "Price", min: 0 })),
+      amount: zod
+        .number({
+          required_error: t("validation-required", { field: "amount" }),
+        })
+        .min(1, t("validation-number-min-length", { field: "Amount", min: 1 })),
     })
   );
 

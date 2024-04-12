@@ -54,6 +54,7 @@
 
   "admin-pack-edit-title": "Title",
   "admin-pack-create-price": "Price",
+  "admin-pack-create-amount": "Amount of stickers",
   "admin-pack-created": "Pack has been created",
   "admin-pack-edited": "Pack has been updated",
   "admin-pack-deleted": "Pack has been deleted",
