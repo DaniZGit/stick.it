@@ -21,6 +21,7 @@ export default <Partial<Config>>{
         "app-gold": "#cd8324",
 
         "app-primary-focus": "#0c21bf",
+        "app-tertiary-focus": "#4e50be",
 
         /* PrimeVue preset colors */
         "primary-50": "rgb(var(--primary-50))",
