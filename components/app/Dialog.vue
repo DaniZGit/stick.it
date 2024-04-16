@@ -17,10 +17,17 @@
       </div>
       <div class="flex justify-center">
         <Icon
+          v-if="!props.loading"
           name="i-mdi:close-circle-outline"
           size="38"
           class="text-app-secondary hover:cursor-pointer"
           @click="closeCallback"
+        />
+        <Icon
+          v-else
+          name="i-svg-spinners:6-dots-scale-middle"
+          size="38"
+          class="text-app-secondary hover:cursor-pointer"
         />
       </div>
     </template>
@@ -36,6 +43,12 @@
     inheritAttrs: false,
   });
 
+  const props = defineProps({
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  });
   const emit = defineEmits<{
     close: [];
   }>();

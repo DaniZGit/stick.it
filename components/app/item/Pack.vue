@@ -14,7 +14,7 @@
           <div class="flex justify-center items-center px-1 py-1">
             <div class="flex items-center gap-x-1 text-app-gold brightness-150">
               <span class="text-lg font-bold">{{ props.pack.price }}</span>
-              <Icon name="i-ic:outline-generating-tokens" size="28" />
+              <Icon name="i-akar-icons:coin" size="24" />
             </div>
           </div>
         </div>

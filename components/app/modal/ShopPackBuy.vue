@@ -4,6 +4,7 @@
     :header="props.pack.title"
     :modal="true"
     :draggable="false"
+    :loading="buyingPacks"
   >
     <div class="h-full w-full flex flex-col justify-between">
       <div class="w-full aspect-thumbnail bg-app-tertiary p-2 rounded-md">
@@ -14,7 +15,14 @@
       </div>
       <div class="grid grid-cols-2 gap-x-4 p-2 text-app-secondary">
         <div class="flex flex-col justify-center items-center gap-y-1">
-          <AppButton class="w-full" color="tertiary">Buy 1x</AppButton>
+          <AppButton
+            class="w-full text-base"
+            color="tertiary"
+            @click="onBuy(1)"
+            :disabled="buyingPacks"
+          >
+            <span class="text-base"> Buy 1x </span>
+          </AppButton>
           <div class="flex items-center gap-x-1 text-app-gold brightness-150">
             <span class="text-xs font-bold tracking-wider">{{
               props.pack?.price
@@ -23,7 +31,14 @@
           </div>
         </div>
         <div class="flex flex-col justify-center items-center gap-y-1">
-          <AppButton class="w-full" color="tertiary">Buy 5x</AppButton>
+          <AppButton
+            class="w-full"
+            color="tertiary"
+            @click="onBuy(5)"
+            :disabled="buyingPacks"
+          >
+            <span class="text-base"> Buy 5x </span>
+          </AppButton>
           <div class="flex items-center gap-x-1 text-app-gold brightness-150">
             <span class="text-xs font-bold tracking-wider">
               {{ 5 * props.pack.price }}
@@ -47,11 +62,30 @@
     },
   });
 
-  const emit = defineEmits<{
-    created: [album: ApiAlbum];
-    error: [message: string];
-    pending: [value: boolean];
-  }>();
+  const buyingPacks = ref(false);
+  const onBuy = async (amount: number) => {
+    buyingPacks.value = true;
+    try {
+      const response = await useApi<{
+        user_pack: ApiUserPack;
+      }>("/v1/transactions/pack", {
+        method: "POST",
+        body: {
+          pack_id: props.pack.id,
+          amount: amount,
+        },
+      });
+
+      if (response.user_pack) {
+        console.log("bought pack:", response.user_pack);
+      }
+    } catch (error) {
+      // toast.value?.show("error", t("user-unexpected-error"));
+    }
+    buyingPacks.value = false;
+  };
+
+  const onBuy5x = () => {};
 </script>
 
 <style></style>

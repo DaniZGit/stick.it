@@ -8,6 +8,7 @@ export const useUserStore = defineStore(
       username: "",
       email: "",
       token: "",
+      tokens: 0,
       created_at: "",
     });
 
