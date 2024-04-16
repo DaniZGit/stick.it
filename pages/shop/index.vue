@@ -7,7 +7,9 @@
       >
         Packs
       </h2>
-      <div v-if="loadingPacks">loading...</div>
+      <div v-if="loadingPacks" class="grid grid-cols-2 gap-x-4 gap-y-4">
+        <AppSkeletonPackItem v-for="n in [1, 2]" :key="n"></AppSkeletonPackItem>
+      </div>
       <div v-else class="grid grid-cols-2 gap-x-4 gap-y-4">
         <AppItemPack
           v-for="(pack, i) in packs"
@@ -25,7 +27,12 @@
       >
         Colector's Tokens
       </h2>
-      <div v-if="loadingPacks">loading...</div>
+      <div v-if="loadingPacks" class="grid grid-cols-3 gap-x-4 gap-y-4">
+        <AppSkeletonBundleItem
+          v-for="n in [1, 2, 3, 4, 5, 6]"
+          :key="n"
+        ></AppSkeletonBundleItem>
+      </div>
       <div v-else class="grid grid-cols-3 gap-x-4 gap-y-4">
         <AppItemBundle
           v-for="(bundle, i) in bundles"
