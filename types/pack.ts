@@ -15,10 +15,3 @@ type ApiPackRarity = {
   rarity_id: string;
   drop_chance: number;
 };
-
-type ApiUserPack = {
-  id: string;
-  user_id: string;
-  pack_id: string;
-  amount: number;
-};

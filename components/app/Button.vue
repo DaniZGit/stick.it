@@ -6,29 +6,28 @@
 
 <script lang="ts" setup>
   import type { ButtonPassThroughOptions } from "primevue/button";
+  import type { PropType } from "vue";
 
   defineOptions({
     inheritAttrs: true,
   });
 
-  const { color } = withDefaults(
-    defineProps<{
-      color?: "primary" | "tertiary";
-    }>(),
-    {
-      color: "primary",
-    }
-  );
+  const props = defineProps({
+    color: {
+      type: String as PropType<"primary" | "tertiary">,
+      default: "primary",
+    },
+  });
 
   const preset: ButtonPassThroughOptions = {
-    root: ({ props }) => ({
+    root: () => ({
       class: [
-        "!ring-offset-0 focus:!ring-2",
+        "!ring-offset-0 hover:!ring-2",
         {
-          "!bg-app-primary focus:!bg-app-primary-focus !text-app-secondary !ring-app-secondary":
-            color == "primary",
-          "!bg-app-tertiary focus:!bg-app-tertiary-focus !text-app-secondary !ring-app-secondary":
-            color == "tertiary",
+          "!bg-app-primary hover:!bg-app-primary-focus !text-app-secondary !ring-app-secondary":
+            props.color == "primary",
+          "!bg-app-tertiary hover:!bg-app-tertiary-focus !text-app-secondary !ring-app-secondary":
+            props.color == "tertiary",
         },
       ],
     }),

@@ -26,69 +26,66 @@
       </div>
 
       <div
-        class="h-1/2 absolute left-0 right-0 bottom-0 flex flex-col rounded-full duration-300"
+        class="h-2/3 absolute left-0 right-0 bottom-0 flex flex-col rounded-full duration-300"
         :class="{
-          'translate-y-full': !isInventoryOpen,
-          'translate-y-0': isInventoryOpen,
+          'translate-y-full': !isStickersTabOpen && !isPacksTabOpen,
+          'translate-y-0': isStickersTabOpen || isPacksTabOpen,
         }"
       >
         <div
-          class="self-center p-4 duration-300"
+          class="w-full flex justify-between items-center gap-x-2 p-4 duration-300"
           :class="{
-            '-translate-y-full': !isInventoryOpen,
-            'translate-y-0': isInventoryOpen,
+            '-translate-y-full': !isStickersTabOpen && !isPacksTabOpen,
+            'translate-y-0': isStickersTabOpen || isPacksTabOpen,
           }"
         >
           <AppIconButton
-            ref="inventoryButton"
-            class="!rounded-full !p-2 !bg-app-tertiary"
-            @click="isInventoryOpen = !isInventoryOpen"
+            ref="packsTabButton"
+            class="!rounded-full w-8 h-8"
+            :class="{
+              'animate-bounce duration-1000':
+                userPacks.length && !isPacksTabOpen,
+            }"
+            :active="isPacksTabOpen"
+            :color="userPacks.length && !isPacksTabOpen ? 'gold' : 'tertiary'"
+            @click="onPacksButtonClick"
           >
-            <Icon
-              v-if="!isInventoryOpen"
-              name="i-mdi:cards-outline"
-              size="32"
-            />
-            <Icon v-else name="i-mdi:close" size="32" />
+            <Icon name="i-mingcute:red-packet-line" size="20" />
+          </AppIconButton>
+
+          <h3
+            v-if="isStickersTabOpen || isPacksTabOpen"
+            class="text-lg font-bold bg-app-tertiary bg-opacity-75 backdrop-blur-sm px-3 py-1.5 rounded-full ease-in-out duration-1000"
+          >
+            {{ isStickersTabOpen ? "Stickers" : "Packs" }}
+          </h3>
+
+          <AppIconButton
+            ref="stickersTabButton"
+            class="!rounded-full w-8 h-8"
+            :active="isStickersTabOpen"
+            color="tertiary"
+            @click="onStickersButtonClick"
+          >
+            <Icon name="i-mdi:cards-outline" size="20" />
           </AppIconButton>
         </div>
         <div
           ref="inventory"
-          class="w-full h-full flex flex-col bg-app-tertiary bg-opacity-75 rounded-t-md p-2 overflow-y-auto"
+          class="w-full h-full bg-app-tertiary bg-opacity-75 backdrop-blur-sm rounded-t-md p-2 overflow-y-auto"
         >
-          <div>sorting filter</div>
-          <!-- Stickers -->
-          <div class="h-full">
-            <div v-if="loadingStickers">loading stickers...</div>
-            <div
-              v-else-if="!stickers.length"
-              class="h-full flex flex-col items-center justify-center text-xl"
-            >
-              <span class="flex flex-col justify-center items-center">
-                <Icon name="i-mdi:face-dead-outline" size="48" />
-                You have no stickers
-              </span>
-              <span
-                >Get some from the
-                <NuxtLink
-                  to="/albums"
-                  class="text-app-gold brightness-125 font-bold underline underline-offset-2"
-                >
-                  store
-                </NuxtLink>
-              </span>
-            </div>
-            <div v-else>
-              <AppItemSticker
-                v-for="sticker in stickers"
-                :key="sticker.id"
-                :sticker="sticker"
-              ></AppItemSticker>
-            </div>
-          </div>
+          <AppAlbumPacksTab
+            v-if="isPacksTabOpen"
+            :userPacks="userPacks"
+          ></AppAlbumPacksTab>
+          <AppAlbumStickersTab
+            v-else-if="isStickersTabOpen"
+            :userStickers="userStickers"
+          ></AppAlbumStickersTab>
         </div>
       </div>
     </div>
+
     <CustomToast ref="toast"></CustomToast>
   </div>
 </template>
@@ -99,44 +96,43 @@
   const route = useRoute();
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
+  const userStore = useUserStore();
 
   const inventory = ref<HTMLElement | null>(null);
-  const inventoryButton = ref<HTMLElement | null>(null);
-  const isInventoryOpen = ref(false);
+  const stickersTabButton = ref<HTMLElement | null>(null);
+  const packsTabButton = ref<HTMLElement | null>(null);
+  const isStickersTabOpen = ref(false);
+  const isPacksTabOpen = ref(false);
   const currentPageNum = ref<number>(0);
+
+  const onStickersButtonClick = () => {
+    isStickersTabOpen.value = !isStickersTabOpen.value;
+    isPacksTabOpen.value = false;
+  };
+
+  const onPacksButtonClick = () => {
+    isPacksTabOpen.value = !isPacksTabOpen.value;
+    isStickersTabOpen.value = false;
+  };
 
   // hides inventory on click outside
   onClickOutside(
     inventory,
     (e) => {
-      if (isInventoryOpen) isInventoryOpen.value = false;
+      if (isStickersTabOpen || isPacksTabOpen) {
+        isStickersTabOpen.value = false;
+        isPacksTabOpen.value = false;
+      }
     },
-    { ignore: [inventoryButton] }
+    { ignore: [packsTabButton, stickersTabButton] }
   );
 
   // fetch albums on load
   onMounted(async () => {
     fetchAlbum();
     fetchStickers();
+    fetchPacks();
   });
-
-  const stickers = ref<Array<ApiSticker>>([]);
-  const loadingStickers = ref(false);
-  const fetchStickers = async () => {
-    loadingStickers.value = true;
-    try {
-      const response = await useApi<{
-        stickers: Array<ApiSticker>;
-      }>(`/v1/stickers/`);
-
-      if (response.stickers) {
-        stickers.value = response.stickers;
-      }
-    } catch (error) {
-      toast.value?.show("error", t("user-unexpected-error"));
-    }
-    loadingStickers.value = false;
-  };
 
   const album = ref<ApiAlbum>();
   const loadingAlbum = ref(false);
@@ -154,6 +150,42 @@
       toast.value?.show("error", t("user-unexpected-error"));
     }
     loadingAlbum.value = false;
+  };
+
+  const userStickers = ref<Array<ApiUserSticker>>([]);
+  const loadingStickers = ref(false);
+  const fetchStickers = async () => {
+    loadingStickers.value = true;
+    try {
+      const response = await useApi<{
+        user_stickers: Array<ApiUserSticker>;
+      }>(`/v1/users/${userStore.user.id}/stickers?album_id=${route.params.id}`);
+
+      if (response.user_stickers) {
+        userStickers.value = response.user_stickers;
+      }
+    } catch (error) {
+      toast.value?.show("error", t("user-unexpected-error"));
+    }
+    loadingStickers.value = false;
+  };
+
+  const userPacks = ref<Array<ApiUserPack>>([]);
+  const loadingPacks = ref(false);
+  const fetchPacks = async () => {
+    loadingPacks.value = true;
+    try {
+      const response = await useApi<{
+        user_packs: Array<ApiUserPack>;
+      }>(`/v1/users/${userStore.user.id}/packs?album_id=${route.params.id}`);
+
+      if (response.user_packs) {
+        userPacks.value = response.user_packs;
+      }
+    } catch (error) {
+      toast.value?.show("error", t("user-unexpected-error"));
+    }
+    loadingPacks.value = false;
   };
 
   // fetch pages when we move left/right

@@ -33,7 +33,7 @@
         <div class="flex flex-col justify-center items-center gap-y-1">
           <AppButton
             class="w-full"
-            color="tertiary"
+            color="primary"
             @click="onBuy(5)"
             :disabled="buyingPacks"
           >
