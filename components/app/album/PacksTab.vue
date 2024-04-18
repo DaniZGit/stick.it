@@ -27,9 +27,15 @@
           :numScroll="1"
           :showNavigators="true"
           :showIndicators="false"
+          :key="carouselKey"
         >
           <template #item="itemProps: { data: ApiUserPack, index: number }">
-            <AppItemUserPack :user-pack="itemProps.data"></AppItemUserPack>
+            <AppItemUserPack
+              :user-pack="itemProps.data"
+              @opened="onPackOpened"
+              @error="emit('error', $event)"
+              @pending="emit('pendingOpening', $event)"
+            ></AppItemUserPack>
           </template>
         </AppCarousel>
       </div>
@@ -40,10 +46,41 @@
 <script lang="ts" setup>
   import type { PropType } from "vue";
 
+  const carouselKey = ref(0); // we use this key to force carousel re-render on pack deletion, GH issue: https://github.com/primefaces/primevue/issues/4661
   const props = defineProps({
     userPacks: Array as PropType<Array<ApiUserPack>>,
     loading: Boolean,
   });
+
+  const emit = defineEmits<{
+    updatePacks: [userPacks: Array<ApiUserPack>];
+    newStickers: [userStickers: Array<ApiSticker>];
+    error: any;
+    pendingOpening: any;
+  }>();
+
+  const onPackOpened = (e: {
+    userPack: ApiUserPack;
+    stickers: Array<ApiSticker>;
+    openAll: boolean;
+  }) => {
+    if (!props.userPacks) return;
+
+    console.log("inside packs tab", e);
+    let localUserPacks = [...props.userPacks];
+    const index = localUserPacks.findIndex((up) => up.id == e.userPack.id);
+    if (index >= 0) {
+      localUserPacks[index].amount -= 1;
+
+      if (localUserPacks[index].amount <= 0 || e.openAll) {
+        localUserPacks.splice(index, 1);
+        carouselKey.value++;
+      }
+    }
+
+    emit("updatePacks", localUserPacks);
+    emit("newStickers", e.stickers);
+  };
 </script>
 
 <style></style>

@@ -55,7 +55,7 @@
 
           <h3
             v-if="isStickersTabOpen || isPacksTabOpen"
-            class="text-lg font-bold bg-app-tertiary bg-opacity-75 backdrop-blur-sm px-3 py-1.5 rounded-full ease-in-out duration-1000"
+            class="text-lg font-bold bg-app-tertiary bg-opacity-75 backdrop-blur-sm px-3 py-1.5 rounded-full ease-in-out duration-1000 ring-2 ring-app-secondary"
           >
             {{ isStickersTabOpen ? "Stickers" : "Packs" }}
           </h3>
@@ -75,11 +75,15 @@
           class="w-full h-full bg-app-tertiary bg-opacity-75 backdrop-blur-sm rounded-t-md p-2 overflow-y-auto"
         >
           <AppAlbumPacksTab
-            v-if="isPacksTabOpen"
+            v-show="isPacksTabOpen"
             :userPacks="userPacks"
+            :loading="loadingPacks"
+            @updatePacks="onPacksUpdate"
+            @newStickers="onNewStickers"
+            @error="onPacksTabError"
           ></AppAlbumPacksTab>
           <AppAlbumStickersTab
-            v-else-if="isStickersTabOpen"
+            v-show="isStickersTabOpen"
             :userStickers="userStickers"
           ></AppAlbumStickersTab>
         </div>
@@ -152,42 +156,6 @@
     loadingAlbum.value = false;
   };
 
-  const userStickers = ref<Array<ApiUserSticker>>([]);
-  const loadingStickers = ref(false);
-  const fetchStickers = async () => {
-    loadingStickers.value = true;
-    try {
-      const response = await useApi<{
-        user_stickers: Array<ApiUserSticker>;
-      }>(`/v1/users/${userStore.user.id}/stickers?album_id=${route.params.id}`);
-
-      if (response.user_stickers) {
-        userStickers.value = response.user_stickers;
-      }
-    } catch (error) {
-      toast.value?.show("error", t("user-unexpected-error"));
-    }
-    loadingStickers.value = false;
-  };
-
-  const userPacks = ref<Array<ApiUserPack>>([]);
-  const loadingPacks = ref(false);
-  const fetchPacks = async () => {
-    loadingPacks.value = true;
-    try {
-      const response = await useApi<{
-        user_packs: Array<ApiUserPack>;
-      }>(`/v1/users/${userStore.user.id}/packs?album_id=${route.params.id}`);
-
-      if (response.user_packs) {
-        userPacks.value = response.user_packs;
-      }
-    } catch (error) {
-      toast.value?.show("error", t("user-unexpected-error"));
-    }
-    loadingPacks.value = false;
-  };
-
   // fetch pages when we move left/right
   watch(currentPageNum, (newPageNum, oldPageNum) => {
     fetchPages();
@@ -209,6 +177,55 @@
       toast.value?.show("error", t("user-unexpected-error"));
     }
     loadingPages.value = false;
+  };
+
+  const userStickers = ref<Array<ApiUserSticker>>([]);
+  const loadingStickers = ref(false);
+  const fetchStickers = async () => {
+    loadingStickers.value = true;
+    try {
+      const response = await useApi<{
+        user_stickers: Array<ApiUserSticker>;
+      }>(`/v1/users/${userStore.user.id}/stickers?album_id=${route.params.id}`);
+
+      if (response.user_stickers) {
+        userStickers.value = response.user_stickers;
+      }
+    } catch (error) {
+      toast.value?.show("error", t("user-unexpected-error"));
+    }
+    loadingStickers.value = false;
+  };
+
+  const onNewStickers = (newStickers: Array<ApiUserPack>) => {
+    console.log("new stickers", newStickers);
+  };
+
+  const userPacks = ref<Array<ApiUserPack>>([]);
+  const loadingPacks = ref(false);
+  const fetchPacks = async () => {
+    loadingPacks.value = true;
+    try {
+      const response = await useApi<{
+        user_packs: Array<ApiUserPack>;
+      }>(`/v1/users/${userStore.user.id}/packs?album_id=${route.params.id}`);
+
+      if (response.user_packs) {
+        userPacks.value = response.user_packs;
+      }
+    } catch (error) {
+      toast.value?.show("error", t("user-unexpected-error"));
+    }
+    loadingPacks.value = false;
+  };
+
+  const onPacksUpdate = (updatedUserPacks: Array<ApiUserPack>) => {
+    console.log("on packs update", updatedUserPacks);
+    userPacks.value = updatedUserPacks;
+  };
+
+  const onPacksTabError = (errorMessage: string) => {
+    toast.value?.show("error", errorMessage);
   };
 </script>
 

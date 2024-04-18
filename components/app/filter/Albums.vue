@@ -51,7 +51,7 @@
   const searchQuery = ref("");
 
   const props = defineProps<{
-    albumsCount: number;
+    albumsCount: number | undefined;
     loading: boolean;
   }>();
 </script>

@@ -8,7 +8,7 @@
           ref="titleRef"
           class="inline-block text-nowrap font-semibold tracking-wider"
           :class="{
-            'overflow-animation': isOverflown(),
+            'overflow-animation': titleIsOverflown,
           }"
         >
           {{ props.userPack.pack.title }}
@@ -26,8 +26,16 @@
         class="grid gap-x-4"
         :class="{ 'grid-cols-2': props.userPack.amount > 1 }"
       >
-        <AppButton> Open </AppButton>
-        <AppButton v-if="props.userPack.amount > 1"> Open All </AppButton>
+        <AppButton :disabled="openingPacks" @click="openPacks(false)">
+          Open
+        </AppButton>
+        <AppButton
+          v-if="props.userPack.amount > 1"
+          :disabled="openingPacks"
+          @click="openPacks(true)"
+        >
+          Open All
+        </AppButton>
       </div>
       <div class="flex justify-center items-center gap-x-1">
         <span class="text-app-gold brightness-150 text-xs font-bold">
@@ -43,14 +51,68 @@
 
 <script lang="ts" setup>
   const titleRef = ref<HTMLElement | null>(null);
+  const userStore = useUserStore();
+  const route = useRoute();
+  const { t } = useI18n();
+  const titleIsOverflown = ref(false);
+
   const props = defineProps<{
     userPack: ApiUserPack;
   }>();
 
-  const isOverflown = () => {
-    if (!titleRef.value) return false;
-    return isElementOverflown(titleRef.value);
+  const emit = defineEmits<{
+    opened: [
+      {
+        userPack: ApiUserPack;
+        stickers: Array<ApiSticker>;
+        openAll: boolean;
+      }
+    ];
+    error: [message: string];
+    pending: [value: boolean];
+  }>();
+
+  const newStickers = ref<Array<ApiSticker>>([]);
+  const openingPacks = ref(false);
+  const openPacks = async (openAll: boolean) => {
+    console.log("opening packs");
+    openingPacks.value = true;
+    emit("pending", true);
+    try {
+      const response = await useApi<{
+        stickers: Array<ApiSticker>;
+      }>(`/v1/users/${userStore.user.id}/open-packs`, {
+        method: "POST",
+        body: {
+          album_id: route.params.id,
+          pack_id: props.userPack.pack_id,
+          open_all: openAll,
+        },
+      });
+
+      if (response.stickers) {
+        newStickers.value = response.stickers;
+      }
+      console.log("response", response);
+
+      emit("opened", {
+        userPack: props.userPack,
+        stickers: response.stickers,
+        openAll: openAll,
+      });
+    } catch (error) {
+      emit("error", t("unexpected-error"));
+    }
+    openingPacks.value = false;
+    emit("pending", false);
   };
+
+  watch(titleRef, (oldTitleRef, newTitleRef) => {
+    if (!newTitleRef || !newTitleRef.parentElement) return;
+
+    titleIsOverflown.value =
+      newTitleRef.clientWidth >= newTitleRef.parentElement.clientWidth;
+  });
 </script>
 
 <style scoped>
