@@ -54,14 +54,14 @@
 
   const emit = defineEmits<{
     updatePacks: [userPacks: Array<ApiUserPack>];
-    newStickers: [userStickers: Array<ApiSticker>];
+    newStickers: [userStickers: Array<ApiUserSticker>];
     error: any;
     pendingOpening: any;
   }>();
 
   const onPackOpened = (e: {
     userPack: ApiUserPack;
-    stickers: Array<ApiSticker>;
+    userStickers: Array<ApiUserSticker>;
     openAll: boolean;
   }) => {
     if (!props.userPacks) return;
@@ -79,7 +79,7 @@
     }
 
     emit("updatePacks", localUserPacks);
-    emit("newStickers", e.stickers);
+    emit("newStickers", e.userStickers);
   };
 </script>
 

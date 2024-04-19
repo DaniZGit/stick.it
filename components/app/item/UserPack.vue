@@ -64,7 +64,7 @@
     opened: [
       {
         userPack: ApiUserPack;
-        stickers: Array<ApiSticker>;
+        userStickers: Array<ApiUserSticker>;
         openAll: boolean;
       }
     ];
@@ -72,7 +72,6 @@
     pending: [value: boolean];
   }>();
 
-  const newStickers = ref<Array<ApiSticker>>([]);
   const openingPacks = ref(false);
   const openPacks = async (openAll: boolean) => {
     console.log("opening packs");
@@ -80,7 +79,7 @@
     emit("pending", true);
     try {
       const response = await useApi<{
-        stickers: Array<ApiSticker>;
+        user_stickers: Array<ApiUserSticker>;
       }>(`/v1/users/${userStore.user.id}/open-packs`, {
         method: "POST",
         body: {
@@ -90,14 +89,11 @@
         },
       });
 
-      if (response.stickers) {
-        newStickers.value = response.stickers;
-      }
       console.log("response", response);
 
       emit("opened", {
         userPack: props.userPack,
-        stickers: response.stickers,
+        userStickers: response.user_stickers,
         openAll: openAll,
       });
     } catch (error) {

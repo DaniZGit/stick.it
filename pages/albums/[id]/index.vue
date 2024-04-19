@@ -55,6 +55,7 @@
 
           <h3
             v-if="isStickersTabOpen || isPacksTabOpen"
+            ref="tabHeader"
             class="text-lg font-bold bg-app-tertiary bg-opacity-75 backdrop-blur-sm px-3 py-1.5 rounded-full ease-in-out duration-1000 ring-2 ring-app-secondary"
           >
             {{ isStickersTabOpen ? "Stickers" : "Packs" }}
@@ -72,14 +73,14 @@
         </div>
         <div
           ref="inventory"
-          class="w-full h-full bg-app-tertiary bg-opacity-75 backdrop-blur-sm rounded-t-md p-2 overflow-y-auto"
+          class="w-full h-full bg-app-tertiary bg-opacity-75 backdrop-blur-sm rounded-t-md overflow-y-auto"
         >
           <AppAlbumPacksTab
             v-show="isPacksTabOpen"
             :userPacks="userPacks"
             :loading="loadingPacks"
-            @updatePacks="onPacksUpdate"
-            @newStickers="onNewStickers"
+            @update-packs="onPacksUpdate"
+            @new-stickers="onNewStickers"
             @error="onPacksTabError"
           ></AppAlbumPacksTab>
           <AppAlbumStickersTab
@@ -105,6 +106,7 @@
   const inventory = ref<HTMLElement | null>(null);
   const stickersTabButton = ref<HTMLElement | null>(null);
   const packsTabButton = ref<HTMLElement | null>(null);
+  const tabHeader = ref<HTMLElement | null>(null);
   const isStickersTabOpen = ref(false);
   const isPacksTabOpen = ref(false);
   const currentPageNum = ref<number>(0);
@@ -128,7 +130,7 @@
         isPacksTabOpen.value = false;
       }
     },
-    { ignore: [packsTabButton, stickersTabButton] }
+    { ignore: [packsTabButton, stickersTabButton, tabHeader] }
   );
 
   // fetch albums on load
@@ -197,8 +199,19 @@
     loadingStickers.value = false;
   };
 
-  const onNewStickers = (newStickers: Array<ApiUserPack>) => {
-    console.log("new stickers", newStickers);
+  const onNewStickers = (newUserStickers: Array<ApiUserSticker>) => {
+    console.log("new stickers", newUserStickers);
+    newUserStickers.forEach((newUserSticker) => {
+      const index = userStickers.value.findIndex(
+        (us) => us.id == newUserSticker.id
+      );
+
+      if (index >= 0) {
+        userStickers.value.splice(index, 1, newUserSticker);
+      } else {
+        userStickers.value.push(newUserSticker);
+      }
+    });
   };
 
   const userPacks = ref<Array<ApiUserPack>>([]);
