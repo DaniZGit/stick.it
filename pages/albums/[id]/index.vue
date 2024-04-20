@@ -35,6 +35,19 @@
       <div class="row-span-1 w-full">
         <div class="w-full h-8"></div>
       </div>
+      <!-- 
+        When the inventory is open and you click on the album it doesn't close the inventory, instead it flips the page 
+          - seems like the PageFlip library calls e.preventDefault() somewhere
+        thats why we have this div to cover the whole page so that VueUse onClickOutside method recognizes the click
+      -->
+      <div
+        class="absolute top-0 left-0 right-0 bottom-0"
+        :class="{
+          hidden: !isStickersTabOpen && !isPacksTabOpen,
+        }"
+      ></div>
+
+      <!-- Buttons and inventory -->
       <div
         class="h-2/3 absolute left-0 right-0 bottom-0 flex flex-col rounded-full duration-300"
         :class="{
@@ -42,6 +55,7 @@
           'translate-y-0': isStickersTabOpen || isPacksTabOpen,
         }"
       >
+        <!-- Buttons -->
         <div
           class="w-full flex justify-between items-center gap-x-2 p-4 px-5 duration-300"
           :class="{
@@ -81,6 +95,7 @@
             <Icon name="i-mdi:cards-outline" size="20" />
           </AppIconButton>
         </div>
+        <!-- Inventory -->
         <div
           ref="inventory"
           class="w-full h-full bg-app-tertiary bg-opacity-75 backdrop-blur-sm rounded-t-md overflow-y-auto"
