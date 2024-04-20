@@ -11,6 +11,9 @@ dependencies:
   '@vee-validate/zod':
     specifier: ^4.12.5
     version: 4.12.6(vue@3.4.21)
+  page-flip:
+    specifier: ^2.0.7
+    version: 2.0.7
   primevue:
     specifier: ^3.48.1
     version: 3.49.1(vue@3.4.21)
@@ -49,6 +52,9 @@ devDependencies:
   '@pinia/nuxt':
     specifier: ^0.5.1
     version: 0.5.1(rollup@4.12.1)(vue@3.4.21)
+  '@types/page-flip':
+    specifier: ^2.0.3
+    version: 2.0.3
   '@vueuse/nuxt':
     specifier: ^10.7.2
     version: 10.9.0(nuxt@3.10.3)(rollup@4.12.1)(vue@3.4.21)
@@ -2149,6 +2155,10 @@ packages:
     resolution: {integrity: sha512-TBHyJxk2b7HceLVGFcpAUjsa5zIdsPWlR6XHfyGzd0SFu+/NFgQgMAl96MSDZgQDvJAvV6BKsFOrt6zIL09JDw==}
     dependencies:
       undici-types: 5.26.5
+    dev: true
+
+  /@types/page-flip@2.0.3:
+    resolution: {integrity: sha512-3scLJ0AqpEtp7JWkmRjkwFTR+4O5cy9imX8K12+t5p8HVfFCN2GUhGDT+yqOV5lqcMkST2qgwzWF25GYp1Sf5A==}
     dev: true
 
   /@types/resolve@1.20.2:
@@ -5702,6 +5712,10 @@ packages:
       - bluebird
       - supports-color
     dev: true
+
+  /page-flip@2.0.7:
+    resolution: {integrity: sha512-96lQFUUz7r/LZzEUZJ3yBIMEKU9+m8HMFDzTvTdD6P7Ag/wXINjp9n0W7b4wanwnDbQETo4uNUoL3zMqpFxwGA==}
+    dev: false
 
   /pako@0.2.9:
     resolution: {integrity: sha512-NUcwaKxUxWrZLpDG+z/xZaCgQITkA/Dv4V/T6bw7VON6l1Xz/VnrBqrYjZQ12TamKHzITTfOEIYUj48y2KXImA==}

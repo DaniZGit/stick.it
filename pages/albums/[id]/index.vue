@@ -12,9 +12,9 @@
     </div>
     <div
       v-else
-      class="w-full h-full p-4 flex flex-col justify-between gap-y-4 aspect-thumbnail relative"
+      class="w-full h-full p-4 grid grid-flow-row grid-rows-12 relative"
     >
-      <div class="w-full flex flex-col items-center gap-y-4">
+      <div class="row-span-11 w-full flex flex-col items-center gap-y-4">
         <h1 class="text-xl font-bold">{{ album?.title }}</h1>
         <AppAlbumPager
           :album="album"
@@ -31,6 +31,10 @@
         ></AppAlbumPager>
       </div>
 
+      <!-- empty div so that the album doesn't overflow the bottom absolute buttons -->
+      <div class="row-span-1 w-full">
+        <div class="w-full h-8"></div>
+      </div>
       <div
         class="h-2/3 absolute left-0 right-0 bottom-0 flex flex-col rounded-full duration-300"
         :class="{
@@ -39,7 +43,7 @@
         }"
       >
         <div
-          class="w-full flex justify-between items-center gap-x-2 p-4 duration-300"
+          class="w-full flex justify-between items-center gap-x-2 p-4 px-5 duration-300"
           :class="{
             '-translate-y-full': !isStickersTabOpen && !isPacksTabOpen,
             'translate-y-0': isStickersTabOpen || isPacksTabOpen,
