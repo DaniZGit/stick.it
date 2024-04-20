@@ -19,8 +19,14 @@
         <AppAlbumPager
           :album="album"
           @onFirstPage="() => (currentPageNum = 0)"
-          @onPrevPage="() => currentPageNum--"
-          @onNextPage="() => currentPageNum++"
+          @onPrevPage="() => (currentPageNum = Math.max(currentPageNum - 1, 0))"
+          @onNextPage="
+            () =>
+              (currentPageNum = Math.min(
+                currentPageNum + 1,
+                album?.pages.length ?? 0
+              ))
+          "
           @onLastPage="() => (currentPageNum = album?.pages.length ?? 0)"
         ></AppAlbumPager>
       </div>
@@ -170,7 +176,15 @@
     try {
       const response = await useApi<{
         pages: Array<ApiPage>;
-      }>(`/v1/pages/`);
+      }>(`/v1/albums/${route.params.id}/pages`, {
+        params: {
+          from: Math.max(currentPageNum.value - 3, 0),
+          to: Math.min(
+            currentPageNum.value + 3,
+            album.value?.pages.length ?? 0
+          ),
+        },
+      });
 
       if (response.pages) {
         pages.value = response.pages;
