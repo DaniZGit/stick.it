@@ -2,21 +2,45 @@
   <div class="w-full h-5/6 flex flex-col gap-y-2">
     <div class="w-full h-full">
       <div ref="book" class="w-full h-full book overflow-y-hidden">
-        <div class="h-full page">
+        <div class="page w-full h-full aspect-thumbnail">
           <NuxtImg
             :src="useUrl(props.album?.file?.url)"
             class="w-auto h-full aspect-thumbnail"
           />
         </div>
         <div
-          v-for="page in album?.pages"
+          v-for="page in props.album?.pages"
           :key="page.id"
-          class="h-full page bg-app-tertiary aspect-thumbnail"
+          class="page w-full h-full aspect-thumbnail bg-app-tertiary"
         >
           <NuxtImg
             :src="useUrl(page.file?.url)"
             class="w-auto h-full aspect-thumbnail"
           />
+
+          <div class="absolute top-0 left-0 bottom-0 right-0">
+            <div class="w-full h-full relative">
+              <div
+                v-for="sticker in page.stickers"
+                :key="sticker.id"
+                :id="sticker.id"
+                class="absolute"
+                :style="`
+                  width: ${sticker.width}%;
+                  height: ${sticker.height}%;
+                  top: ${sticker.top}%;
+                  left: ${sticker.left}%;
+                  aspect-ratio: ${sticker.numerator / sticker.denominator}
+                `"
+              >
+                <NuxtImg
+                  v-if="sticker"
+                  :src="useUrl(sticker.file?.url)"
+                  class="w-full h-full opacity-50"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

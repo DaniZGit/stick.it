@@ -134,7 +134,6 @@
   const tabHeader = ref<HTMLElement | null>(null);
   const isStickersTabOpen = ref(false);
   const isPacksTabOpen = ref(false);
-  const currentPageNum = ref<number>(0);
 
   const onStickersButtonClick = () => {
     isStickersTabOpen.value = !isStickersTabOpen.value;
@@ -184,11 +183,11 @@
   };
 
   // fetch pages when we move left/right
+  const currentPageNum = ref<number>(0);
   watch(currentPageNum, (newPageNum, oldPageNum) => {
     fetchPages();
   });
 
-  const pages = ref<Array<ApiPage>>([]);
   const loadingPages = ref(false);
   const fetchPages = async () => {
     loadingPages.value = true;
@@ -206,7 +205,15 @@
       });
 
       if (response.pages) {
-        pages.value = response.pages;
+        // update album pages with stickers data
+        response.pages.forEach((p) => {
+          const index = album.value?.pages.findIndex((ap) => ap.id == p.id);
+          if (index != undefined && index >= 0) {
+            if (album.value) {
+              album.value.pages[index].stickers = p.stickers;
+            }
+          }
+        });
       }
     } catch (error) {
       toast.value?.show("error", t("user-unexpected-error"));
