@@ -34,10 +34,19 @@
               :user-pack="itemProps.data"
               @opened="onPackOpened"
               @error="emit('error', $event)"
-              @pending="emit('pendingOpening', $event)"
+              @pending="onPackOpening"
             ></AppItemUserPack>
           </template>
         </AppCarousel>
+
+        <!-- Pack animation modal -->
+        <AppModalPackOpenAnimation
+          v-model:visible="showPackAnimationModal"
+          :user-pack="openedUserPack"
+          :user-stickers="newUserStickers"
+          :loading="openingPack"
+          @close="onPackAnimationClose"
+        ></AppModalPackOpenAnimation>
       </div>
     </div>
   </div>
@@ -46,19 +55,38 @@
 <script lang="ts" setup>
   import type { PropType } from "vue";
 
+  const showPackAnimationModal = ref(false);
   const carouselKey = ref(0); // we use this key to force carousel re-render on pack deletion, GH issue: https://github.com/primefaces/primevue/issues/4661
   const props = defineProps({
     userPacks: Array as PropType<Array<ApiUserPack>>,
-    loading: Boolean,
+    loading: Boolean as PropType<boolean>,
   });
 
   const emit = defineEmits<{
     updatePacks: [userPacks: Array<ApiUserPack>];
     newStickers: [userStickers: Array<ApiUserSticker>];
     error: any;
-    pendingOpening: any;
+    pendingOpening: [boolean];
+    packAnimationStart: [];
+    packAnimationEnd: [];
   }>();
 
+  const openingPack = ref(false);
+  const onPackOpening = (e: { status: boolean; userPack: ApiUserPack }) => {
+    openingPack.value = e.status;
+    openedUserPack.value = e.userPack;
+
+    if (e.status == true) {
+      // start the pack opening animation
+      showPackAnimationModal.value = true;
+      emit("packAnimationStart");
+    }
+
+    emit("pendingOpening", e.status);
+  };
+
+  const openedUserPack = ref<ApiUserPack | null>(null);
+  const newUserStickers = ref<Array<ApiUserSticker>>([]);
   const onPackOpened = (e: {
     userPack: ApiUserPack;
     userStickers: Array<ApiUserSticker>;
@@ -78,8 +106,17 @@
       }
     }
 
+    newUserStickers.value = e.userStickers;
+
     emit("updatePacks", localUserPacks);
     emit("newStickers", e.userStickers);
+  };
+
+  const onPackAnimationClose = () => {
+    openedUserPack.value = null;
+    newUserStickers.value = [];
+
+    emit("packAnimationEnd");
   };
 </script>
 

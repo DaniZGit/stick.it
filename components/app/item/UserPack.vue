@@ -69,14 +69,22 @@
       }
     ];
     error: [message: string];
-    pending: [value: boolean];
+    pending: [
+      {
+        status: boolean;
+        userPack: ApiUserPack;
+      }
+    ];
   }>();
 
   const openingPacks = ref(false);
   const openPacks = async (openAll: boolean) => {
     console.log("opening packs");
     openingPacks.value = true;
-    emit("pending", true);
+    emit("pending", {
+      status: true,
+      userPack: props.userPack,
+    });
     try {
       const response = await useApi<{
         user_stickers: Array<ApiUserSticker>;
@@ -100,7 +108,10 @@
       emit("error", t("unexpected-error"));
     }
     openingPacks.value = false;
-    emit("pending", false);
+    emit("pending", {
+      status: false,
+      userPack: props.userPack,
+    });
   };
 
   watch(titleRef, (oldTitleRef, newTitleRef) => {

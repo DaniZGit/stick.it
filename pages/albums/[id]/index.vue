@@ -107,6 +107,8 @@
             @update-packs="onPacksUpdate"
             @new-stickers="onNewStickers"
             @error="onPacksTabError"
+            @pack-animation-start="isPackAnimation = true"
+            @pack-animation-end="isPackAnimation = false"
           ></AppAlbumPacksTab>
           <AppAlbumStickersTab
             v-show="isStickersTabOpen"
@@ -134,6 +136,7 @@
   const tabHeader = ref<HTMLElement | null>(null);
   const isStickersTabOpen = ref(false);
   const isPacksTabOpen = ref(false);
+  const isPackAnimation = ref(false);
 
   const onStickersButtonClick = () => {
     isStickersTabOpen.value = !isStickersTabOpen.value;
@@ -149,7 +152,7 @@
   onClickOutside(
     inventory,
     (e) => {
-      if (isStickersTabOpen || isPacksTabOpen) {
+      if ((isStickersTabOpen || isPacksTabOpen) && !isPackAnimation.value) {
         isStickersTabOpen.value = false;
         isPacksTabOpen.value = false;
       }
