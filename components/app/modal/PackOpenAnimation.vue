@@ -46,9 +46,12 @@
           >
             <div
               v-for="userSticker in props.userStickers"
-              class="flex flex-col"
+              class="flex flex-col aspect-thumbnail"
             >
-              <NuxtImg :src="useUrl(userSticker.sticker.file?.url)"></NuxtImg>
+              <NuxtImg
+                :src="useUrl(userSticker.sticker.file?.url)"
+                class="w-full h-full"
+              ></NuxtImg>
             </div>
           </div>
         </div>

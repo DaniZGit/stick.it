@@ -250,7 +250,11 @@
       );
 
       if (index >= 0) {
-        userStickers.value.splice(index, 1, newUserSticker);
+        // we can get duplicate stickers if opening multiple packs
+        // they can be in wrong order, so we want to make sure the latest amount is set
+        if (userStickers.value[index].amount < newUserSticker.amount) {
+          userStickers.value.splice(index, 1, newUserSticker);
+        }
       } else {
         userStickers.value.push(newUserSticker);
       }
