@@ -17,17 +17,10 @@
       <div class="row-span-11 w-full flex flex-col items-center gap-y-4">
         <h1 class="text-xl font-bold">{{ album?.title }}</h1>
         <AppAlbumPager
+          ref="albumPagerRef"
+          v-model:page="currentPageNum"
           :album="album"
-          @onFirstPage="() => (currentPageNum = 0)"
-          @onPrevPage="() => (currentPageNum = Math.max(currentPageNum - 1, 0))"
-          @onNextPage="
-            () =>
-              (currentPageNum = Math.min(
-                currentPageNum + 1,
-                album?.pages.length ?? 0
-              ))
-          "
-          @onLastPage="() => (currentPageNum = album?.pages.length ?? 0)"
+          @flipped-to-sticker-page="onFlippedToStickerPage"
         ></AppAlbumPager>
       </div>
 
@@ -113,16 +106,23 @@
           <AppAlbumStickersTab
             v-show="isStickersTabOpen"
             :userStickers="userStickers"
+            @sticker-stick="onStickerStick"
           ></AppAlbumStickersTab>
         </div>
       </div>
     </div>
 
+    <img
+      ref="stickingAnimationSticker"
+      class="absolute ring-2 ring-app-secondary rounded-md z-[9999] hidden"
+      :src="useUrl(undefined)"
+    />
     <CustomToast ref="toast"></CustomToast>
   </div>
 </template>
 
 <script lang="ts" setup>
+  import type { AppAlbumPager } from "#build/components";
   import CustomToast from "~/components/CustomToast.vue";
 
   const route = useRoute();
@@ -130,6 +130,8 @@
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
   const userStore = useUserStore();
 
+  const albumPagerRef = ref<InstanceType<typeof AppAlbumPager> | null>(null);
+  const stickingAnimationSticker = ref<HTMLImageElement | null>(null);
   const inventory = ref<HTMLElement | null>(null);
   const stickersTabButton = ref<HTMLElement | null>(null);
   const packsTabButton = ref<HTMLElement | null>(null);
@@ -170,6 +172,7 @@
   const album = ref<ApiAlbum>();
   const loadingAlbum = ref(false);
   const fetchAlbum = async () => {
+    console.log("fetching album data");
     loadingAlbum.value = true;
     try {
       const response = await useApi<{
@@ -193,6 +196,7 @@
 
   const loadingPages = ref(false);
   const fetchPages = async () => {
+    console.log("fetching pages");
     loadingPages.value = true;
     try {
       const response = await useApi<{
@@ -217,6 +221,15 @@
             }
           }
         });
+
+        // first condition checks if the animation is already running
+        // second condition checks if we are in the middle of page flipping (in case api call was faster)
+        if (
+          !stickingAnimationIsRunning.value &&
+          albumPagerRef.value?.getFlipState() != "flipping"
+        ) {
+          startStickingToPageAnimation();
+        }
       }
     } catch (error) {
       toast.value?.show("error", t("user-unexpected-error"));
@@ -227,6 +240,7 @@
   const userStickers = ref<Array<ApiUserSticker>>([]);
   const loadingStickers = ref(false);
   const fetchStickers = async () => {
+    console.log("fetching stickers");
     loadingStickers.value = true;
     try {
       const response = await useApi<{
@@ -243,7 +257,6 @@
   };
 
   const onNewStickers = (newUserStickers: Array<ApiUserSticker>) => {
-    console.log("new stickers", newUserStickers);
     newUserStickers.forEach((newUserSticker) => {
       const index = userStickers.value.findIndex(
         (us) => us.id == newUserSticker.id
@@ -264,6 +277,7 @@
   const userPacks = ref<Array<ApiUserPack>>([]);
   const loadingPacks = ref(false);
   const fetchPacks = async () => {
+    console.log("fetching packs");
     loadingPacks.value = true;
     try {
       const response = await useApi<{
@@ -280,12 +294,102 @@
   };
 
   const onPacksUpdate = (updatedUserPacks: Array<ApiUserPack>) => {
-    console.log("on packs update", updatedUserPacks);
     userPacks.value = updatedUserPacks;
   };
 
   const onPacksTabError = (errorMessage: string) => {
     toast.value?.show("error", errorMessage);
+  };
+
+  const onStickerStick = (data: {
+    userSticker: ApiUserSticker | undefined;
+    userStickerContainer: HTMLElement | null;
+  }) => {
+    if (
+      !albumPagerRef.value ||
+      !stickingAnimationSticker.value ||
+      !data.userSticker ||
+      !data.userStickerContainer
+    )
+      return;
+
+    // make an absolute version of selected sticker
+    stickingAnimationSticker.value.id = data.userSticker.sticker.id;
+    stickingAnimationSticker.value.style.top =
+      data.userStickerContainer.getBoundingClientRect().top + "px";
+    stickingAnimationSticker.value.style.left =
+      data.userStickerContainer.getBoundingClientRect().left + "px";
+    stickingAnimationSticker.value.style.width =
+      data.userStickerContainer.getBoundingClientRect().width + "px";
+    stickingAnimationSticker.value.style.height =
+      data.userStickerContainer.getBoundingClientRect().height + "px";
+
+    // set selected sticker image
+    stickingAnimationSticker.value.src = useUrl(
+      data.userSticker.sticker.file?.url
+    );
+    stickingAnimationSticker.value.classList.remove("hidden");
+
+    // flip to the page that the sticker is on - this will then emit an event that will run the onFlippedToStickerPage() function
+    albumPagerRef.value.flipToStickerPage(data.userSticker);
+
+    // close all tabs
+    isPacksTabOpen.value = false;
+    isStickersTabOpen.value = false;
+  };
+
+  const onFlippedToStickerPage = () => {
+    // if we are fetching stickers from api, wait for that to finish and start the animation from the fetchPages() function instead
+    if (loadingPages.value || stickingAnimationIsRunning.value) return;
+
+    startStickingToPageAnimation();
+  };
+
+  const stickingAnimationIsRunning = ref(false);
+  const startStickingToPageAnimation = () => {
+    if (!stickingAnimationSticker.value) return;
+
+    // get the sticker element that is on the album page
+    const stickerEl = document.getElementById(
+      `sticker-${stickingAnimationSticker.value.id}`
+    );
+    if (!stickerEl) return;
+
+    stickingAnimationIsRunning.value = true;
+    setTimeout(() => {
+      if (!stickingAnimationSticker.value) {
+        stickingAnimationIsRunning.value = false;
+        return;
+      }
+
+      // move the absolute sticker to the position that the sticker is on the album page
+      stickingAnimationSticker.value.style.transitionDuration = "1000ms";
+      stickingAnimationSticker.value.style.top =
+        stickerEl.getBoundingClientRect().top + "px";
+      stickingAnimationSticker.value.style.left =
+        stickerEl.getBoundingClientRect().left + "px";
+      stickingAnimationSticker.value.style.width =
+        stickerEl.getBoundingClientRect().width + "px";
+      stickingAnimationSticker.value.style.height =
+        stickerEl.getBoundingClientRect().height + "px";
+
+      // after the animation ends
+      setTimeout(() => {
+        if (stickingAnimationSticker.value) {
+          // show page sticker
+          const stickerEl = document.getElementById(
+            `sticker-${stickingAnimationSticker.value.id}`
+          );
+          stickerEl?.classList.remove("opacity-0");
+          stickerEl?.classList.add("opacity-100");
+          // hide moving sticker
+          stickingAnimationSticker.value.classList.add("hidden");
+          stickingAnimationSticker.value.style.transitionDuration = "0ms";
+        }
+
+        stickingAnimationIsRunning.value = false;
+      }, 1000);
+    }, 250);
   };
 </script>
 

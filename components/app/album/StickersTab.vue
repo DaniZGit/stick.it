@@ -1,9 +1,9 @@
 <template>
   <div class="w-full h-full grid grid-flow-row grid-rows-12 pt-2">
     <div class="row-span-12 flex flex-nowrap">
-      <div v-if="loading">loading stickers...</div>
+      <div v-if="props.loading">loading stickers...</div>
       <div
-        v-else-if="!userStickers?.length"
+        v-else-if="!props.userStickers?.length"
         class="w-full h-full flex flex-col items-center justify-center text-xl"
       >
         <span class="flex flex-col justify-center items-center">
@@ -25,9 +25,11 @@
         class="w-full grid grid-cols-4 auto-rows-max gap-x-2 gap-y-5 p-2 pb-5 overflow-y-auto"
       >
         <AppItemUserSticker
-          v-for="userSticker in userStickers"
+          v-for="userSticker in props.userStickers"
           :key="userSticker.id"
           :user-sticker="userSticker"
+          @stick="emit('stickerStick', $event)"
+          @view="emit('stickerView', $event)"
         >
         </AppItemUserSticker>
       </div>
@@ -42,6 +44,11 @@
     userStickers: Array as PropType<Array<ApiUserSticker>>,
     loading: Boolean,
   });
+
+  const emit = defineEmits<{
+    stickerView: [userSticker: ApiUserSticker | undefined];
+    stickerStick: [userSticker: ApiUserSticker | undefined];
+  }>();
 </script>
 
 <style></style>
