@@ -20,6 +20,7 @@
           ref="albumPagerRef"
           v-model:page="currentPageNum"
           :album="album"
+          :user-stickers="userStickers"
           @flipped-to-sticker-page="onFlippedToStickerPage"
         ></AppAlbumPager>
       </div>
@@ -330,6 +331,8 @@
     );
     stickingAnimationSticker.value.classList.remove("hidden");
 
+    apiStickStickerRequest(data.userSticker);
+
     // flip to the page that the sticker is on - this will then emit an event that will run the onFlippedToStickerPage() function
     albumPagerRef.value.flipToStickerPage(data.userSticker);
 
@@ -390,6 +393,35 @@
         stickingAnimationIsRunning.value = false;
       }, 1000);
     }, 250);
+  };
+
+  const stickingSticker = ref(false);
+  const apiStickStickerRequest = async (userSticker: ApiUserSticker) => {
+    console.log("fetching album data");
+    stickingSticker.value = true;
+    try {
+      const response = await useApi<{
+        user_sticker: ApiUserSticker;
+      }>(`/v1/users/${userStore.user.id}/stick-sticker`, {
+        method: "PATCH",
+        body: {
+          sticker_id: userSticker.sticker_id,
+        },
+      });
+
+      if (response.user_sticker) {
+        const index = userStickers.value.findIndex((us) => {
+          return us.id == response.user_sticker.id;
+        });
+        if (index >= 0) {
+          userStickers.value[index].sticked = response.user_sticker.sticked;
+          userStickers.value[index].amount = response.user_sticker.amount;
+        }
+      }
+    } catch (error) {
+      toast.value?.show("error", t("user-unexpected-error"));
+    }
+    stickingSticker.value = false;
   };
 </script>
 

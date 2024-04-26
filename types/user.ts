@@ -28,5 +28,6 @@ type ApiUserSticker = {
   user_id: string;
   sticker_id: string;
   amount: number;
+  sticked: boolean;
   sticker: ApiSticker;
 };

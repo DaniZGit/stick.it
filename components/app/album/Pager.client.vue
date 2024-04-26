@@ -20,25 +20,13 @@
 
           <div class="absolute top-0 left-0 bottom-0 right-0">
             <div class="w-full h-full relative">
-              <div
+              <AppItemPageSticker
                 v-for="sticker in page.stickers"
                 :key="sticker.id"
-                :id="`sticker-${sticker.id}`"
-                class="absolute opacity-0"
-                :style="`
-                  width: ${sticker.width}%;
-                  height: ${sticker.height}%;
-                  top: ${sticker.top}%;
-                  left: ${sticker.left}%;
-                  aspect-ratio: ${sticker.numerator / sticker.denominator}
-                `"
+                :sticker="sticker"
+                :user-stickers="userStickers"
               >
-                <NuxtImg
-                  v-if="sticker"
-                  :src="useUrl(sticker.file?.url)"
-                  class="w-full h-full"
-                />
-              </div>
+              </AppItemPageSticker>
             </div>
           </div>
         </div>
@@ -77,6 +65,7 @@
 
   const props = defineProps({
     album: Object as PropType<ApiAlbum>,
+    userStickers: Array as PropType<Array<ApiUserSticker>>,
   });
 
   const emit = defineEmits<{

@@ -20,10 +20,8 @@
       v-if="focus"
       class="absolute top-0 bottom-0 left-0 right-0 flex items-center px-1"
     >
-      <div
-        class="w-full flex flex-col justify-center divide-y-2 divide-app-primary ring-2 ring-app-primary rounded-md"
-      >
-        <div
+      <div class="w-full flex flex-col justify-center gap-y-1 rounded-md">
+        <AppButton
           v-for="(option, i) in options"
           class="w-full flex justify-center bg-app-tertiary hover:bg-app-tertiary-focus bg-opacity-50 duration-150 py-1"
           :class="{
@@ -31,9 +29,10 @@
             'rounded-b-md': i == options.length - 1,
           }"
           @click="option.action"
+          :disabled="option.disabled"
         >
           <Icon v-if="option.icon" :name="option.icon" size="18" />
-        </div>
+        </AppButton>
       </div>
     </div>
   </div>
@@ -67,6 +66,7 @@
           userSticker: props.userSticker,
           userStickerContainer: container.value,
         }),
+      disabled: computed(() => props.userSticker?.sticked),
     },
     {
       id: 1,
