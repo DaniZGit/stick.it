@@ -46,9 +46,9 @@
       icon: "i-mdi:book-open-blank-variant-outline",
     },
     {
-      link: "/club",
-      title: "Club",
-      icon: "i-mdi:baseball-outline",
+      link: "/settings",
+      title: "Settings",
+      icon: "i-mdi:settings-outline",
     },
   ];
 </script>
