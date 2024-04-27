@@ -7,10 +7,10 @@
       >
         Packs
       </h2>
-      <div v-if="loadingPacks" class="grid grid-cols-3 gap-x-4 gap-y-4">
+      <div v-if="loadingPacks" class="grid grid-cols-2 gap-x-4 gap-y-4">
         <AppSkeletonPackItem v-for="n in [1, 2]" :key="n"></AppSkeletonPackItem>
       </div>
-      <div v-else class="grid grid-cols-3 gap-x-4 gap-y-4">
+      <div v-else class="grid grid-cols-2 gap-x-4 gap-y-4">
         <AppItemPack
           v-for="(pack, i) in packs"
           :key="pack.id"
