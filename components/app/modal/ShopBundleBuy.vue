@@ -10,22 +10,19 @@
       <div
         class="w-full flex flex-col items-center justify-center p-2 rounded-md"
       >
-        <Icon
-          name="i-akar-icons:coin"
-          size="96"
-          class="text-app-gold brightness-150"
-        />
-        <div
-          class="flex flex-col items-center gap-x-1 text-app-gold brightness-150"
-        >
-          <span class="text-3xl font-bold tracking-wider">
-            {{ props.bundle?.amount }}
-          </span>
-          <span
-            class="text-lg font-bold tracking-wider text-app-gold brightness-100"
-          >
-            + {{ props.bundle?.bonus }}
-          </span>
+        <NuxtImg
+          :src="useUrl(props.bundle.file?.url)"
+          class="aspect-square rounded-t-md"
+        ></NuxtImg>
+        <div>
+          <div class="flex justify-center items-center gap-x-1">
+            <span class="text-lg font-bold text-app-gold brightness-150">{{
+              props.bundle.tokens
+            }}</span>
+            <span class="text-base text-app-gold brightness-125">
+              ( + {{ props.bundle.bonus }} )
+            </span>
+          </div>
         </div>
       </div>
       <div
@@ -67,12 +64,17 @@
         user: ApiUser;
       }>("/v1/transactions/bundle", {
         method: "POST",
+        body: {
+          bundle_id: props.bundle.id,
+        },
       });
 
       if (response.user) {
         userStore.user.tokens = response.user.tokens;
         console.log("bought pack:", response.user);
       }
+
+      isVisible.value = false;
     } catch (error) {
       // toast.value?.show("error", t("user-unexpected-error"));
     }

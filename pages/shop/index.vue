@@ -7,10 +7,10 @@
       >
         Packs
       </h2>
-      <div v-if="loadingPacks" class="grid grid-cols-2 gap-x-4 gap-y-4">
+      <div v-if="loadingPacks" class="grid grid-cols-3 gap-x-4 gap-y-4">
         <AppSkeletonPackItem v-for="n in [1, 2]" :key="n"></AppSkeletonPackItem>
       </div>
-      <div v-else class="grid grid-cols-2 gap-x-4 gap-y-4">
+      <div v-else class="grid grid-cols-3 gap-x-4 gap-y-4">
         <AppItemPack
           v-for="(pack, i) in packs"
           :key="pack.id"
@@ -53,30 +53,7 @@
 
   onMounted(() => {
     fetchPacks();
-    // fetchBundles();
-    bundles.value = [
-      {
-        id: "12",
-        title: "Bagiful",
-        price: 4.99,
-        amount: 150,
-        bonus: 25,
-      },
-      {
-        id: "123",
-        title: "Plentiful",
-        price: 10.99,
-        amount: 450,
-        bonus: 75,
-      },
-      {
-        id: "1234",
-        title: "Chestful",
-        price: 54.99,
-        amount: 1500,
-        bonus: 350,
-      },
-    ];
+    fetchBundles();
   });
 
   // fetch packs
@@ -101,6 +78,21 @@
   // fetches bundles
   const bundles = ref<Array<ApiBundle>>([]);
   const loadingBundles = ref(false);
+  const fetchBundles = async () => {
+    loadingBundles.value = true;
+    try {
+      const response = await useApi<{
+        bundles: Array<ApiBundle>;
+      }>("/v1/shop/bundles");
+
+      if (response.bundles) {
+        bundles.value = response.bundles;
+      }
+    } catch (error) {
+      toast.value?.show("error", t("user-unexpected-error"));
+    }
+    loadingBundles.value = false;
+  };
 </script>
 
 <style></style>
