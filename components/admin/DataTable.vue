@@ -32,10 +32,10 @@
       <Column :pt="columnPreset" class="text-right" header-class="items-end">
         <template #body="slotProps">
           <div class="flex justify-end gap-x-2">
-            <AdminButton @click="emit('delete', slotProps.data)">
+            <AdminButton @click="emit('edit', slotProps.data)">
               <Icon name="i-mdi:square-edit-outline" size="24" />
             </AdminButton>
-            <AdminButton @click="emit('edit', slotProps.data)">
+            <AdminButton @click="emit('delete', slotProps.data)">
               <Icon name="i-mdi:trash-can-outline" size="24" />
             </AdminButton>
           </div>

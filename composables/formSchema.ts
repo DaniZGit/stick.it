@@ -258,6 +258,39 @@ export const useFormSchema = () => {
     })
   );
 
+  const BundleCreateSchema = toTypedSchema(
+    zod.object({
+      file: zod
+        .any()
+        .refine((file) => {
+          if (!file || file.size <= MAX_FILE_SIZE) return true;
+        }, t("validation-file-max-size"))
+        .refine((file) => {
+          if (!file || ACCEPTED_IMAGE_TYPES.includes(file?.type)) return true;
+        }, t("validation-file-accepted-types")),
+      title: zod
+        .string({
+          required_error: t("validation-required", { field: "title" }),
+        })
+        .min(3, t("validation-min-length", { field: "Title", min: 3 })),
+      price: zod
+        .number({
+          required_error: t("validation-required", { field: "price" }),
+        })
+        .min(0, t("validation-number-min-length", { field: "Price", min: 0 })),
+      tokens: zod
+        .number({
+          required_error: t("validation-required", { field: "tokens" }),
+        })
+        .min(1, t("validation-number-min-length", { field: "Tokens", min: 1 })),
+      bonus: zod
+        .number({
+          required_error: t("validation-required", { field: "bonus" }),
+        })
+        .min(0, t("validation-number-min-length", { field: "Bonus", min: 0 })),
+    })
+  );
+
   return {
     RegisterSchema,
     LoginSchema,
@@ -268,5 +301,6 @@ export const useFormSchema = () => {
     StickerRarityCreateSchema,
     RarityCreateSchema,
     PackCreateSchema,
+    BundleCreateSchema,
   };
 };

@@ -1,7 +1,7 @@
 <template>
   <AdminDialog
     v-model:visible="isVisible"
-    header="Create Pack"
+    header="Update Bundle"
     :modal="true"
     :draggable="false"
     @hide="resetForm"
@@ -18,6 +18,7 @@
           <CustomFileUpload
             v-model:file="file"
             :error="errors.file"
+            :url="props.bundle?.file?.url"
           ></CustomFileUpload>
         </div>
 
@@ -45,20 +46,36 @@
           />
 
           <AdminInputNumber
-            id="amount"
-            name="amount"
-            :label="$t('admin-pack-create-amount')"
+            id="tokens"
+            name="tokens"
+            :label="$t('admin-pack-create-tokens')"
             placeholder="5"
             icon="i-material-symbols:height"
-            v-model="amount"
+            v-model="tokens"
+            :min="1"
+            show-buttons
+            :error="errors.tokens"
+          />
+
+          <AdminInputNumber
+            id="bonus"
+            name="bonus"
+            :label="$t('admin-pack-create-bonus')"
+            placeholder="5"
+            icon="i-material-symbols:height"
+            v-model="bonus"
             :min="0"
             show-buttons
-            :error="errors.amount"
+            :error="errors.bonus"
           />
         </div>
 
-        <AdminButton type="submit" class="self-center rounded-md w-1/2">
-          Create
+        <AdminButton
+          type="submit"
+          class="self-center rounded-md w-1/2 py-1"
+          color="blue"
+        >
+          Update
         </AdminButton>
       </VeeForm>
     </div>
@@ -67,57 +84,71 @@
 
 <script lang="ts" setup>
   import type { FetchError } from "ofetch";
-  const { PackCreateSchema } = useFormSchema();
+  const { BundleCreateSchema } = useFormSchema();
 
   const { t } = useI18n();
   const isVisible = defineModel("visible", { type: Boolean });
 
   const props = defineProps<{
-    albumId: string;
+    bundle: ApiBundle | null;
   }>();
 
   const emit = defineEmits<{
-    created: [album: ApiPack];
+    edited: [bundle: ApiBundle];
     error: [message: string];
     pending: [value: boolean];
   }>();
 
   // form stuff
-  const { defineField, handleSubmit, errors, setErrors, resetForm } = useForm({
-    validationSchema: PackCreateSchema,
-    initialValues: {
-      price: 0,
-    },
-  });
+  const { defineField, handleSubmit, errors, setErrors, resetForm, setValues } =
+    useForm({
+      validationSchema: BundleCreateSchema,
+    });
 
   const [title] = defineField("title");
   const [price] = defineField("price");
-  const [amount] = defineField("amount");
+  const [tokens] = defineField("tokens");
+  const [bonus] = defineField("bonus");
   const [file] = defineField("file");
+
+  watch(isVisible, (newVisible, oldVisible) => {
+    if (newVisible == true) {
+      setValues({
+        title: props.bundle?.title,
+        price: props.bundle?.price,
+        tokens: props.bundle?.tokens,
+        bonus: props.bundle?.bonus,
+      });
+    }
+  });
 
   // create request
   const onSubmit = handleSubmit(async (values) => {
     const body = new FormData();
     body.append("title", values.title);
     body.append("price", values.price.toString());
-    body.append("amount", values.amount.toString());
-    body.append("album_id", props.albumId);
+    body.append("tokens", values.tokens.toString());
+    body.append("bonus", values.bonus.toString());
+    body.append("file_id", props.bundle?.file_id?.toString() ?? "");
     body.append("file", values.file);
 
     console.log(values);
 
     emit("pending", true);
     try {
-      const response = await useApi<{ pack: ApiPack }>("/v1/packs", {
-        method: "POST",
-        body: body,
-      });
+      const response = await useApi<{ bundle: ApiBundle }>(
+        `/v1/bundles/${props.bundle?.id}`,
+        {
+          method: "PUT",
+          body: body,
+        }
+      );
 
       // hide modal
       isVisible.value = false;
 
-      if (response.pack) {
-        emit("created", response.pack);
+      if (response.bundle) {
+        emit("edited", response.bundle);
       } else {
         emit("error", t("admin-mismatched-response"));
       }

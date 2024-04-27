@@ -1,7 +1,7 @@
 <template>
   <AdminDialog
     v-model:visible="isVisible"
-    header="Create Pack"
+    header="Create Bundle"
     :modal="true"
     :draggable="false"
     @hide="resetForm"
@@ -45,15 +45,27 @@
           />
 
           <AdminInputNumber
-            id="amount"
-            name="amount"
-            :label="$t('admin-pack-create-amount')"
+            id="tokens"
+            name="tokens"
+            :label="$t('admin-pack-create-tokens')"
             placeholder="5"
             icon="i-material-symbols:height"
-            v-model="amount"
+            v-model="tokens"
+            :min="1"
+            show-buttons
+            :error="errors.tokens"
+          />
+
+          <AdminInputNumber
+            id="bonus"
+            name="bonus"
+            :label="$t('admin-pack-create-bonus')"
+            placeholder="5"
+            icon="i-material-symbols:height"
+            v-model="bonus"
             :min="0"
             show-buttons
-            :error="errors.amount"
+            :error="errors.bonus"
           />
         </div>
 
@@ -67,32 +79,30 @@
 
 <script lang="ts" setup>
   import type { FetchError } from "ofetch";
-  const { PackCreateSchema } = useFormSchema();
+  const { BundleCreateSchema } = useFormSchema();
 
   const { t } = useI18n();
   const isVisible = defineModel("visible", { type: Boolean });
 
-  const props = defineProps<{
-    albumId: string;
-  }>();
-
   const emit = defineEmits<{
-    created: [album: ApiPack];
+    created: [bundle: ApiBundle];
     error: [message: string];
     pending: [value: boolean];
   }>();
 
   // form stuff
   const { defineField, handleSubmit, errors, setErrors, resetForm } = useForm({
-    validationSchema: PackCreateSchema,
+    validationSchema: BundleCreateSchema,
     initialValues: {
       price: 0,
+      bonus: 0,
     },
   });
 
   const [title] = defineField("title");
   const [price] = defineField("price");
-  const [amount] = defineField("amount");
+  const [tokens] = defineField("tokens");
+  const [bonus] = defineField("bonus");
   const [file] = defineField("file");
 
   // create request
@@ -100,15 +110,15 @@
     const body = new FormData();
     body.append("title", values.title);
     body.append("price", values.price.toString());
-    body.append("amount", values.amount.toString());
-    body.append("album_id", props.albumId);
+    body.append("tokens", values.tokens.toString());
+    body.append("bonus", values.bonus.toString());
     body.append("file", values.file);
 
     console.log(values);
 
     emit("pending", true);
     try {
-      const response = await useApi<{ pack: ApiPack }>("/v1/packs", {
+      const response = await useApi<{ bundle: ApiBundle }>("/v1/bundles", {
         method: "POST",
         body: body,
       });
@@ -116,8 +126,8 @@
       // hide modal
       isVisible.value = false;
 
-      if (response.pack) {
-        emit("created", response.pack);
+      if (response.bundle) {
+        emit("created", response.bundle);
       } else {
         emit("error", t("admin-mismatched-response"));
       }
