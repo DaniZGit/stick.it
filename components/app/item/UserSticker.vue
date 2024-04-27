@@ -17,8 +17,11 @@
 
     <!-- options -->
     <div
-      v-if="focus"
-      class="absolute top-0 bottom-0 left-0 right-0 flex items-center px-1"
+      class="absolute top-0 bottom-0 left-0 right-0 flex items-center px-1 duration-200"
+      :class="{
+        'opacity-0 pointer-events-none': !focus,
+        'opacity-100': focus,
+      }"
     >
       <div class="w-full flex flex-col justify-center gap-y-1 rounded-md">
         <AppButton
@@ -27,9 +30,9 @@
           :class="{
             'rounded-t-md': i == 0,
             'rounded-b-md': i == options.length - 1,
+            hidden: option.hideIf,
           }"
           @click="option.action"
-          :disabled="option.disabled"
         >
           <Icon v-if="option.icon" :name="option.icon" size="18" />
         </AppButton>
@@ -66,13 +69,14 @@
           userSticker: props.userSticker,
           userStickerContainer: container.value,
         }),
-      disabled: computed(() => props.userSticker?.sticked),
+      hideIf: computed(() => props.userSticker?.sticked),
     },
     {
       id: 1,
       icon: "i-mdi:eye",
       label: "View",
       action: () => emit("view", props.userSticker),
+      hideIf: false,
     },
   ]);
 

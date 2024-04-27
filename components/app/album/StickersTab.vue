@@ -29,11 +29,16 @@
           :key="userSticker.id"
           :user-sticker="userSticker"
           @stick="emit('stickerStick', $event)"
-          @view="emit('stickerView', $event)"
+          @view="onStickerView"
         >
         </AppItemUserSticker>
       </div>
     </div>
+    <AppModalViewSticker
+      v-model:visible="showStickerViewModal"
+      :sticker="selectedUserSticker?.sticker"
+      @hide="emit('stickerViewClose')"
+    ></AppModalViewSticker>
   </div>
 </template>
 
@@ -48,7 +53,15 @@
   const emit = defineEmits<{
     stickerView: [userSticker: ApiUserSticker | undefined];
     stickerStick: [userSticker: ApiUserSticker | undefined];
+    stickerViewOpen: [];
+    stickerViewClose: [];
   }>();
-</script>
 
-<style></style>
+  const showStickerViewModal = ref(false);
+  const selectedUserSticker = ref<ApiUserSticker | null>(null);
+  const onStickerView = (userSticker: ApiUserSticker) => {
+    selectedUserSticker.value = userSticker;
+    showStickerViewModal.value = true;
+    emit("stickerViewOpen");
+  };
+</script>

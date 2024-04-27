@@ -108,6 +108,8 @@
             v-show="isStickersTabOpen"
             :userStickers="userStickers"
             @sticker-stick="onStickerStick"
+            @sticker-view-open="isViewingSticker = true"
+            @sticker-view-close="isViewingSticker = false"
           ></AppAlbumStickersTab>
         </div>
       </div>
@@ -140,6 +142,7 @@
   const isStickersTabOpen = ref(false);
   const isPacksTabOpen = ref(false);
   const isPackAnimation = ref(false);
+  const isViewingSticker = ref(false);
 
   const onStickersButtonClick = () => {
     isStickersTabOpen.value = !isStickersTabOpen.value;
@@ -155,7 +158,11 @@
   onClickOutside(
     inventory,
     (e) => {
-      if ((isStickersTabOpen || isPacksTabOpen) && !isPackAnimation.value) {
+      if (
+        (isStickersTabOpen || isPacksTabOpen) &&
+        !isPackAnimation.value &&
+        !isViewingSticker.value
+      ) {
         isStickersTabOpen.value = false;
         isPacksTabOpen.value = false;
       }
