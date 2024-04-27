@@ -12,7 +12,7 @@
       >
         <NuxtImg
           :src="useUrl(props.bundle.file?.url)"
-          class="aspect-square rounded-t-md"
+          class="w-1/2 aspect-square rounded-md"
         ></NuxtImg>
         <div>
           <div class="flex justify-center items-center gap-x-1">
