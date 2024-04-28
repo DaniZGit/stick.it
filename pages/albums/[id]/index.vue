@@ -14,7 +14,12 @@
       v-else
       class="w-full h-full p-4 grid grid-flow-row grid-rows-12 relative"
     >
-      <div class="row-span-11 w-full flex flex-col items-center gap-y-4">
+      <div
+        class="row-span-11 w-full flex flex-col items-center gap-y-4"
+        :class="{
+          'pointer-events-none': stickingAnimationIsRunning,
+        }"
+      >
         <h1 class="text-xl font-bold">{{ album?.title }}</h1>
         <AppAlbumPager
           ref="albumPagerRef"
@@ -43,7 +48,7 @@
 
       <!-- Buttons and inventory -->
       <div
-        class="h-2/3 absolute left-0 right-0 bottom-0 flex flex-col rounded-full duration-300"
+        class="h-2/3 absolute left-0 right-0 bottom-0 flex flex-col rounded-full duration-300 z-[1]"
         :class="{
           'translate-y-full': !isStickersTabOpen && !isPacksTabOpen,
           'translate-y-0': isStickersTabOpen || isPacksTabOpen,
@@ -117,7 +122,7 @@
 
     <img
       ref="stickingAnimationSticker"
-      class="absolute ring-2 ring-app-secondary rounded-md z-[9999] hidden"
+      class="absolute ring-2 ring-app-secondary rounded-md hidden"
       :src="useUrl(undefined)"
     />
     <CustomToast ref="toast"></CustomToast>
@@ -233,6 +238,7 @@
         // first condition checks if the animation is already running
         // second condition checks if we are in the middle of page flipping (in case api call was faster)
         if (
+          !stickingAnimationSticker.value?.classList.contains("hidden") &&
           !stickingAnimationIsRunning.value &&
           albumPagerRef.value?.getFlipState() != "flipping"
         ) {
@@ -348,6 +354,7 @@
     isStickersTabOpen.value = false;
   };
 
+  // event emitted from inside the flipToStickerPage() function
   const onFlippedToStickerPage = () => {
     // if we are fetching stickers from api, wait for that to finish and start the animation from the fetchPages() function instead
     if (loadingPages.value || stickingAnimationIsRunning.value) return;
