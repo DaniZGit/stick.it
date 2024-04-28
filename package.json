@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^3.3.0",
     "@vee-validate/nuxt": "^4.12.5",
     "@vee-validate/zod": "^4.12.5",
     "nuxt-swiper": "2.0.0-1",

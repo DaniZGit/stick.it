@@ -48,6 +48,10 @@
       type: Boolean,
       default: false,
     },
+    removePadding: {
+      type: Boolean,
+      default: false,
+    },
   });
   const emit = defineEmits<{
     close: [];
@@ -59,7 +63,12 @@
   };
 
   const preset: DialogPassThroughOptions = {
-    root: "w-5/6 h-full text-app-primary !border-0 !shadow-none",
+    root: [
+      "w-5/6 h-full text-app-primary !border-0 !shadow-none",
+      {
+        "w-full max-h-full": props.removePadding,
+      },
+    ],
     content: "!shadow-0",
   };
 </script>

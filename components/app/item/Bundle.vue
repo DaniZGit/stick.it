@@ -1,8 +1,7 @@
 <template>
-  <div class="h-full w-full group" @click="showBuyModal = true">
+  <div class="h-full w-full group">
     <div
       class="h-full flex flex-col justify-between items-center text-center rounded-md"
-      @click="showBuyModal = true"
     >
       <h3>{{ props.bundle.title }}</h3>
       <div
@@ -18,28 +17,26 @@
           >
             {{ props.bundle.price }} €
           </span>
-          <div class="flex justify-center items-center gap-x-1">
-            <span class="text-base font-bold text-app-gold brightness-150">{{
+          <div class="flex justify-center items-center gap-x-1 text-app-gold">
+            <span class="text-base font-bold brightness-150">{{
               props.bundle.tokens
             }}</span>
-            <span class="text-xs text-app-gold brightness-125">
+            <span class="text-xs brightness-125">
               ( + {{ props.bundle.bonus }} )
             </span>
+            <Icon
+              name="i-akar-icons:coin"
+              size="14"
+              class="brightness-150 mt-0.5"
+            />
           </div>
         </div>
       </div>
     </div>
-    <AppModalShopBundleBuy
-      v-model:visible="showBuyModal"
-      :modal="true"
-      :draggable="false"
-      :bundle="props.bundle"
-    ></AppModalShopBundleBuy>
   </div>
 </template>
 
 <script lang="ts" setup>
-  const showBuyModal = ref(false);
   const props = defineProps<{
     bundle: ApiBundle;
   }>();

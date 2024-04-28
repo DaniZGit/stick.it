@@ -38,9 +38,17 @@
           v-for="(bundle, i) in bundles"
           :key="bundle.id"
           :bundle="bundle"
+          @click="onBundleClick(bundle)"
         ></AppItemBundle>
       </div>
     </div>
+    <!-- buy bundle modal -->
+    <AppModalShopBundleBuy
+      v-model:visible="showBuyBundleModal"
+      :modal="true"
+      :draggable="false"
+      :bundle="selectedBundle"
+    ></AppModalShopBundleBuy>
     <CustomToast ref="toast"></CustomToast>
   </div>
 </template>
@@ -92,6 +100,13 @@
       toast.value?.show("error", t("user-unexpected-error"));
     }
     loadingBundles.value = false;
+  };
+
+  const showBuyBundleModal = ref(false);
+  const selectedBundle = ref<ApiBundle | null>(null);
+  const onBundleClick = (bundle: ApiBundle) => {
+    selectedBundle.value = bundle;
+    showBuyBundleModal.value = true;
   };
 </script>
 
