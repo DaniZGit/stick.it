@@ -42,6 +42,7 @@
         ></AppItemBundle>
       </div>
     </div>
+    
     <!-- buy bundle modal -->
     <AppModalShopBundleBuy
       v-model:visible="showBuyBundleModal"
