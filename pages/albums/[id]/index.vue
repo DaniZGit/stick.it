@@ -383,8 +383,7 @@
       stickingAnimationSticker.value.style.height =
         stickerEl.getBoundingClientRect().height + "px";
 
-      // after the animation ends
-      setTimeout(() => {
+      stickingAnimationSticker.value.addEventListener("transitionend", () => {
         if (stickingAnimationSticker.value) {
           // show page sticker
           const stickerEl = document.getElementById(
@@ -398,7 +397,7 @@
         }
 
         stickingAnimationIsRunning.value = false;
-      }, 1000);
+      });
     }, 250);
   };
 
