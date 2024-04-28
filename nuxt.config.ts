@@ -27,6 +27,7 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@nuxt/fonts",
     "@nuxtjs/i18n",
+    "nuxt-swiper",
   ],
   devtools: { enabled: true },
   tailwindcss: {

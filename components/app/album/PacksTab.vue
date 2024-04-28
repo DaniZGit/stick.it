@@ -13,7 +13,7 @@
         <span
           >Get some from the
           <NuxtLink
-            to="/albums"
+            to="/shop"
             class="text-app-gold brightness-125 font-bold underline underline-offset-2"
           >
             store
@@ -38,16 +38,16 @@
             ></AppItemUserPack>
           </template>
         </AppCarousel>
-
-        <!-- Pack animation modal -->
-        <AppModalPackOpenAnimation
-          v-model:visible="showPackAnimationModal"
-          :user-pack="openedUserPack"
-          :user-stickers="newUserStickers"
-          :loading="openingPack"
-          @close="onPackAnimationClose"
-        ></AppModalPackOpenAnimation>
       </div>
+
+      <!-- Pack animation modal -->
+      <AppModalPackOpenAnimation
+        v-model:visible="showPackAnimationModal"
+        :user-pack="openedUserPack"
+        :user-stickers="newUserStickers"
+        :loading="openingPack"
+        @close="onPackAnimationClose"
+      ></AppModalPackOpenAnimation>
     </div>
   </div>
 </template>

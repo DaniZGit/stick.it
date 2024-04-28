@@ -9,50 +9,68 @@
   >
     <div class="h-full w-full flex flex-nowrap p-2">
       <div
-        class="w-full h-full grid grid-cols-2 aspect-thumbnail relative border-2 overflow-hidden"
+        class="w-full h-full grid grid-cols-2 aspect-thumbnail relative overflow-hidden"
         :class="{
           'body-container': !props.loading,
         }"
       >
-        <div class="left-container h-full relative z-[5]">
-          <NuxtImg
-            :src="useUrl(props.userPack?.pack.file?.url)"
-            height="400"
-            width="200"
-            class="w-full h-full object-cover object-left"
-            :class="{
-              'left-image': !props.loading,
-            }"
-          ></NuxtImg>
-        </div>
-        <div class="right-container h-full relative z-[5]">
-          <NuxtImg
-            :src="useUrl(props.userPack?.pack.file?.url)"
-            height="400"
-            width="200"
-            class="w-full h-full object-cover object-right"
-            :class="{
-              'right-image': !props.loading,
-            }"
-          ></NuxtImg>
-        </div>
+        <NuxtImg
+          :src="useUrl(props.userPack?.pack.file?.url)"
+          height="400"
+          width="200"
+          class="w-full h-full object-cover object-left z-[7]"
+          :class="{
+            'left-image': !props.loading,
+          }"
+        ></NuxtImg>
+        <NuxtImg
+          :src="useUrl(props.userPack?.pack.file?.url)"
+          height="400"
+          width="200"
+          class="w-full h-full object-cover object-right z-[7]"
+          :class="{
+            'right-image': !props.loading,
+          }"
+        ></NuxtImg>
 
         <div
           v-if="props.userStickers?.length"
           class="container absolute w-full h-full"
         >
           <div
-            class="w-full grid grid-cols-2 auto-rows-max gap-x-4 gap-y-4 p-2"
+            class="w-full h-full flex flex-col justify-between p-4 px-8 relative z-[5]"
           >
-            <div
-              v-for="userSticker in props.userStickers"
-              class="flex flex-col aspect-thumbnail"
-            >
-              <NuxtImg
-                :src="useUrl(userSticker.sticker.file?.url)"
-                class="w-full h-full"
-              ></NuxtImg>
-            </div>
+            <ClientOnly>
+              <swiper-container
+                ref="swiperRef"
+                class="w-full h-5/6"
+                effect="cards"
+                :slides-per-view="1"
+                :grab-cursor="true"
+                :initial-slide="Math.floor(props.userStickers.length / 2)"
+                :pagination="true"
+              >
+                <swiper-slide
+                  v-for="userSticker in props.userStickers"
+                  :key="userSticker.id"
+                  class="w-full !h-auto !aspect-thumbnail my-auto"
+                >
+                  <NuxtImg
+                    :src="useUrl(userSticker.sticker.file?.url)"
+                    class="w-full h-full"
+                  ></NuxtImg>
+                </swiper-slide>
+              </swiper-container>
+
+              <div class="px-8 pb-2 grid grid-cols-2 gap-x-4 z-[5]">
+                <AppButton @click="swiper.prev()">
+                  <Icon name="i-mdi:arrow-left-bold-outline" size="22" />
+                </AppButton>
+                <AppButton @click="swiper.next()">
+                  <Icon name="i-mdi:arrow-right-bold-outline" size="22" />
+                </AppButton>
+              </div>
+            </ClientOnly>
           </div>
         </div>
         <div
@@ -77,6 +95,8 @@
   import { boolean } from "zod";
 
   const isVisible = defineModel("visible", { type: Boolean });
+  const swiperRef = ref(null);
+  const swiper = useSwiper(swiperRef);
 
   const props = defineProps({
     userPack: Object as PropType<ApiUserPack>,
