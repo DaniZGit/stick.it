@@ -121,7 +121,6 @@
       mode: "payment",
       amount: (props.bundle?.price ?? 0) * 100,
       currency: "eur",
-      paymentMethodTypes: ["card"],
       appearance,
     });
     if (!elements.value) return;
@@ -157,7 +156,7 @@
       clientSecret,
       confirmParams: {
         receipt_email: userStore.user.email,
-        payment_method: "card",
+        return_url: window.location.href,
       },
       redirect: "if_required",
     });
@@ -200,9 +199,8 @@
         }>("/v1/transactions/create-payment-intent", {
           method: "POST",
           body: {
-            amount: (props.bundle?.price ?? 0) * 100,
+            bundle_id: props.bundle?.id,
             currency: "eur",
-            payment_method_type: "card",
           },
         });
 
