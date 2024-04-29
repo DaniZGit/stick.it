@@ -389,6 +389,7 @@
         stickerEl.getBoundingClientRect().width + "px";
       stickingAnimationSticker.value.style.height =
         stickerEl.getBoundingClientRect().height + "px";
+      stickingAnimationSticker.value.style.transform = `rotate(${stickerEl.style.rotate}deg)`;
 
       stickingAnimationSticker.value.addEventListener("transitionend", () => {
         if (stickingAnimationSticker.value) {

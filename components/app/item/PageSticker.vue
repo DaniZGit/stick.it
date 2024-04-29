@@ -12,7 +12,9 @@
       height: ${props.sticker.height}%;
       top: ${props.sticker.top}%;
       left: ${props.sticker.left}%;
-      aspect-ratio: ${props.sticker.numerator / props.sticker.denominator}
+      aspect-ratio: ${props.sticker.numerator / props.sticker.denominator};
+      transform: rotate(${props.sticker.rotation}deg);
+      transform-origin: 35.5% 48.5%;
     `"
   >
     <NuxtImg
