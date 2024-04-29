@@ -43,7 +43,12 @@
           class="w-full flex gap-x-1"
           color="tertiary"
           type="submit"
-          :disabled="loadingStripe || !inputIsValid || buyingBundle"
+          :disabled="
+            fetchingPublishableKey ||
+            loadingStripe ||
+            !inputIsValid ||
+            buyingBundle
+          "
         >
           <div v-if="buyingBundle">
             <span class="text-lg">Adding tokens...</span>
@@ -85,17 +90,47 @@
     },
   });
 
+  const publishableKey = ref("");
+  const fetchingPublishableKey = ref(false);
+  onMounted(async () => {
+    // fetch publishable key
+    fetchingPublishableKey.value = true;
+    try {
+      const response = await useApi<{
+        publishable_key: string;
+      }>("/v1/transactions/config");
+
+      if (response.publishable_key) {
+        publishableKey.value = response.publishable_key;
+      }
+    } catch (error) {
+      // toast.value?.show("error", t("user-unexpected-error"));
+      return;
+    }
+    fetchingPublishableKey.value = false;
+
+    // load stripe
+    stripe.value = await loadStripe(publishableKey.value);
+  });
+
   const stripe = ref<Stripe | null>();
   const elements = ref<StripeElements | null>();
   const loadingStripe = ref(false);
   const inputIsValid = ref(true);
-  // every time we open the dialog we load stripe elements
+  // every time we open the dialog we fetch payment intent and load stripe elements
   const onDialogShow = async () => {
     loadingStripe.value = true;
 
-    const clientSecret = useRuntimeConfig().public.stripeKey;
-    stripe.value = await loadStripe(clientSecret);
+    // in case we opened the dialog before the stripe could load
+    if (!stripe.value) {
+      stripe.value = await loadStripe(publishableKey.value);
+    }
 
+    // create payment intent and get client_secret from backend API
+    const clientSecret = await createPaymentIntent();
+    if (!clientSecret) return;
+
+    // elements appearance
     const appearance = {
       variables: {
         fontFamily: "Sohne, system-ui, sans-serif",
@@ -117,14 +152,15 @@
         },
       },
     };
+
+    // create stripe elements
     elements.value = stripe.value?.elements({
-      mode: "payment",
-      amount: (props.bundle?.price ?? 0) * 100,
-      currency: "eur",
+      clientSecret: clientSecret,
       appearance,
     });
     if (!elements.value) return;
 
+    // create payment element and load it to DOM
     const paymentElement = elements.value.create("payment");
     paymentElement.mount("#payment-element");
 
@@ -145,17 +181,11 @@
     const validationObj = await validateElements();
     if (validationObj?.error) return;
 
-    // create payment intent and get client_secret from backend API
-    const clientSecret = await createPaymentIntent();
-    if (!clientSecret) return;
-
     // confirm payment on stripe
     confirmingStripePayment.value = true;
     const { error } = await stripe.value?.confirmPayment({
       elements: elements.value,
-      clientSecret,
       confirmParams: {
-        receipt_email: userStore.user.email,
         return_url: window.location.href,
       },
       redirect: "if_required",
@@ -169,7 +199,7 @@
     }
 
     // send an API request to buy bundle
-    buyBundle(clientSecret);
+    buyBundle();
   };
 
   const validatingElements = ref(false);
@@ -200,7 +230,6 @@
           method: "POST",
           body: {
             bundle_id: props.bundle?.id,
-            currency: "eur",
           },
         });
 
@@ -215,7 +244,7 @@
   };
 
   const buyingBundle = ref(false);
-  const buyBundle = async (clientSecret: string) => {
+  const buyBundle = async () => {
     buyingBundle.value = true;
     try {
       const response = await useApi<{
