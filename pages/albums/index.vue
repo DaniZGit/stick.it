@@ -18,7 +18,7 @@
     </div>
     <div v-else class="grid grid-cols-2 gap-y-4 gap-x-4 py-2 px-4">
       <AppItemAlbum
-        v-for="album in albums?.concat(albums.concat(albums))"
+        v-for="album in albums"
         :key="album.id"
         :album="album"
       ></AppItemAlbum>
