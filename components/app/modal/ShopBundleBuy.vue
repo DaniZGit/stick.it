@@ -8,7 +8,7 @@
     @show="onDialogShow"
   >
     <form
-      class="flex flex-col justify-between items-center"
+      class="h-full flex flex-col justify-between items-center"
       @submit.prevent="onSubmit"
     >
       <div
