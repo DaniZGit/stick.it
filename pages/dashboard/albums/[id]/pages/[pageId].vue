@@ -6,12 +6,15 @@
       class="h-full row-span-11 grid grid-cols-12 bg-base-tertiary p-4 relative"
     >
       <div class="h-full col-span-8 flex justify-center gap-x-2">
-        <div class="relative aspect-thumbnail">
+        <div class="relative">
           <AdminEditorPage
-            v-if="page?.stickers"
+            v-if="album && page?.stickers"
             ref="pageEditorRef"
             :items="stickers"
             :page-file-url="page?.file?.url"
+            :aspect-ratio="
+              (album?.page_numerator ?? 1) / (album?.page_denominator ?? 1)
+            "
             @select="onSelect"
             @drag-end="onDragEnd"
             @rotate-end="onRotateEnd"
@@ -128,9 +131,38 @@
     },
   ];
 
+  onMounted(async () => {
+    fetchAlbum();
+    fetchPage();
+  });
+
+  const fetchingAlbum = ref(false);
+  const album = ref<ApiAlbum | null>(null);
+  const fetchAlbum = async () => {
+    fetchingAlbum.value = true;
+    try {
+      const response = await useApi<{ album: ApiAlbum }>(
+        `/v1/albums/${route.params.id}`
+      );
+      if (!response.album) {
+        toast.value?.show("error", t("admin-response-mismatch"));
+        return;
+      }
+
+      album.value = response.album;
+      console.log(album.value);
+    } catch (error) {
+      toast.value?.show("error", t("unexpected-error"));
+      // router.push({ path: "/dashboard/albums" });
+    }
+    fetchingAlbum.value = false;
+  };
+
   const page = ref<ApiPage>();
   const stickers = ref<Array<ApiSticker>>([]);
-  onMounted(async () => {
+  const fetchingPage = ref(false);
+  const fetchPage = async () => {
+    fetchingPage.value = true;
     try {
       const response = await useApi<{
         metadata: ApiMetadata;
@@ -149,7 +181,8 @@
     } catch (error) {
       toast.value?.show("error", t("unexpected-error"));
     }
-  });
+    fetchingPage.value = false;
+  };
 
   const selectedSticker = ref<ApiSticker | null>(null);
   const onSelect = (e: any, targets: Array<HTMLElement | SVGElement>) => {

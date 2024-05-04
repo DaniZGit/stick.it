@@ -1,8 +1,14 @@
 <template>
   <div
     ref="container"
-    class="h-full w-auto aspect-thumbnail relative bg-base-white bg-cover"
-    :style="`background-image: url(${useUrl(pageFileUrl)});`"
+    class="h-full w-auto aspect-thumbnail relative bg-base-white"
+    :style="`
+        background-image: url(${useUrl(pageFileUrl)});
+        aspect-ratio: ${props.aspectRatio};
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: left top;
+      `"
   >
     <Moveable
       ref="moveableRef"
@@ -112,6 +118,7 @@
   const props = defineProps<{
     items: Array<ApiSticker>;
     pageFileUrl: string | undefined;
+    aspectRatio: number;
   }>();
 
   const emit = defineEmits<{

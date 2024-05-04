@@ -1,21 +1,28 @@
 <template>
   <div class="w-full h-5/6 flex flex-col gap-y-2">
     <div class="w-full h-full">
-      <div ref="book" class="w-full h-full book overflow-y-hidden">
-        <div class="page w-full h-full aspect-thumbnail">
+      <div
+        ref="book"
+        class="w-full h-full book overflow-y-hidden overflow-x-hidden"
+      >
+        <div
+          class="page w-full h-full bg-app-tertiary"
+          :style="`aspect-ratio: ${getPageAspectRatio};`"
+        >
           <NuxtImg
             :src="useUrl(props.album?.file?.url)"
-            class="w-auto h-full aspect-thumbnail"
+            class="w-full h-full object-contain object-left-top"
           />
         </div>
         <div
           v-for="page in props.album?.pages"
           :key="page.id"
-          class="page w-full h-full aspect-thumbnail bg-app-tertiary"
+          class="page w-full h-full bg-app-tertiary"
+          :style="`aspect-ratio: ${getPageAspectRatio};`"
         >
           <NuxtImg
             :src="useUrl(page.file?.url)"
-            class="w-auto h-full aspect-thumbnail"
+            class="w-full h-full object-contain object-left-top"
           />
 
           <div class="absolute top-0 left-0 bottom-0 right-0">
@@ -72,20 +79,26 @@
     flippedToStickerPage: [];
   }>();
 
+  const getPageAspectRatio = computed(() => {
+    return (
+      (props.album?.page_numerator ?? 1) / (props.album?.page_denominator ?? 1)
+    );
+  });
+
   onMounted(() => {
     setTimeout(() => {
       if (!book.value) return;
 
       // init page flip
       pageFlip.value = new PageFlip(book.value, {
-        width: 3, // required parameter - base page width --> resizes based on init aspect ratio
-        height: 4, // required parameter - base page height
+        width: props.album?.page_numerator, // required parameter - base page width --> resizes based on init aspect ratio
+        height: props.album?.page_denominator, // required parameter - base page height
         size: "stretch" as SizeType,
         minWidth: 200,
         maxWidth: 1000,
         minHeight: 100,
         maxHeight: 1350,
-        showCover: true,
+        showCover: false, // this doesn't seme to work well - jumps when doing first page flip
         mobileScrollSupport: false,
         maxShadowOpacity: 0,
         showPageCorners: false,
