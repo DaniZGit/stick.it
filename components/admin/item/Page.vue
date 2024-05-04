@@ -6,7 +6,7 @@
       <div class="flex flex-col relative hover:shadow-md">
         <NuxtImg
           :src="useUrl(props.page.file.url)"
-          class="aspect-thumbnail w-full rounded-md"
+          class="aspect-thumbnail w-full rounded-md object-cover object-center"
         ></NuxtImg>
         <AdminButton
           class="absolute top-2 right-2 p-1 flex justify-center items-center gap-x-2"

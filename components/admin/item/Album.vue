@@ -5,8 +5,7 @@
     <div class="w-full relative">
       <NuxtImg
         :src="useUrl(file?.url)"
-        class="w-full h-full"
-        style="aspect-ratio: 6/7"
+        class="w-full h-full aspect-thumbnail object-cover object-center"
       />
 
       <div

@@ -4,7 +4,7 @@
       <div class="flex flex-col gap-y-2 relative">
         <NuxtImg
           :src="useUrl(pack.file?.url)"
-          class="aspect-thumbnail w-full rounded-md"
+          class="aspect-thumbnail w-full rounded-md object-cover object-center"
         ></NuxtImg>
         <AdminButton
           class="absolute top-2 right-2 p-1 flex justify-center items-center gap-x-2"

@@ -59,6 +59,49 @@
           />
 
           <div>
+            <div class="grid grid-cols-2 gap-x-2">
+              <AdminInputNumber
+                id="pageNumerator"
+                name="pageNumerator"
+                label="Aspect ratio"
+                placeholder="3"
+                icon="i-material-symbols:width"
+                v-model="pageNumerator"
+                :min="1"
+                :max="100"
+                max-fraction-digits="0"
+                show-buttons
+              />
+
+              <AdminInputNumber
+                id="pageDenominator "
+                name="pageDenominator "
+                label="&nbsp"
+                placeholder="4"
+                icon="i-material-symbols:height"
+                v-model="pageDenominator"
+                :min="1"
+                :max="100"
+                max-fraction-digits="0"
+                show-buttons
+              />
+              <AdminInlineMessage
+                severity="error"
+                class="h-0 transition-[height] ease-out duration-100"
+                :class="{
+                  'h-[14px]': errors.pageNumerator || errors.pageDenominator,
+                }"
+              >
+                {{
+                  errors.pageNumerator
+                    ? errors.pageNumerator
+                    : errors.pageDenominator
+                }}
+              </AdminInlineMessage>
+            </div>
+          </div>
+
+          <div>
             <label for="">{{ $t("admin-album-create-options") }}</label>
             <InputGroup class="flex gap-x-2">
               <AdminInputGroupAddon>
@@ -110,6 +153,8 @@
   const [dateFrom] = defineField("dateFrom");
   const [dateTo] = defineField("dateTo");
   const [featured] = defineField("featured");
+  const [pageNumerator] = defineField("pageNumerator");
+  const [pageDenominator] = defineField("pageDenominator");
   const [file] = defineField("file");
 
   // create request
@@ -119,6 +164,8 @@
     body.append("date_from", values.dateFrom.toISOString());
     body.append("date_to", values.dateTo?.toISOString() ?? "");
     body.append("featured", JSON.stringify(values.featured));
+    body.append("page_numerator", values.pageNumerator.toString());
+    body.append("page_denominator", values.pageDenominator.toString());
     body.append("file", values.file);
 
     console.log(values);

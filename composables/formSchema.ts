@@ -76,6 +76,8 @@ export const useFormSchema = () => {
         required_error: t("validation-required", { field: "date to" }),
       }),
       featured: zod.boolean().default(false),
+      pageNumerator: zod.number().min(1).default(3),
+      pageDenominator: zod.number().min(1).default(4),
       file: zod
         .any()
         .refine((file) => {
