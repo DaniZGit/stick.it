@@ -61,7 +61,6 @@
       @error="onBundleDeleteError"
       @pending="onBundleDeleting"
     />
-    <CustomToast ref="toast"></CustomToast>
   </div>
 </template>
 

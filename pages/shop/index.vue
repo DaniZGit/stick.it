@@ -7,7 +7,10 @@
       >
         Packs
       </h2>
-      <div v-if="loadingPacks" class="grid grid-cols-2 gap-x-4 gap-y-4">
+      <div
+        v-if="loadingPacks && !packs?.length"
+        class="grid grid-cols-2 gap-x-4 gap-y-4"
+      >
         <AppSkeletonPackItem v-for="n in [1, 2]" :key="n"></AppSkeletonPackItem>
       </div>
       <div v-else class="grid grid-cols-2 gap-x-4 gap-y-4">
@@ -27,7 +30,10 @@
       >
         Colector's Tokens
       </h2>
-      <div v-if="loadingPacks" class="grid grid-cols-3 gap-x-4 gap-y-4">
+      <div
+        v-if="loadingBundles && !bundles?.length"
+        class="grid grid-cols-3 gap-x-4 gap-y-4"
+      >
         <AppSkeletonBundleItem
           v-for="n in [1, 2, 3, 4, 5, 6]"
           :key="n"
@@ -42,7 +48,7 @@
         ></AppItemBundle>
       </div>
     </div>
-    
+
     <!-- buy bundle modal -->
     <AppModalShopBundleBuy
       v-model:visible="showBuyBundleModal"
@@ -50,19 +56,34 @@
       :draggable="false"
       :bundle="selectedBundle"
     ></AppModalShopBundleBuy>
-    <CustomToast ref="toast"></CustomToast>
+
+    <AppToast position="top-center" :closable="true" group="buy_group" />
+    <AppToast position="top-center" :closable="false" group="sync_group" />
   </div>
 </template>
 
 <script lang="ts" setup>
   import CustomToast from "~/components/CustomToast.vue";
+  import { useShopStore } from "~/stores/shop";
 
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
+  const toastie = useToast();
+  const shopStore = useShopStore();
 
   onMounted(() => {
+    packs.value = shopStore.packs;
+    bundles.value = shopStore.bundles;
+
     fetchPacks();
     fetchBundles();
+
+    toastie.add({
+      severity: "info",
+      detail: `Syncing data...`,
+      life: 500,
+      group: "sync_group",
+    });
   });
 
   // fetch packs
@@ -77,6 +98,7 @@
 
       if (response.packs) {
         packs.value = response.packs;
+        shopStore.packs = response.packs;
       }
     } catch (error) {
       toast.value?.show("error", t("user-unexpected-error"));
@@ -96,6 +118,7 @@
 
       if (response.bundles) {
         bundles.value = response.bundles;
+        shopStore.bundles = response.bundles;
       }
     } catch (error) {
       toast.value?.show("error", t("user-unexpected-error"));

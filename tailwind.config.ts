@@ -23,6 +23,12 @@ export default <Partial<Config>>{
         "app-primary-focus": "#0c21bf",
         "app-tertiary-focus": "#4e50be",
 
+        "app-severity-success": "#57f000",
+        "app-severity-info": "#2cccff",
+        "app-severity-warn": "#ffb302",
+        "app-severity-error": "#fe3839",
+        "app-severity-buy": "#57f000",
+
         /* PrimeVue preset colors */
         "primary-50": "rgb(var(--primary-50))",
         "primary-100": "rgb(var(--primary-100))",

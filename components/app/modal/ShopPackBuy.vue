@@ -53,6 +53,7 @@
 
 <script lang="ts" setup>
   const { t } = useI18n();
+  const toast = useToast();
   const isVisible = defineModel("visible", { type: Boolean });
 
   const props = defineProps({
@@ -78,6 +79,12 @@
 
       if (response.user_pack) {
         console.log("bought pack:", response.user_pack);
+        toast.add({
+          severity: "buy",
+          detail: `${amount} ${amount > 1 ? "Packs" : "Pack"} bought`,
+          life: 3000,
+          group: "buy_group",
+        });
       }
     } catch (error) {
       // toast.value?.show("error", t("user-unexpected-error"));

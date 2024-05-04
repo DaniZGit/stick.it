@@ -71,7 +71,6 @@
 <script lang="ts" setup>
   import type { ToastPassThroughOptions } from "primevue/toast";
   import type Toast from "primevue/toast";
-  import type { PropType } from "vue";
 
   const toast = useToast();
 

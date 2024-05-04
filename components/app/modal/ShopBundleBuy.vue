@@ -4,7 +4,7 @@
     :header="props.bundle?.title"
     :modal="true"
     :draggable="false"
-    :loading="buyingBundle"
+    :loading="validatingElements || confirmingStripePayment || buyingBundle"
     @show="onDialogShow"
   >
     <form
@@ -46,8 +46,11 @@
           :disabled="
             fetchingPublishableKey ||
             loadingStripe ||
-            !inputIsValid ||
-            buyingBundle
+            validatingElements ||
+            creatingPaymentIntent ||
+            confirmingStripePayment ||
+            buyingBundle ||
+            !inputIsValid
           "
         >
           <div v-if="buyingBundle">
@@ -82,6 +85,7 @@
 
   const isVisible = defineModel("visible", { type: Boolean });
   const userStore = useUserStore();
+  const toast = useToast();
 
   const props = defineProps({
     bundle: {
@@ -248,7 +252,7 @@
     buyingBundle.value = true;
     try {
       const response = await useApi<{
-        user: ApiUser;
+        tokens: number;
       }>("/v1/transactions/bundle", {
         method: "POST",
         body: {
@@ -256,8 +260,15 @@
         },
       });
 
-      if (response.user) {
-        userStore.user.tokens = response.user.tokens;
+      if (response.tokens) {
+        userStore.user.tokens = response.tokens;
+
+        toast.add({
+          severity: "buy",
+          detail: `Bundle bought`,
+          life: 3000,
+          group: "buy_group",
+        });
       }
 
       isVisible.value = false;
