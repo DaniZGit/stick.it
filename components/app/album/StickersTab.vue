@@ -25,11 +25,13 @@
         class="w-full grid grid-cols-4 auto-rows-max gap-x-2 gap-y-5 p-2 pb-5 overflow-y-auto"
       >
         <AppItemUserSticker
-          v-for="userSticker in props.userStickers"
+          v-for="userSticker in props.userStickers.filter((s) => s.amount > 0)"
           :key="userSticker.id"
           :user-sticker="userSticker"
           @stick="emit('stickerStick', $event)"
           @view="onStickerView"
+          @drag-start="emit('stickerDragStart', $event)"
+          @drag-stick="emit('stickerDragStick', $event)"
         >
         </AppItemUserSticker>
       </div>
@@ -52,9 +54,16 @@
 
   const emit = defineEmits<{
     stickerView: [userSticker: ApiUserSticker | undefined];
-    stickerStick: [userSticker: ApiUserSticker | undefined];
+    stickerStick: [
+      data: {
+        userSticker: ApiUserSticker | undefined;
+        userStickerContainer: HTMLElement | null;
+      }
+    ];
+    stickerDragStick: [userSticker: ApiUserSticker | undefined];
     stickerViewOpen: [];
     stickerViewClose: [];
+    stickerDragStart: [e: any];
   }>();
 
   const showStickerViewModal = ref(false);

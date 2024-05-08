@@ -58,6 +58,20 @@ export default <Partial<Config>>{
         thumbnail: "3 / 4",
         package: "5 / 6",
       },
+      animation: {
+        wiggle: "wiggle 1s ease-in-out infinite",
+        scaling: "scaling 1s ease-in-out infinite",
+      },
+      keyframes: {
+        wiggle: {
+          "0%, 100%": { transform: "rotate(-3deg)" },
+          "50%": { transform: "rotate(3deg)" },
+        },
+        scaling: {
+          "0%": { scale: "1" },
+          "50%": { scale: "1.05" },
+        },
+      },
     },
   },
 };

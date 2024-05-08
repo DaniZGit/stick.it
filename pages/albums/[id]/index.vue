@@ -115,6 +115,8 @@
             @sticker-stick="onStickerStick"
             @sticker-view-open="isViewingSticker = true"
             @sticker-view-close="isViewingSticker = false"
+            @sticker-drag-start="isStickersTabOpen = false"
+            @sticker-drag-stick="onStickerDragStick"
           ></AppAlbumStickersTab>
         </div>
       </div>
@@ -132,11 +134,13 @@
 <script lang="ts" setup>
   import type { AppAlbumPager } from "#build/components";
   import CustomToast from "~/components/CustomToast.vue";
+  import { useAlbumStore } from "~/stores/album";
 
   const route = useRoute();
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
   const userStore = useUserStore();
+  const albumStore = useAlbumStore();
 
   const albumPagerRef = ref<InstanceType<typeof AppAlbumPager> | null>(null);
   const stickingAnimationSticker = ref<HTMLImageElement | null>(null);
@@ -315,6 +319,13 @@
     toast.value?.show("error", errorMessage);
   };
 
+  const onStickerDragStick = (userSticker: ApiUserSticker | undefined) => {
+    if (!userSticker) return;
+
+    albumStore.userSticker = userSticker;
+    apiStickStickerRequest(userSticker);
+  };
+
   const onStickerStick = (data: {
     userSticker: ApiUserSticker | undefined;
     userStickerContainer: HTMLElement | null;
@@ -326,6 +337,9 @@
       !data.userStickerContainer
     )
       return;
+
+    albumStore.userSticker = data.userSticker;
+    albumStore.pendingAnimation = true;
 
     // make an absolute version of selected sticker
     stickingAnimationSticker.value.id = data.userSticker.sticker.id;
@@ -385,11 +399,29 @@
         stickerEl.getBoundingClientRect().top + "px";
       stickingAnimationSticker.value.style.left =
         stickerEl.getBoundingClientRect().left + "px";
-      stickingAnimationSticker.value.style.width =
-        stickerEl.getBoundingClientRect().width + "px";
-      stickingAnimationSticker.value.style.height =
-        stickerEl.getBoundingClientRect().height + "px";
-      stickingAnimationSticker.value.style.transform = `rotate(${stickerEl.style.rotate}deg)`;
+
+      console.log("rotation", stickerEl.style.rotate);
+      // rotate
+      const rotationAngle = parseInt(stickerEl.style.rotate);
+      stickingAnimationSticker.value.style.rotate = `${
+        rotationAngle + (rotationAngle > 180 ? -360 : 0)
+      }deg`;
+      stickingAnimationSticker.value.style.transformOrigin =
+        stickerEl.style.transformOrigin;
+
+      // scale width/height based on rotation
+      const width =
+        (rotationAngle > 45 && rotationAngle < 135) ||
+        (rotationAngle > 225 && rotationAngle < 315)
+          ? stickerEl.getBoundingClientRect().height
+          : stickerEl.getBoundingClientRect().width;
+      const height =
+        (rotationAngle > 45 && rotationAngle < 135) ||
+        (rotationAngle > 225 && rotationAngle < 315)
+          ? stickerEl.getBoundingClientRect().width
+          : stickerEl.getBoundingClientRect().height;
+      stickingAnimationSticker.value.style.width = width + "px";
+      stickingAnimationSticker.value.style.height = height + "px";
 
       stickingAnimationSticker.value.addEventListener("transitionend", () => {
         if (stickingAnimationSticker.value) {
@@ -402,15 +434,18 @@
           // hide moving sticker
           stickingAnimationSticker.value.classList.add("hidden");
           stickingAnimationSticker.value.style.transitionDuration = "0ms";
+          stickingAnimationSticker.value.style.rotate = `0deg`;
         }
 
         stickingAnimationIsRunning.value = false;
+        albumStore.pendingAnimation = false;
       });
     }, 250);
   };
 
   const stickingSticker = ref(false);
   const apiStickStickerRequest = async (userSticker: ApiUserSticker) => {
+    albumStore.pendingRequest = true;
     console.log("fetching album data");
     stickingSticker.value = true;
     try {
@@ -436,6 +471,7 @@
       toast.value?.show("error", t("user-unexpected-error"));
     }
     stickingSticker.value = false;
+    albumStore.pendingRequest = false;
   };
 </script>
 
