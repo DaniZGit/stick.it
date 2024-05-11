@@ -6,7 +6,7 @@
         v-else-if="!userPacks?.length"
         class="w-full h-full flex flex-col items-center justify-center text-xl"
       >
-        <span class="flex flex-col justify-center items-center">
+        <span class="w-full flex flex-col justify-center items-center">
           <Icon name="i-mdi:face-dead-outline" size="48" />
           You have no packs
         </span>

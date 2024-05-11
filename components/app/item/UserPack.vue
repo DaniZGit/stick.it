@@ -26,10 +26,15 @@
         class="grid gap-x-4"
         :class="{ 'grid-cols-2': props.userPack.amount > 1 }"
       >
-        <AppButton :disabled="openingPacks" @click="openPacks(false)">
+        <AppButton
+          class="text-xs !py-1.5"
+          :disabled="openingPacks"
+          @click="openPacks(false)"
+        >
           Open
         </AppButton>
         <AppButton
+          class="text-xs !py-1.5"
           v-if="props.userPack.amount > 1"
           :disabled="openingPacks"
           @click="openPacks(true)"

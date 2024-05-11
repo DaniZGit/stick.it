@@ -1,19 +1,19 @@
 <template>
-  <div class="w-full h-full grid grid-flow-row grid-rows-12 pt-2">
+  <div class="w-full h-full grid grid-flow-row grid-rows-12">
     <div class="row-span-12 flex flex-nowrap">
       <div v-if="props.loading">loading stickers...</div>
       <div
         v-else-if="!props.userStickers?.length"
         class="w-full h-full flex flex-col items-center justify-center text-xl"
       >
-        <span class="flex flex-col justify-center items-center">
+        <span class="w-full flex flex-col justify-center items-center">
           <Icon name="i-mdi:face-dead-outline" size="48" />
           You have no stickers
         </span>
         <span
           >Get some from the
           <NuxtLink
-            to="/albums"
+            to="/shop"
             class="text-app-gold brightness-125 font-bold underline underline-offset-2"
           >
             store
