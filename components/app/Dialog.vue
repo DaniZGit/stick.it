@@ -1,7 +1,7 @@
 <template>
   <Dialog v-bind="attrs" :pt="preset" :pt-options="{ mergeProps: true }">
     <template #container="{ closeCallback }">
-      <div class="border-0 py-2">
+      <div v-if="attrs.header" class="border-0 py-2">
         <div class="w-full text-center text-nowrap overflow-x-hidden">
           <h1
             ref="headerRef"

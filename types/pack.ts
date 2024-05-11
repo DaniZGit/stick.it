@@ -5,6 +5,7 @@ type ApiPack = {
   price: number;
   amount: number;
   album_id: string;
+  album: ApiAlbum;
   file_id: string | null;
   file: ApiFile | null;
 };

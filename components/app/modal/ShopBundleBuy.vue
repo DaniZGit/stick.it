@@ -12,7 +12,7 @@
       @submit.prevent="onSubmit"
     >
       <div
-        class="w-full flex flex-col items-center justify-center gap-y-2 p-2 rounded-md"
+        class="w-full h-full flex flex-col items-center justify-center gap-y-2 p-2 rounded-md"
       >
         <NuxtImg
           :src="useUrl(props.bundle?.file?.url)"
@@ -33,7 +33,21 @@
             />
           </div>
         </div>
-        <div id="payment-element" class="text-app-secondary"></div>
+        <div
+          v-show="loadingStripeEl"
+          class="h-full flex justify-center items-center"
+        >
+          <Icon
+            name="i-svg-spinners:6-dots-scale-middle"
+            size="38"
+            class="text-app-secondary hover:cursor-pointer"
+          />
+        </div>
+        <div
+          v-show="!loadingStripeEl"
+          id="payment-element"
+          class="h-full text-app-secondary"
+        ></div>
       </div>
       <div id="payment-request-button"></div>
       <div
@@ -119,11 +133,13 @@
 
   const stripe = ref<Stripe | null>();
   const elements = ref<StripeElements | null>();
+  const loadingStripeEl = ref(false);
   const loadingStripe = ref(false);
   const inputIsValid = ref(true);
   // every time we open the dialog we fetch payment intent and load stripe elements
   const onDialogShow = async () => {
     loadingStripe.value = true;
+    loadingStripeEl.value = true;
 
     // in case we opened the dialog before the stripe could load
     if (!stripe.value) {
@@ -133,6 +149,8 @@
     // create payment intent and get client_secret from backend API
     const clientSecret = await createPaymentIntent();
     if (!clientSecret) return;
+
+    loadingStripeEl.value = false;
 
     // elements appearance
     const appearance = {

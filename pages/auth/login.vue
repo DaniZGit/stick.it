@@ -3,7 +3,11 @@
     <div>
       <h1 class="text-4xl font-bold uppercase">Login</h1>
     </div>
-    <VeeForm class="w-1/5 flex flex-col gap-4" method="post" @submit="onSubmit">
+    <VeeForm
+      class="w-full flex flex-col gap-4"
+      method="post"
+      @submit="onSubmit"
+    >
       <InputGroup>
         <InputGroupAddon>
           <Icon name="ic:outline-email" />
@@ -81,6 +85,8 @@
 <script setup lang="ts">
   import { FetchError } from "ofetch";
   import type CustomToast from "~/components/CustomToast.vue";
+
+  setPageLayout("guest");
 
   const { t } = useI18n();
   const route = useRoute();

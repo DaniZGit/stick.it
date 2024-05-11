@@ -5,6 +5,8 @@ interface User {
   email: string;
   token: string;
   tokens: number;
+  available_free_packs: number;
+  last_free_pack_obtain_date: string;
 }
 
 interface ApiUser {
@@ -13,6 +15,8 @@ interface ApiUser {
   username: string;
   email: string;
   tokens: number;
+  available_free_packs: number;
+  last_free_pack_obtain_date: string;
 }
 
 type ApiUserPack = {

@@ -5,6 +5,7 @@
 <script lang="ts" setup>
   const userStore = useUserStore();
   const router = useRouter();
+  setPageLayout("guest");
 
   onMounted(() => {
     userStore.logout();
