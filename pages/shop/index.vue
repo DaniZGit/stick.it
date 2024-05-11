@@ -57,8 +57,25 @@
       :bundle="selectedBundle"
     ></AppModalShopBundleBuy>
 
+    <!-- Toasties -->
     <AppToast position="top-center" :closable="true" group="buy_group" />
-    <AppToast position="top-center" :closable="false" group="sync_group" />
+    <!-- Progress bar -->
+    <div class="fixed bottom-0 left-0 right-0 h-[2px]">
+      <div
+        class="bg-app-tertiary z-50 duration-500 transition-all"
+        :style="`width: ${dataSyncProgress}%;`"
+        :class="{ 'opacity-0 duration-150': hideProgressBar }"
+        @transitionend="
+          () => {
+            if (dataSyncProgress >= 100) {
+              hideProgressBar = true;
+            }
+          }
+        "
+      >
+        &nbsp
+      </div>
+    </div>
   </div>
 </template>
 
@@ -68,9 +85,10 @@
 
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
-  const toastie = useToast();
   const shopStore = useShopStore();
 
+  const dataSyncProgress = ref(0);
+  const hideProgressBar = ref(false);
   onMounted(() => {
     packs.value = shopStore.packs;
     bundles.value = shopStore.bundles;
@@ -78,12 +96,10 @@
     fetchPacks();
     fetchBundles();
 
-    toastie.add({
-      severity: "info",
-      detail: `Syncing data...`,
-      life: 500,
-      group: "sync_group",
-    });
+    // need to add a timeout, otherwise we don't get the transition effect
+    setTimeout(() => {
+      dataSyncProgress.value += 50;
+    }, 1);
   });
 
   // fetch packs
@@ -104,6 +120,8 @@
       toast.value?.show("error", t("user-unexpected-error"));
     }
     loadingPacks.value = false;
+
+    dataSyncProgress.value += 25;
   };
 
   // fetches bundles
@@ -124,6 +142,8 @@
       toast.value?.show("error", t("user-unexpected-error"));
     }
     loadingBundles.value = false;
+
+    dataSyncProgress.value += 25;
   };
 
   const showBuyBundleModal = ref(false);
