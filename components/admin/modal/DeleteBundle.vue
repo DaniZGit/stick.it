@@ -61,7 +61,7 @@
     emit("pending", true);
 
     try {
-      await useApi<User>(`/v1/bundles/${props.bundle?.id}`, {
+      await useApi(`/v1/bundles/${props.bundle?.id}`, {
         method: "DELETE",
       });
 

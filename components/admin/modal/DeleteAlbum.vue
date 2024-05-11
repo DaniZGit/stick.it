@@ -62,7 +62,7 @@
     emit("pending", true);
 
     try {
-      await useApi<User>(`/v1/albums/${id}`, {
+      await useApi(`/v1/albums/${id}`, {
         method: "DELETE",
       });
 

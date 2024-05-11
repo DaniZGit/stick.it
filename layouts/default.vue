@@ -9,9 +9,30 @@
 </template>
 
 <script lang="ts" setup>
+  const userStore = useUserStore();
+
   onMounted(() => {
-    console.log("Sync user data");
+    if (userStore.isLoggedIn()) {
+      fetchUser();
+    }
   });
+
+  const fetchingUser = ref(false);
+  const fetchUser = async () => {
+    fetchingUser.value = true;
+    try {
+      const response = await useApi<{
+        user: ApiUser;
+      }>(`/v1/users/${userStore.user.id}`);
+
+      if (response.user) {
+        userStore.setUser(response.user);
+      }
+    } catch (error) {
+      // toast.value?.show("error", t("user-unexpected-error"));
+    }
+    fetchingUser.value = false;
+  };
 </script>
 
 <style></style>

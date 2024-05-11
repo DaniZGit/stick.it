@@ -3,13 +3,15 @@ import { defineStore } from "pinia";
 export const useUserStore = defineStore(
   "user",
   () => {
-    const user = ref<User>({
+    const user = ref<ApiUser>({
       id: "",
       username: "",
       email: "",
       token: "",
       tokens: 0,
       created_at: "",
+      available_free_packs: 0,
+      last_free_pack_obtain_date: "",
     });
 
     const getUser = () => {
@@ -20,12 +22,12 @@ export const useUserStore = defineStore(
       return user.value.token;
     };
 
-    const setUser = (data: User) => {
+    const setUser = (data: ApiUser) => {
       user.value = data;
     };
 
     const logout = () => {
-      user.value = <User>{
+      user.value = <ApiUser>{
         id: "",
         username: "",
         email: "",

@@ -107,13 +107,15 @@
   // login request
   const onSubmit = handleSubmit(async (values) => {
     try {
-      const data = await useApi<User>("/v1/login", {
+      const response = await useApi<{ user: ApiUser }>("/v1/login", {
         method: "POST",
         body: values,
       });
 
       // store user
-      userStore.setUser(data);
+      if (response.user) {
+        userStore.setUser(response.user);
+      }
 
       const next = route.query.next as string;
       if (next) {

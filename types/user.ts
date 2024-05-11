@@ -1,19 +1,9 @@
-interface User {
-  id: string;
-  created_at: string;
-  username: string;
-  email: string;
-  token: string;
-  tokens: number;
-  available_free_packs: number;
-  last_free_pack_obtain_date: string;
-}
-
 interface ApiUser {
   id: string;
   created_at: string;
   username: string;
   email: string;
+  token: string;
   tokens: number;
   available_free_packs: number;
   last_free_pack_obtain_date: string;

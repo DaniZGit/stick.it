@@ -62,7 +62,7 @@
     emit("pending", true);
 
     try {
-      await useApi<User>(`/v1/stickers/${props.sticker?.id}`, {
+      await useApi(`/v1/stickers/${props.sticker?.id}`, {
         method: "DELETE",
       });
 

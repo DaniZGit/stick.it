@@ -124,12 +124,14 @@
   // register request
   const onSubmit = handleSubmit(async (values) => {
     try {
-      const data = await useApi<User>("/v1/register", {
+      const response = await useApi<{ user: ApiUser }>("/v1/register", {
         method: "POST",
         body: values,
       });
 
-      userStore.setUser(data);
+      if (response.user) {
+        userStore.setUser(response.user);
+      }
 
       // redirect to homepage
       navigateTo({ path: "/home" }, { redirectCode: 301 });
