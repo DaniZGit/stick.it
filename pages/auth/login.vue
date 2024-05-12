@@ -94,6 +94,12 @@
 
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
 
+  onMounted(() => {
+    if (userStore.isLoggedIn()) {
+      navigateTo({ path: "/home" }, { redirectCode: 301 });
+    }
+  });
+
   // form stuff
   const { LoginSchema } = useFormSchema();
   const { defineField, handleSubmit, errors, isSubmitting, setErrors } =

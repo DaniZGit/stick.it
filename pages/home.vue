@@ -14,6 +14,8 @@
 </template>
 
 <script lang="ts" setup>
+  setPageLayout("default");
+
   const userStore = useUserStore();
 </script>
 

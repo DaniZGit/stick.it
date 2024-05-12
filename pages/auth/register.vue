@@ -107,8 +107,14 @@
   setPageLayout("guest");
 
   const { t } = useI18n();
-  const userStore = useUserStore();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
+  const userStore = useUserStore();
+
+  onMounted(() => {
+    if (userStore.isLoggedIn()) {
+      navigateTo({ path: "/home" }, { redirectCode: 301 });
+    }
+  });
 
   // form stuff
   const { RegisterSchema } = useFormSchema();
@@ -124,17 +130,13 @@
   // register request
   const onSubmit = handleSubmit(async (values) => {
     try {
-      const response = await useApi<{ user: ApiUser }>("/v1/register", {
+      await useApi("/v1/register", {
         method: "POST",
         body: values,
       });
 
-      if (response.user) {
-        userStore.setUser(response.user);
-      }
-
-      // redirect to homepage
-      navigateTo({ path: "/home" }, { redirectCode: 301 });
+      // redirect to confirmation page
+      navigateTo({ path: "/auth/confirmation" }, { redirectCode: 301 });
     } catch (error) {
       const handledErrors = useHandleFormErrors(error as FetchError<ApiError>);
 
