@@ -78,7 +78,7 @@
     claimed: [
       {
         user: ApiUser;
-        pack: ApiPack;
+        user_pack: ApiUserPack;
       }
     ];
   }>();
@@ -156,7 +156,7 @@
     try {
       const response = await useApi<{
         user: ApiUser;
-        pack: ApiPack;
+        user_pack: ApiUserPack;
       }>(`/v1/users/${userStore.user.id}/free-pack`, {
         method: "POST",
         body: {
@@ -167,14 +167,14 @@
       if (response.user) {
         toast.add({
           severity: "buy",
-          detail: `Claimed ${response.pack.title} pack`,
+          detail: `Claimed ${selectedPack.title} pack`,
           life: 3000,
           group: "free_pack_group",
         });
 
         emit("claimed", {
           user: response.user,
-          pack: response.pack,
+          user_pack: response.user_pack,
         });
       }
     } catch (error) {

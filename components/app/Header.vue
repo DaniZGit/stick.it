@@ -62,6 +62,7 @@
   const showFreePackClaimModal = ref(false);
   const userStore = useUserStore();
 
+  const timeTillFreePackInSeconds = 12 * 60 * 60; // 12h
   const timeTillNextFreebie = ref<number>(0);
   onMounted(() => {
     timeTillNextFreebie.value = calculateTimeTillNextFreebie();
@@ -74,7 +75,7 @@
         userStore.user.available_free_packs++;
         userStore.user.last_free_pack_obtain_date = new Date(
           new Date(userStore.user.last_free_pack_obtain_date).getTime() +
-            12 * 60 * 60 * 1000
+            timeTillFreePackInSeconds * 1000
         ).toISOString();
 
         timeTillNextFreebie.value = calculateTimeTillNextFreebie();
@@ -88,7 +89,7 @@
 
   const calculateTimeTillNextFreebie = () => {
     return (
-      12 * 60 * 60 - // 12h
+      timeTillFreePackInSeconds -
       (new Date().getTime() - // the difference between today and the last time we obtained a free pack
         new Date(userStore.user.last_free_pack_obtain_date).getTime()) /
         1000
@@ -116,7 +117,10 @@
     showFreePackClaimModal.value = true;
   };
 
-  const onFreePackClaimed = (data: { user: ApiUser; pack: ApiPack }) => {
+  const onFreePackClaimed = (data: {
+    user: ApiUser;
+    user_pack: ApiUserPack;
+  }) => {
     userStore.user.available_free_packs = data.user.available_free_packs;
     userStore.user.last_free_pack_obtain_date =
       data.user.last_free_pack_obtain_date;
