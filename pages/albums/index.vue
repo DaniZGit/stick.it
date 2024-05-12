@@ -4,7 +4,10 @@
       :albums-count="albums?.length"
       :loading="loading"
     ></AppFilterAlbums>
-    <div v-if="loading" class="grid grid-cols-2 gap-y-4 gap-x-4 py-2 px-4">
+    <div
+      v-if="loading && !albums?.length"
+      class="grid grid-cols-2 gap-y-4 gap-x-4 py-2 px-4"
+    >
       <AppSkeletonAlbumItem
         v-for="n in [1, 2, 3, 4, 5, 6]"
       ></AppSkeletonAlbumItem>
@@ -24,20 +27,37 @@
       ></AppItemAlbum>
     </div>
     <CustomToast ref="toast"></CustomToast>
+    <!-- Sync progress bar -->
+    <div class="fixed bottom-0 left-0 right-0 h-[2px]">
+      <AppSyncBar v-model="dataSyncProgress"></AppSyncBar>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
   import CustomToast from "~/components/CustomToast.vue";
+  import { useAlbumsStore } from "~/stores/albums";
 
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
+  const albumsStore = useAlbumsStore();
 
   const albums = ref<Array<ApiAlbum>>();
 
   // fetch albums on load
+  const dataSyncProgress = ref(0);
+  onMounted(() => {
+    albums.value = albumsStore.albums;
+    fetchAlbums();
+
+    // need to add a timeout, otherwise we don't get the transition effect
+    setTimeout(() => {
+      dataSyncProgress.value += 50;
+    }, 1);
+  });
+
   const loading = ref(false);
-  onMounted(async () => {
+  const fetchAlbums = async () => {
     loading.value = true;
     try {
       const response = await useApi<{
@@ -50,12 +70,14 @@
 
       if (response.albums) {
         albums.value = response.albums;
+        albumsStore.albums = response.albums;
+        dataSyncProgress.value += 50;
       }
     } catch (error) {
       toast.value?.show("error", t("user-unexpected-error"));
     }
     loading.value = false;
-  });
+  };
 </script>
 
 <style></style>

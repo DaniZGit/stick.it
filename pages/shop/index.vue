@@ -61,20 +61,7 @@
     <AppToast position="top-center" :closable="true" group="buy_group" />
     <!-- Progress bar -->
     <div class="fixed bottom-0 left-0 right-0 h-[2px]">
-      <div
-        class="bg-app-tertiary z-50 duration-500 transition-all"
-        :style="`width: ${dataSyncProgress}%;`"
-        :class="{ 'opacity-0 duration-150': hideProgressBar }"
-        @transitionend="
-          () => {
-            if (dataSyncProgress >= 100) {
-              hideProgressBar = true;
-            }
-          }
-        "
-      >
-        &nbsp
-      </div>
+      <AppSyncBar v-model="dataSyncProgress"></AppSyncBar>
     </div>
   </div>
 </template>
@@ -88,7 +75,6 @@
   const shopStore = useShopStore();
 
   const dataSyncProgress = ref(0);
-  const hideProgressBar = ref(false);
   onMounted(() => {
     packs.value = shopStore.packs;
     bundles.value = shopStore.bundles;

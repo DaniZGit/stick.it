@@ -1,6 +1,6 @@
 <template>
   <div class="pt-2 px-4">
-    <div v-if="props.loading">
+    <div v-if="props.loading && !props.albumsCount">
       <AppSkeletonAlbumFilter></AppSkeletonAlbumFilter>
     </div>
     <div v-else class="flex flex-col gap-y-2 relative">
