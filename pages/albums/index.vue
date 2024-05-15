@@ -71,12 +71,13 @@
       if (response.albums) {
         albums.value = response.albums;
         albumsStore.albums = response.albums;
-        dataSyncProgress.value += 50;
       }
     } catch (error) {
       toast.value?.show("error", t("user-unexpected-error"));
     }
     loading.value = false;
+
+    dataSyncProgress.value += 50;
   };
 </script>
 
