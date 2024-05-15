@@ -24,4 +24,5 @@ type ApiUserSticker = {
   amount: number;
   sticked: boolean;
   sticker: ApiSticker;
+  album: ApiAlbum | null;
 };

@@ -1,14 +1,54 @@
 <template>
-  <div class="w-full h-full relative">
-    <div class="h-full overflow-y-auto">
+  <div class="w-full h-full grid grid-flow-row grid-rows-12 relative">
+    <div
+      class="row-span-1 flex items-center gap-x-4 border-b-2 border-app-secondary overflow-x-scroll px-2"
+    >
+      <div class="grow overflow-x-auto no-scrollbar">
+        <AppSelectButton
+          v-model="selectedAlbum"
+          :options="albums"
+          optionLabel="title"
+          @change="onAlbumSelect"
+          class="mx-auto"
+        ></AppSelectButton>
+      </div>
+      <AppButton class="!py-1 px-8" @click="showAuctionCreateModal = true"
+        >Create</AppButton
+      >
+    </div>
+    <div class="row-span-11">
       <AppAuctionTable></AppAuctionTable>
     </div>
-    <div class="absolute bottom-0 left-0 right-0 flex justify-end p-2">
-      <AppIconButton class="!rounded-full !p-2 !ring-1">
-        <Icon name="i-mdi:court-hammer" size="22" class="" />
-      </AppIconButton>
-    </div>
+    <AppModalCreateAuctionOffer
+      v-model:visible="showAuctionCreateModal"
+    ></AppModalCreateAuctionOffer>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  const selectedAlbum = ref<ApiAlbum | null>(null);
+  const albums = ref<Array<ApiAlbum>>([
+    {
+      id: "ad",
+      title: "Album 1",
+    },
+    {
+      id: "ad",
+      title: "Album 2",
+    },
+    {
+      id: "ad",
+      title: "Album 3",
+    },
+    {
+      id: "ad",
+      title: "Album 4",
+    },
+  ]);
+
+  const showAuctionCreateModal = ref(true);
+
+  const onAlbumSelect = (e) => {
+    console.log(e);
+  };
+</script>

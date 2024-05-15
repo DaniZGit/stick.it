@@ -2,14 +2,33 @@
   <div class="w-full h-full">
     <DataTable
       v-model:expandedRows="expandedRows"
-      :value="products.concat(products).concat(products).concat(products)"
+      :value="
+        products
+          .concat(products)
+          .concat(products)
+          .concat(products)
+          .concat(products)
+          .concat(products)
+      "
       data-key="id"
-      :sticky-header="true"
+      :paginator="false"
+      :rows="10"
+      :scrollable="true"
+      scroll-height="flex"
+      :virtualScrollerOptions="{
+        lazy: true,
+        onLazyLoad: (e) => console.log('on lazy load', e),
+        itemSize: 46,
+        delay: 200,
+        showLoader: true,
+        loading: false,
+        numToleratedItems: 10,
+      }"
       @row-expand="onRowExpand"
       @row-collapse="onRowCollapse"
       :pt="tablePreset"
       :pt-options="{ mergeProps: true }"
-      class="!max-w-full"
+      class="!max-w-full !max-h-full"
     >
       <Column
         field="image"
