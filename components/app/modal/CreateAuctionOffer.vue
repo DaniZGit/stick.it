@@ -31,7 +31,9 @@
         <div class="grid grid-cols-4 gap-x-4 gap-y-6 overflow-y-auto p-1 pb-4">
           <AppItemAuctionUserSticker
             v-for="(userSticker, i) in userStickers.filter(
-              (us) => !selectedAlbum || us.album?.id == selectedAlbum?.id
+              (us) =>
+                us.amount > 0 &&
+                (!selectedAlbum || us.album?.id == selectedAlbum?.id)
             )"
             :key="userSticker.id"
             :user-sticker="userSticker"
@@ -73,6 +75,10 @@
 <script lang="ts" setup>
   const isVisible = defineModel("visible", { type: Boolean });
   const userStore = useUserStore();
+
+  const emit = defineEmits<{
+    created: [auctionOffer: ApiAuctionOffer];
+  }>();
 
   const startingBid = ref<number | null>(null);
   const selectedAlbum = ref<ApiAlbum | null>(null);
@@ -121,23 +127,35 @@
 
   const auctioning = ref(false);
   const onAuction = async () => {
-    auctioning.value = true;
-    // try {
-    //   const response = await useApi<{
-    //     user_stickers: Array<ApiUserSticker>;
-    //   }>(`/v1/users/${userStore.user.id}/stickers`);
+    if (!selectedUserSticker.value) return;
 
-    //   if (response.user_stickers) {
-    //     userStickers.value = response.user_stickers;
-    //     userStickers.value.forEach((us) => {
-    //       if (us.album && !albums.value.some((a) => a.id == us.album?.id)) {
-    //         albums.value.push(us.album);
-    //       }
-    //     });
-    //   }
-    // } catch (error) {
-    //   console.log("error", error);
-    // }
+    auctioning.value = true;
+    try {
+      const response = await useApi<{
+        auction_offer: ApiAuctionOffer;
+      }>(`/v1/auction/offers`, {
+        method: "POST",
+        body: {
+          user_sticker_id: selectedUserSticker.value.id,
+          starting_bid: startingBid.value,
+        },
+      });
+
+      if (response.auction_offer) {
+        emit("created", response.auction_offer);
+
+        const index = userStickers.value.findIndex(
+          (us) => us.id == selectedUserSticker.value?.id
+        );
+        if (index >= 0) {
+          userStickers.value[index].amount--;
+        }
+      }
+
+      isVisible.value = false;
+    } catch (error) {
+      console.log("error", error);
+    }
     auctioning.value = false;
   };
 </script>

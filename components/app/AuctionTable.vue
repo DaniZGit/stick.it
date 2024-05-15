@@ -2,17 +2,9 @@
   <div class="w-full h-full">
     <DataTable
       v-model:expandedRows="expandedRows"
-      :value="
-        products
-          .concat(products)
-          .concat(products)
-          .concat(products)
-          .concat(products)
-          .concat(products)
-      "
+      :value="props.items"
       data-key="id"
       :paginator="false"
-      :rows="10"
       :scrollable="true"
       scroll-height="flex"
       :virtualScrollerOptions="{
@@ -44,8 +36,8 @@
         </template>
       </Column>
       <Column field="name" :pt="columnPreset">
-        <template #body="slotProps">
-          {{ slotProps.data.title }}
+        <template #body="{ data }">
+          {{ data.id.substr(5, 5) }}
         </template>
       </Column>
       <Column
@@ -57,18 +49,21 @@
         <template #header>
           <Icon name="i-mdi:christmas-star-outline" size="18" class="mx-auto" />
         </template>
-        <template #body="slotProps"> {{ slotProps.data.rarity }} </template>
+        <template #body="slotProps"> {{ "R" }} </template>
       </Column>
       <Column
-        field="price"
+        field="starting_bid"
         :sortable="true"
+        sor
         class="text-center"
         :pt="columnPreset"
       >
         <template #header>
           <Icon name="i-akar-icons:coin" size="16" class="mx-auto" />
         </template>
-        <template #body="slotProps"> {{ slotProps.data.bid }} </template>
+        <template #body="slotProps">
+          {{ slotProps.data.starting_bid }}
+        </template>
       </Column>
       <Column
         field="time"
@@ -79,7 +74,7 @@
         <template #header>
           <Icon name="i-mdi:timer-outline" size="18" class="mx-auto" />
         </template>
-        <template #body="slotProps"> {{ slotProps.data.time }} </template>
+        <template #body="slotProps"> {{ "12:00" }} </template>
       </Column>
       <Column expander :pt="columnPreset" />
 
@@ -88,7 +83,7 @@
           class="flex flex-col gap-y-3 text-app-secondary p-3"
           :class="{
             'border-b-[1px] border-app-tertiary':
-              slotProps.index < products.length - 1,
+              props.items?.length && slotProps.index < props.items?.length - 1,
           }"
         >
           <div
@@ -142,10 +137,7 @@
             <div class="text-center">
               <span
                 class="text-xs underline underline-offset-2"
-                @click="
-                  products[slotProps.index].showDetail =
-                    !products[slotProps.index].showDetail
-                "
+                @click="() => console.log(slotProps.index)"
               >
                 {{ slotProps.data.showDetail ? "Hide" : "Show" }} sticker
                 details
@@ -191,49 +183,22 @@
   } from "primevue/datatable";
   import { useToast } from "primevue/usetoast";
 
-  const products = ref([
-    {
-      id: 0,
-      title: "first",
-      rarity: "R",
-      bid: 100,
-      time: "12:34",
-      showDetail: false,
-    },
-    {
-      id: 1,
-      title: "second",
-      rarity: "U",
-      bid: 60,
-      time: "06:34",
-      showDetail: false,
-    },
-  ]);
   const expandedRows = ref({}); // { 0: true, 1: true }
   const toast = useToast();
 
+  const props = defineProps({
+    items: Array<ApiAuctionOffer>,
+  });
+
   const onRowExpand = (event: DataTableRowExpandEvent) => {
-    // toast.add({
-    //   severity: "info",
-    //   summary: "Product Expanded",
-    //   detail: event.data.name,
-    //   life: 3000,
-    // });
     console.log(event);
     const id = event.data.id;
-    const index = products.value.findIndex((p) => p.id == id);
-    if (index >= 0) {
+    const index = props.items?.findIndex((p) => p.id == id);
+    if (index != undefined && index >= 0) {
       expandedRows.value = { [index]: true };
     }
   };
-  const onRowCollapse = (event: DataTableRowCollapseEvent) => {
-    // toast.add({
-    //   severity: "success",
-    //   summary: "Product Collapsed",
-    //   detail: event.data.name,
-    //   life: 3000,
-    // });
-  };
+  const onRowCollapse = (event: DataTableRowCollapseEvent) => {};
 
   const tablePreset: DataTablePassThroughOptions = {
     table: "!relative",
@@ -241,7 +206,8 @@
       class: [
         "!bg-app-primary !text-app-secondary",
         {
-          "!bg-app-tertiary": expandedRows.value[context.index],
+          "!bg-app-tertiary":
+            expandedRows.value && expandedRows.value[context.index],
         },
       ],
     }),

@@ -17,17 +17,18 @@
       >
     </div>
     <div class="row-span-11">
-      <AppAuctionTable></AppAuctionTable>
+      <AppAuctionTable :items="auctionOffers"></AppAuctionTable>
     </div>
     <AppModalCreateAuctionOffer
       v-model:visible="showAuctionCreateModal"
+      @created="onAuctionOfferCreate"
     ></AppModalCreateAuctionOffer>
   </div>
 </template>
 
 <script setup lang="ts">
   const selectedAlbum = ref<ApiAlbum | null>(null);
-  const albums = ref<Array<ApiAlbum>>([
+  const albums = ref<Array<Object>>([
     {
       id: "ad",
       title: "Album 1",
@@ -46,9 +47,36 @@
     },
   ]);
 
-  const showAuctionCreateModal = ref(true);
+  onMounted(() => {
+    fetchAuctionOffers();
+  });
+
+  const auctionOffers = ref<Array<ApiAuctionOffer>>([]);
+  const loadingAuctionOffers = ref(false);
+  const fetchAuctionOffers = async () => {
+    console.log("fetching stickers");
+    loadingAuctionOffers.value = true;
+    try {
+      const response = await useApi<{
+        auction_offers: Array<ApiAuctionOffer>;
+      }>(`/v1/auction/offers`);
+
+      if (response.auction_offers) {
+        auctionOffers.value = response.auction_offers;
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+    loadingAuctionOffers.value = false;
+  };
+
+  const showAuctionCreateModal = ref(false);
 
   const onAlbumSelect = (e) => {
     console.log(e);
+  };
+
+  const onAuctionOfferCreate = (auctionOffer: ApiAuctionOffer) => {
+    console.log("new auction offer", auctionOffer);
   };
 </script>
