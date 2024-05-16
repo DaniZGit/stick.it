@@ -17,7 +17,7 @@
       >
     </div>
     <div class="row-span-11">
-      <AppAuctionTable :items="auctionOffers"></AppAuctionTable>
+      <AppAuctionTable :items="auctionOffers" @bid="onBid"></AppAuctionTable>
     </div>
     <AppModalCreateAuctionOffer
       v-model:visible="showAuctionCreateModal"
@@ -72,11 +72,22 @@
 
   const showAuctionCreateModal = ref(false);
 
-  const onAlbumSelect = (e) => {
+  const onAlbumSelect = (e: any) => {
     console.log(e);
   };
 
   const onAuctionOfferCreate = (auctionOffer: ApiAuctionOffer) => {
     console.log("new auction offer", auctionOffer);
+  };
+
+  const onBid = (auctionBid: ApiAuctionBid) => {
+    const index = auctionOffers.value.findIndex(
+      (ao) => ao.id == auctionBid.auction_offer_id
+    );
+
+    if (index >= 0) {
+      auctionOffers.value[index].latest_bid = auctionBid.bid;
+      console.log("on bid", auctionOffers.value[index]);
+    }
   };
 </script>
