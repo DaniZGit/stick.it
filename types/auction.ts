@@ -2,6 +2,7 @@ type ApiAuctionOffer = {
   id: string;
   created_at: string;
   starting_bid: number;
+  duration: number;
   user_sticker_id: string;
   user_sticker: ApiUserSticker;
   latest_bid: number;
