@@ -35,9 +35,7 @@
     <div class="flex flex-col justify-center items-center gap-y-1">
       <div class="flex gap-x-1">
         <span>Time left:</span>
-        <span class="font-bold">{{
-          formattedTime(new Date(props.auctionOffer.created_at))
-        }}</span>
+        <span class="font-bold">{{ getTimeLeft() }}</span>
       </div>
       <AppButton class="w-1/2 py-1" :disabled="!canBid()" @click="onBid">
         <div v-if="bidding">
@@ -63,7 +61,7 @@
       <div class="text-center">
         <span
           class="text-xs underline underline-offset-2"
-          @click="showDetail != showDetail"
+          @click="showDetail = !showDetail"
         >
           {{ showDetail ? "Hide" : "Show" }} sticker details
         </span>
@@ -75,7 +73,19 @@
           >
             sticker description
           </h2>
-          <div class="flex flex-col text-center">
+          <div class="flex flex-col text-center pt-3">
+            <div
+              class="w-1/2 self-center"
+              :class="`aspect-[${
+                props.auctionOffer.user_sticker.sticker.numerator /
+                props.auctionOffer.user_sticker.sticker.denominator
+              }]`"
+            >
+              <NuxtImg
+                :src="useUrl(props.auctionOffer.user_sticker.sticker.file?.url)"
+                class="w-full h-full"
+              ></NuxtImg>
+            </div>
             <div>
               <span class="font-bold">Title: </span>
               <span>{{ props.auctionOffer.user_sticker.sticker.title }}</span>
@@ -157,6 +167,7 @@
   const canBid = () => {
     const bidders = getAuctionOfferBidders();
     return (
+      getTimeLeft() != "00:00:00" &&
       getLatestBid() <= userStore.user.tokens &&
       (!bidders.length ||
         bidders[bidders.length - 1].user_id != userStore.user.id)
@@ -187,18 +198,18 @@
     bidding.value = false;
   };
 
-  const formattedTime = (date: Date) => {
-    const hours = date.getUTCHours();
-    const minutes = date.getMinutes();
-    const seconds = date.getUTCSeconds();
-
-    return (
-      hours.toString().padStart(2, "0") +
-      ":" +
-      minutes.toString().padStart(2, "0") +
-      ":" +
-      seconds.toString().padStart(2, "0")
+  const currentDate = useNow();
+  const getTimeLeft = () => {
+    const auctionEndDate = new Date(
+      new Date(props.auctionOffer.created_at).getTime() +
+        props.auctionOffer.duration
     );
+    const dateDiffInMiliseconds =
+      auctionEndDate.getTime() - currentDate.value.getTime();
+
+    return new Date(Math.max(dateDiffInMiliseconds, 0))
+      .toISOString()
+      .slice(11, -5);
   };
 </script>
 

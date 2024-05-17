@@ -76,7 +76,7 @@
           <Icon name="i-mdi:timer-outline" size="18" class="mx-auto" />
         </template>
         <template #body="{ data }">
-          {{ formattedTime(new Date(data.created_at)) }}
+          {{ getTimeLeft(data) }}
         </template>
       </Column>
       <Column expander :pt="columnPreset" />
@@ -117,18 +117,17 @@
     expandedRows.value = { [id]: true };
   };
 
-  const formattedTime = (date: Date) => {
-    const hours = date.getUTCHours();
-    const minutes = date.getMinutes();
-    const seconds = date.getUTCSeconds();
-
-    return (
-      hours.toString().padStart(2, "0") +
-      ":" +
-      minutes.toString().padStart(2, "0") +
-      ":" +
-      seconds.toString().padStart(2, "0")
+  const currentDate = useNow();
+  const getTimeLeft = (auctionOffer: ApiAuctionOffer) => {
+    const auctionEndDate = new Date(
+      new Date(auctionOffer.created_at).getTime() + auctionOffer.duration
     );
+    const dateDiffInMiliseconds =
+      auctionEndDate.getTime() - currentDate.value.getTime();
+
+    return new Date(Math.max(dateDiffInMiliseconds, 0))
+      .toISOString()
+      .slice(11, -5);
   };
 
   const tablePreset: DataTablePassThroughOptions = {
