@@ -28,7 +28,10 @@
         class="row-span-8 flex flex-col gap-y-2 text-app-secondary text-center py-2"
       >
         <h2 class="font-semibold text-lg">Select a sticker to auction</h2>
-        <div class="grid grid-cols-4 gap-x-4 gap-y-6 overflow-y-auto p-1 pb-4">
+        <div
+          v-if="userStickers.length"
+          class="grid grid-cols-4 gap-x-4 gap-y-6 overflow-y-auto p-1 pb-4"
+        >
           <AppItemAuctionUserSticker
             v-for="(userSticker, i) in userStickers.filter(
               (us) =>
@@ -42,6 +45,35 @@
             "
             @select="onStickerSelect"
           ></AppItemAuctionUserSticker>
+        </div>
+        <div
+          v-else-if="loadingStickers"
+          class="w-full h-full flex flex-col items-center justify-center text-xl"
+        >
+          <span
+            class="w-full flex flex-col justify-center items-center gap-1 text-base"
+          >
+            <Icon name="i-svg-spinners:6-dots-scale-middle" size="48" />
+            Loading your stickers...
+          </span>
+        </div>
+        <div
+          v-else
+          class="w-full h-full flex flex-col items-center justify-center text-xl"
+        >
+          <span class="w-full flex flex-col justify-center items-center">
+            <Icon name="i-mdi:face-dead-outline" size="48" />
+            You have no stickers to auction
+          </span>
+          <span
+            >Get some from the
+            <NuxtLink
+              to="/shop"
+              class="text-app-gold brightness-125 font-bold underline underline-offset-2"
+            >
+              store
+            </NuxtLink>
+          </span>
         </div>
       </div>
 
@@ -92,7 +124,7 @@
     try {
       const response = await useApi<{
         user_stickers: Array<ApiUserSticker>;
-      }>(`/v1/users/${userStore.user.id}/stickers`);
+      }>(`/v1/users/${userStore.user.id}/auction-stickers`);
 
       if (response.user_stickers) {
         userStickers.value = response.user_stickers;

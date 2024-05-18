@@ -44,7 +44,7 @@
         <div v-else class="flex gap-x-1 font-bold text-lg">
           <span>BID</span>
           <div class="flex items-center gap-x-1">
-            <span>{{ getLatestBid() + 1 }}</span>
+            <span>{{ getBidAmount() }}</span>
             <Icon name="i-akar-icons:coin" size="22" />
           </div>
         </div>
@@ -158,17 +158,18 @@
     );
   };
 
-  const getLatestBid = () => {
+  const getBidAmount = () => {
     return props.auctionOffer.latest_bid
-      ? props.auctionOffer.latest_bid
+      ? props.auctionOffer.latest_bid + 1
       : props.auctionOffer.starting_bid;
   };
 
   const canBid = () => {
     const bidders = getAuctionOfferBidders();
     return (
+      props.auctionOffer.user_sticker.user_id != userStore.user.id &&
       getTimeLeft() != "00:00:00" &&
-      getLatestBid() <= userStore.user.tokens &&
+      getBidAmount() <= userStore.user.tokens &&
       (!bidders.length ||
         bidders[bidders.length - 1].user_id != userStore.user.id)
     );
