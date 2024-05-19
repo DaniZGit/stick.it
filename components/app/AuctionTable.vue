@@ -84,8 +84,15 @@
       <template #expansion="{ data, index }">
         <AppItemAuctionOffer
           :auction-offer="data"
+          :websocket-conn="props.websocketConn"
           @bid="emit('bid', $event)"
         ></AppItemAuctionOffer>
+      </template>
+
+      <template #empty>
+        <div class="w-full h-full text-center font-semibold">
+          There are currently no active auctions
+        </div>
       </template>
     </DataTable>
     <Toast />
@@ -95,11 +102,13 @@
 <script setup lang="ts">
   import type { ColumnPassThroughOptions } from "primevue/column";
   import type { DataTablePassThroughOptions } from "primevue/datatable";
+  import type { PropType } from "vue";
 
   const expandedRows = ref<Record<string, boolean>>({}); // { 0: true, 1: true }
 
   const props = defineProps({
     items: Array<ApiAuctionOffer>,
+    websocketConn: Object as PropType<WebSocket | null>,
   });
 
   const emit = defineEmits<{
@@ -153,3 +162,10 @@
     headerCell: "!bg-app-primary !text-app-secondary !border-app-tertiary",
   };
 </script>
+
+<style>
+  /* emptyMessageCell property from PrimeVue doesn't work - so we target it this way */
+  td[data-pc-section="emptymessagecell"] {
+    border-color: #fff;
+  }
+</style>

@@ -16,3 +16,17 @@ type ApiAuctionBid = {
   user_id: string;
   user: ApiUser;
 };
+
+type ApiAuctionEvent =
+  | {
+      type: "auction_event_created";
+      payload: ApiAuctionOffer;
+    }
+  | {
+      type: "auction_event_bid";
+      payload: ApiAuctionBid;
+    }
+  | {
+      type: "auction_event_completed";
+      payload: ApiAuctionOffer;
+    };

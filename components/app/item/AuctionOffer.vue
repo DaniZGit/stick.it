@@ -118,6 +118,7 @@
       type: Object as PropType<ApiAuctionOffer>,
       required: true,
     },
+    websocketConn: Object as PropType<WebSocket | null>,
   });
 
   const emit = defineEmits<{
@@ -126,7 +127,25 @@
 
   onMounted(() => {
     fetchAuctionBidders();
+    listenToWs();
   });
+
+  const listenToWs = () => {
+    if (!props.websocketConn) return;
+
+    props.websocketConn.onmessage = function (evt) {
+      const data = JSON.parse(evt.data) as ApiAuctionEvent;
+      switch (data.type) {
+        case "auction_event_bid":
+          // only add new bids from other users
+          if (data.payload.user_id != userStore.user.id) {
+            auctionBidders.value.push(data.payload);
+            emit("bid", data.payload);
+          }
+          break;
+      }
+    };
+  };
 
   const auctionBidders = ref<Array<ApiAuctionBid>>([]);
   const fetchinBidders = ref(false);
