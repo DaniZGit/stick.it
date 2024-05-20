@@ -21,6 +21,7 @@
         :items="auctionOffers"
         :websocket-conn="websocketConn"
         @bid="onBid"
+        @lazy-load="onLazyLoad"
       ></AppAuctionTable>
     </div>
     <AppModalCreateAuctionOffer
@@ -56,18 +57,37 @@
     startWS();
   });
 
+  const limit = ref(8);
+  const page = ref(0);
   const auctionOffers = ref<Array<ApiAuctionOffer>>([]);
   const loadingAuctionOffers = ref(false);
-  const fetchAuctionOffers = async () => {
+  const fetchAuctionOffers = async (appendFetchedItems: boolean = false) => {
     console.log("fetching stickers");
     loadingAuctionOffers.value = true;
     try {
       const response = await useApi<{
         auction_offers: Array<ApiAuctionOffer>;
-      }>(`/v1/auction/offers`);
+        metadata: ApiMetadata;
+      }>(`/v1/auction/offers`, {
+        params: {
+          limit: limit.value,
+          page: page.value,
+        },
+      });
 
       if (response.auction_offers) {
-        auctionOffers.value = response.auction_offers;
+        if (appendFetchedItems) {
+          auctionOffers.value = auctionOffers.value.concat(
+            response.auction_offers
+          );
+        } else {
+          auctionOffers.value = response.auction_offers;
+        }
+
+        // we want to decrease current page by 1, because we want to retry the next time
+        if (response.auction_offers.length <= 0) {
+          page.value -= 1;
+        }
       }
     } catch (error) {
       console.log("error", error);
@@ -75,7 +95,11 @@
     loadingAuctionOffers.value = false;
   };
 
-  const showAuctionCreateModal = ref(false);
+  const onLazyLoad = () => {
+    console.log("lazy load now, fetching new");
+    page.value += 1;
+    fetchAuctionOffers(true);
+  };
 
   const onAlbumSelect = (e: any) => {
     console.log(e);
@@ -106,8 +130,12 @@
     }
   };
 
+  const showAuctionCreateModal = ref(false);
   const onAuctionOfferCreated = (auctionOffer: ApiAuctionOffer) => {
-    fetchAuctionOffers();
+    // only re-fetch if there are so many items that scroll hasn't been shown yet
+    if (auctionOffers.value.length < 8) {
+      fetchAuctionOffers();
+    }
   };
 
   const websocketConn = ref<WebSocket | null>(null);

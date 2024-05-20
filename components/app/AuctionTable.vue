@@ -7,15 +7,6 @@
       :paginator="false"
       :scrollable="true"
       scroll-height="flex"
-      :virtualScrollerOptions="{
-        lazy: true,
-        onLazyLoad: (e) => console.log('on lazy load', e),
-        itemSize: 46,
-        delay: 200,
-        showLoader: true,
-        loading: false,
-        numToleratedItems: 10,
-      }"
       @row-expand="onRowExpand"
       :pt="tablePreset"
       :pt-options="{ mergeProps: true }"
@@ -113,7 +104,28 @@
 
   const emit = defineEmits<{
     bid: [auctionBid: ApiAuctionBid];
+    lazyLoad: [];
   }>();
+
+  const tableWrapper = ref<HTMLElement | null>(null);
+  const { arrivedState } = useScroll(tableWrapper, {
+    offset: { bottom: 100 },
+  });
+  onMounted(() => {
+    tableWrapper.value = document.querySelector<HTMLElement>(
+      "div[data-pc-section='wrapper']"
+    );
+  });
+
+  // load new items when we arrive to the bottom
+  watch(
+    () => arrivedState.bottom,
+    (newBottom, oldBottom) => {
+      if (newBottom) {
+        emit("lazyLoad");
+      }
+    }
+  );
 
   const getLatestBid = (auctionOffer: ApiAuctionOffer) => {
     return auctionOffer.latest_bid
@@ -150,7 +162,7 @@
         },
       ],
     }),
-    rowExpansion: "!bg-app-primary roundedd-b-lg",
+    rowExpansion: "!bg-app-primary ",
     rowExpansionCell: "!rounded-b-lg",
     header: "!sticky !top-0",
     headerRow: "!sticky !top-0",
