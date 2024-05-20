@@ -8,6 +8,7 @@
       :scrollable="true"
       scroll-height="flex"
       @row-expand="onRowExpand"
+      @sort="emit('sort', $event)"
       :pt="tablePreset"
       :pt-options="{ mergeProps: true }"
       class="!max-w-full !max-h-full"
@@ -30,12 +31,7 @@
           {{ data.user_sticker.sticker.title }}
         </template>
       </Column>
-      <Column
-        field="rarity"
-        :sortable="true"
-        class="text-center"
-        :pt="columnPreset"
-      >
+      <Column field="rarity" class="text-center" :pt="columnPreset">
         <template #header>
           <Icon name="i-mdi:christmas-star-outline" size="18" class="mx-auto" />
         </template>
@@ -44,7 +40,7 @@
         </template>
       </Column>
       <Column
-        field="starting_bid"
+        field="bid"
         :sortable="true"
         sor
         class="text-center"
@@ -58,7 +54,7 @@
         </template>
       </Column>
       <Column
-        field="time"
+        field="timespan"
         :sortable="true"
         class="text-center"
         :pt="columnPreset"
@@ -92,7 +88,10 @@
 
 <script setup lang="ts">
   import type { ColumnPassThroughOptions } from "primevue/column";
-  import type { DataTablePassThroughOptions } from "primevue/datatable";
+  import type {
+    DataTablePassThroughOptions,
+    DataTableSortEvent,
+  } from "primevue/datatable";
   import type { PropType } from "vue";
 
   const expandedRows = ref<Record<string, boolean>>({}); // { 0: true, 1: true }
@@ -105,11 +104,12 @@
   const emit = defineEmits<{
     bid: [auctionBid: ApiAuctionBid];
     lazyLoad: [];
+    sort: [e: DataTableSortEvent];
   }>();
 
   const tableWrapper = ref<HTMLElement | null>(null);
   const { arrivedState } = useScroll(tableWrapper, {
-    offset: { bottom: 100 },
+    offset: { bottom: 50 },
   });
   onMounted(() => {
     tableWrapper.value = document.querySelector<HTMLElement>(

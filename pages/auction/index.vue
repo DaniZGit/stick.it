@@ -22,6 +22,7 @@
         :websocket-conn="websocketConn"
         @bid="onBid"
         @lazy-load="onLazyLoad"
+        @sort="onSort"
       ></AppAuctionTable>
     </div>
     <AppModalCreateAuctionOffer
@@ -32,6 +33,8 @@
 </template>
 
 <script setup lang="ts">
+  import type { DataTableSortEvent } from "primevue/datatable";
+
   const selectedAlbum = ref<ApiAlbum | null>(null);
   const albums = ref<Array<Object>>([
     {
@@ -59,6 +62,8 @@
 
   const limit = ref(8);
   const page = ref(0);
+  const sortField = ref("timespan");
+  const sortOrder = ref(1);
   const auctionOffers = ref<Array<ApiAuctionOffer>>([]);
   const loadingAuctionOffers = ref(false);
   const fetchAuctionOffers = async (appendFetchedItems: boolean = false) => {
@@ -72,6 +77,8 @@
         params: {
           limit: limit.value,
           page: page.value,
+          sort_field: sortField.value,
+          sort_order: sortOrder.value == 1 ? "ASC" : "DESC",
         },
       });
 
@@ -99,6 +106,16 @@
     console.log("lazy load now, fetching new");
     page.value += 1;
     fetchAuctionOffers(true);
+  };
+
+  const onSort = (e: DataTableSortEvent) => {
+    sortField.value = e.sortField as string;
+    console.log("sorting", e);
+    sortOrder.value = e.sortOrder == 1 ? e.sortOrder : -1;
+    page.value = 0;
+    console.log("sort order", sortOrder.value);
+
+    fetchAuctionOffers();
   };
 
   const onAlbumSelect = (e: any) => {
