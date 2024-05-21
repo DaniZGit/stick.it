@@ -72,7 +72,7 @@
         <AppItemAuctionOffer
           :auction-offer="data"
           :websocket-conn="props.websocketConn"
-          @bid="emit('bid', $event)"
+          @auction-event="emit('auctionEvent', $event)"
         ></AppItemAuctionOffer>
       </template>
 
@@ -102,7 +102,7 @@
   });
 
   const emit = defineEmits<{
-    bid: [auctionBid: ApiAuctionBid];
+    auctionEvent: [auctionEvent: ApiAuctionEvent];
     lazyLoad: [];
     sort: [e: DataTableSortEvent];
   }>();

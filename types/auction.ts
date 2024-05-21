@@ -28,5 +28,10 @@ type ApiAuctionEvent =
     }
   | {
       type: "auction_event_completed";
-      payload: ApiAuctionOffer;
+      payload: {
+        auction_offer_id: string;
+        bid: number;
+        user_id: string;
+        winner: boolean;
+      };
     };

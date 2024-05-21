@@ -20,14 +20,14 @@
       <AppAuctionTable
         :items="auctionOffers"
         :websocket-conn="websocketConn"
-        @bid="onBid"
+        @auction-event="onActionEvent"
         @lazy-load="onLazyLoad"
         @sort="onSort"
       ></AppAuctionTable>
     </div>
     <AppModalCreateAuctionOffer
       v-model:visible="showAuctionCreateModal"
-      @created="onAuctionOfferCreated"
+      @created="onAuctionOfferCreate"
     ></AppModalCreateAuctionOffer>
   </div>
 </template>
@@ -35,6 +35,7 @@
 <script setup lang="ts">
   import type { DataTableSortEvent } from "primevue/datatable";
 
+  const userStore = useUserStore();
   const selectedAlbum = ref<ApiAlbum | null>(null);
   const albums = ref<Array<Object>>([
     {
@@ -67,7 +68,6 @@
   const auctionOffers = ref<Array<ApiAuctionOffer>>([]);
   const loadingAuctionOffers = ref(false);
   const fetchAuctionOffers = async (appendFetchedItems: boolean = false) => {
-    console.log("fetching stickers");
     loadingAuctionOffers.value = true;
     try {
       const response = await useApi<{
@@ -93,8 +93,11 @@
 
         // we want to decrease current page by 1, because we want to retry the next time
         if (response.auction_offers.length <= 0) {
-          page.value -= 1;
+          page.value = Math.max(0, page.value - 1);
         }
+
+        // sort offers
+        sortAuctionOffers();
       }
     } catch (error) {
       console.log("error", error);
@@ -103,17 +106,14 @@
   };
 
   const onLazyLoad = () => {
-    console.log("lazy load now, fetching new");
     page.value += 1;
     fetchAuctionOffers(true);
   };
 
   const onSort = (e: DataTableSortEvent) => {
     sortField.value = e.sortField as string;
-    console.log("sorting", e);
     sortOrder.value = e.sortOrder == 1 ? e.sortOrder : -1;
     page.value = 0;
-    console.log("sort order", sortOrder.value);
 
     fetchAuctionOffers();
   };
@@ -122,7 +122,55 @@
     console.log(e);
   };
 
-  const onBid = (auctionBid: ApiAuctionBid) => {
+  const sortAuctionOffers = () => {
+    auctionOffers.value.sort((ao1, ao2) => {
+      if (sortField.value == "bid") {
+        return sortOrder.value == 1
+          ? ao1.latest_bid - ao2.latest_bid
+          : ao2.latest_bid - ao1.latest_bid;
+      } else if (sortField.value == "timespan") {
+        const ao1_duration = getAuctionDuration(ao1);
+        const ao2_duration = getAuctionDuration(ao2);
+        return sortOrder.value == 1
+          ? ao1_duration - ao2_duration
+          : ao2_duration - ao1_duration;
+      } else {
+        return 0;
+      }
+    });
+
+    return auctionOffers.value;
+  };
+
+  // const currentDate = useNow();
+  const getAuctionDuration = (auctionOffer: ApiAuctionOffer) => {
+    const currentDate = useNow();
+    const auctionEndDate = new Date(
+      new Date(auctionOffer.created_at).getTime() + auctionOffer.duration
+    );
+    const dateDiffInMiliseconds =
+      auctionEndDate.getTime() - currentDate.value.getTime();
+
+    return dateDiffInMiliseconds;
+  };
+
+  const onActionEvent = (data: ApiAuctionEvent) => {
+    switch (data.type) {
+      case "auction_event_created":
+        onAuctionOfferCreate();
+        break;
+      case "auction_event_bid":
+        onAuctionOfferBid(data.payload);
+        break;
+      case "auction_event_completed":
+        onAuctionOfferComplete(data);
+        break;
+    }
+
+    sortAuctionOffers();
+  };
+
+  const onAuctionOfferBid = (auctionBid: ApiAuctionBid) => {
     const index = auctionOffers.value.findIndex(
       (ao) => ao.id == auctionBid.auction_offer_id
     );
@@ -148,10 +196,29 @@
   };
 
   const showAuctionCreateModal = ref(false);
-  const onAuctionOfferCreated = (auctionOffer: ApiAuctionOffer) => {
+  const onAuctionOfferCreate = () => {
     // only re-fetch if there are so many items that scroll hasn't been shown yet
-    if (auctionOffers.value.length < 8) {
+    if (auctionOffers.value.length < limit.value) {
       fetchAuctionOffers();
+    }
+  };
+
+  const onAuctionOfferComplete = (auctionEvent: ApiAuctionEvent) => {
+    if (auctionEvent.type != "auction_event_completed") return;
+
+    const index = auctionOffers.value.findIndex(
+      (ao) => ao.id == auctionEvent.payload.auction_offer_id
+    );
+    if (index >= 0) {
+      auctionOffers.value.splice(index, 1);
+    }
+
+    // increase current user tokens if their auction was completed and there was a winn
+    if (
+      auctionEvent.payload.user_id == userStore.user.id &&
+      auctionEvent.payload.winner
+    ) {
+      userStore.user.tokens += auctionEvent.payload.bid;
     }
   };
 
@@ -177,23 +244,7 @@
 
     websocketConn.value.onmessage = (evt) => {
       const data = JSON.parse(evt.data) as ApiAuctionEvent;
-      switch (data.type) {
-        case "auction_event_created":
-          fetchAuctionOffers();
-          break;
-        case "auction_event_bid":
-          onBid(data.payload);
-          break;
-        case "auction_event_completed":
-          // only add new bids from other users
-          const index = auctionOffers.value.findIndex(
-            (ao) => ao.id == data.payload.id
-          );
-          if (index >= 0) {
-            auctionOffers.value.splice(index, 1);
-          }
-          break;
-      }
+      onActionEvent(data);
     };
   };
 </script>

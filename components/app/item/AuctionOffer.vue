@@ -122,7 +122,7 @@
   });
 
   const emit = defineEmits<{
-    bid: [auctionBid: ApiAuctionBid];
+    auctionEvent: [auctionEvent: ApiAuctionEvent];
   }>();
 
   onMounted(() => {
@@ -136,21 +136,25 @@
     props.websocketConn.onmessage = function (evt) {
       const data = JSON.parse(evt.data) as ApiAuctionEvent;
       switch (data.type) {
+        case "auction_event_created":
+          break;
         case "auction_event_bid":
-          // only add new bids from other users
-          if (data.payload.user_id != userStore.user.id) {
+          // only push if its a bid from the currently opened auction offer
+          if (data.payload.auction_offer_id == props.auctionOffer.id) {
             auctionBidders.value.push(data.payload);
-            emit("bid", data.payload);
           }
           break;
+        case "auction_event_completed":
+          break;
       }
+
+      emit("auctionEvent", data);
     };
   };
 
   const auctionBidders = ref<Array<ApiAuctionBid>>([]);
   const fetchinBidders = ref(false);
   const fetchAuctionBidders = async () => {
-    console.log("fetching bidders");
     fetchinBidders.value = true;
     try {
       const response = await useApi<{
@@ -210,7 +214,6 @@
       if (response.auction_bid) {
         userStore.user.tokens = response.auction_bid.user.tokens;
         auctionBidders.value.push(response.auction_bid);
-        emit("bid", response.auction_bid);
       }
     } catch (error) {
       console.log("auction bid err", error);
