@@ -8,7 +8,10 @@
       >
         Last bidders
       </h2>
-      <div v-if="auctionBidders.length" class="grid grid-cols-3 gap-x-2 pt-4">
+      <div
+        v-if="getAuctionOfferBidders().length"
+        class="grid grid-cols-3 gap-x-2 pt-4"
+      >
         <div
           v-for="(auctionBid, i) in getAuctionOfferBidders()"
           :key="auctionBid.id"
@@ -118,44 +121,25 @@
       type: Object as PropType<ApiAuctionOffer>,
       required: true,
     },
+    auctionBids: {
+      type: Array<ApiAuctionBid>,
+    },
     websocketConn: Object as PropType<WebSocket | null>,
   });
 
   const emit = defineEmits<{
-    auctionEvent: [auctionEvent: ApiAuctionEvent];
+    fetchedBids: [
+      data: { auctionBids: Array<ApiAuctionBid>; auctionOffer: ApiAuctionOffer }
+    ];
   }>();
 
   onMounted(() => {
     fetchAuctionBidders();
-    listenToWs();
   });
 
-  const listenToWs = () => {
-    if (!props.websocketConn) return;
-
-    props.websocketConn.onmessage = function (evt) {
-      const data = JSON.parse(evt.data) as ApiAuctionEvent;
-      switch (data.type) {
-        case "auction_event_created":
-          break;
-        case "auction_event_bid":
-          // only push if its a bid from the currently opened auction offer
-          if (data.payload.auction_offer_id == props.auctionOffer.id) {
-            auctionBidders.value.push(data.payload);
-          }
-          break;
-        case "auction_event_completed":
-          break;
-      }
-
-      emit("auctionEvent", data);
-    };
-  };
-
-  const auctionBidders = ref<Array<ApiAuctionBid>>([]);
-  const fetchinBidders = ref(false);
+  const fetchingBidders = ref(false);
   const fetchAuctionBidders = async () => {
-    fetchinBidders.value = true;
+    fetchingBidders.value = true;
     try {
       const response = await useApi<{
         auction_bids: Array<ApiAuctionBid>;
@@ -166,25 +150,33 @@
       });
 
       if (response.auction_bids) {
-        auctionBidders.value = response.auction_bids;
+        emit("fetchedBids", {
+          auctionBids: response.auction_bids,
+          auctionOffer: props.auctionOffer,
+        });
       }
     } catch (error) {
       console.log("auction bid err", error);
     }
-    fetchinBidders.value = false;
+    fetchingBidders.value = false;
   };
 
   const getAuctionOfferBidders = () => {
-    return auctionBidders.value.slice(
-      Math.max(auctionBidders.value.length - 3, 0),
-      auctionBidders.value.length
-    );
+    if (!props.auctionBids) return [];
+
+    return props.auctionBids
+      .sort((a, b) => a.bid - b.bid)
+      .slice(
+        Math.max(props.auctionBids.length - 3, 0),
+        props.auctionBids.length
+      );
   };
 
-  const getBidAmount = () => {
-    return props.auctionOffer.latest_bid
-      ? props.auctionOffer.latest_bid + 1
-      : props.auctionOffer.starting_bid;
+  const getBidAmount = (): number => {
+    return (
+      props.auctionOffer.latest_bid +
+      Number(props.auctionOffer.starting_bid != props.auctionOffer.latest_bid)
+    );
   };
 
   const canBid = () => {
@@ -213,7 +205,6 @@
 
       if (response.auction_bid) {
         userStore.user.tokens = response.auction_bid.user.tokens;
-        auctionBidders.value.push(response.auction_bid);
       }
     } catch (error) {
       console.log("auction bid err", error);

@@ -50,7 +50,7 @@
           <Icon name="i-akar-icons:coin" size="16" class="mx-auto" />
         </template>
         <template #body="{ data }">
-          {{ getLatestBid(data) }}
+          {{ data.latest_bid }}
         </template>
       </Column>
       <Column
@@ -71,8 +71,8 @@
       <template #expansion="{ data, index }">
         <AppItemAuctionOffer
           :auction-offer="data"
-          :websocket-conn="props.websocketConn"
-          @auction-event="emit('auctionEvent', $event)"
+          :auction-bids="auctionBids[data.id]"
+          @fetched-bids="onFetchedBids"
         ></AppItemAuctionOffer>
       </template>
 
@@ -95,6 +95,7 @@
   import type { PropType } from "vue";
 
   const expandedRows = ref<Record<string, boolean>>({}); // { 0: true, 1: true }
+  const userStore = useUserStore();
 
   const props = defineProps({
     items: Array<ApiAuctionOffer>,
@@ -127,10 +128,56 @@
     }
   );
 
-  const getLatestBid = (auctionOffer: ApiAuctionOffer) => {
-    return auctionOffer.latest_bid
-      ? auctionOffer.latest_bid
-      : auctionOffer.starting_bid;
+  // listen to ws when ready
+  watch(
+    () => props.websocketConn,
+    (newWebsocketConn, oldWebsocketConn) => {
+      if (newWebsocketConn) {
+        listenToWs();
+      }
+    }
+  );
+
+  const auctionBids = ref<Record<string, Array<ApiAuctionBid>>>({});
+  const listenToWs = () => {
+    if (!props.websocketConn) return;
+
+    props.websocketConn.onmessage = (evt) => {
+      const data = JSON.parse(evt.data) as ApiAuctionEvent;
+      switch (data.type) {
+        case "auction_event_created":
+          break;
+        case "auction_event_bid":
+          const auctionBid = data.payload.auction_bid;
+          if (!auctionBids.value[auctionBid.auction_offer_id])
+            auctionBids.value[auctionBid.auction_offer_id] = [];
+
+          // check if new bidder is this user, decrement their tokens
+          if (auctionBid.user_id == userStore.user.id) {
+            userStore.user.tokens -= auctionBid.bid;
+          }
+
+          // check if last bidder is this user, increment their tokens
+          if (data.payload.last_auction_bid.user_id == userStore.user.id) {
+            userStore.user.tokens += data.payload.last_auction_bid.bid;
+          }
+
+          // add new auction bid to the array - to display it
+          auctionBids.value[auctionBid.auction_offer_id].push(auctionBid);
+          break;
+        case "auction_event_completed":
+          break;
+      }
+
+      emit("auctionEvent", data);
+    };
+  };
+
+  const onFetchedBids = (data: {
+    auctionBids: Array<ApiAuctionBid>;
+    auctionOffer: ApiAuctionOffer;
+  }) => {
+    auctionBids.value[data.auctionOffer.id] = data.auctionBids;
   };
 
   const onRowExpand = (event: { data: ApiAuctionOffer }) => {

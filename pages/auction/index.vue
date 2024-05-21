@@ -27,7 +27,6 @@
     </div>
     <AppModalCreateAuctionOffer
       v-model:visible="showAuctionCreateModal"
-      @created="onAuctionOfferCreate"
     ></AppModalCreateAuctionOffer>
   </div>
 </template>
@@ -110,16 +109,16 @@
     fetchAuctionOffers(true);
   };
 
+  const onAlbumSelect = (e: any) => {
+    console.log(e);
+  };
+
   const onSort = (e: DataTableSortEvent) => {
     sortField.value = e.sortField as string;
     sortOrder.value = e.sortOrder == 1 ? e.sortOrder : -1;
     page.value = 0;
 
     fetchAuctionOffers();
-  };
-
-  const onAlbumSelect = (e: any) => {
-    console.log(e);
   };
 
   const sortAuctionOffers = () => {
@@ -155,19 +154,29 @@
   };
 
   const onActionEvent = (data: ApiAuctionEvent) => {
+    console.log("new event", data);
     switch (data.type) {
       case "auction_event_created":
-        onAuctionOfferCreate();
+        onAuctionOfferCreated();
         break;
       case "auction_event_bid":
-        onAuctionOfferBid(data.payload);
+        onAuctionOfferBid(data.payload.auction_bid);
         break;
       case "auction_event_completed":
-        onAuctionOfferComplete(data);
+        onAuctionOfferCompleted(data);
         break;
     }
 
     sortAuctionOffers();
+  };
+
+  const showAuctionCreateModal = ref(false);
+  const onAuctionOfferCreated = () => {
+    console.log("getting new offer");
+    // only re-fetch if there are so many items that scroll hasn't been shown yet
+    if (auctionOffers.value.length < limit.value) {
+      fetchAuctionOffers();
+    }
   };
 
   const onAuctionOfferBid = (auctionBid: ApiAuctionBid) => {
@@ -195,15 +204,7 @@
     }
   };
 
-  const showAuctionCreateModal = ref(false);
-  const onAuctionOfferCreate = () => {
-    // only re-fetch if there are so many items that scroll hasn't been shown yet
-    if (auctionOffers.value.length < limit.value) {
-      fetchAuctionOffers();
-    }
-  };
-
-  const onAuctionOfferComplete = (auctionEvent: ApiAuctionEvent) => {
+  const onAuctionOfferCompleted = (auctionEvent: ApiAuctionEvent) => {
     if (auctionEvent.type != "auction_event_completed") return;
 
     const index = auctionOffers.value.findIndex(
@@ -235,16 +236,10 @@
     websocketConn.value.onclose = function (evt) {
       console.log("connection closed", evt);
     };
-
-    listenToWs();
   };
 
-  const listenToWs = () => {
-    if (!websocketConn.value) return;
-
-    websocketConn.value.onmessage = (evt) => {
-      const data = JSON.parse(evt.data) as ApiAuctionEvent;
-      onActionEvent(data);
-    };
-  };
+  onUnmounted(() => {
+    console.log("closing ws connection");
+    websocketConn.value?.close();
+  });
 </script>

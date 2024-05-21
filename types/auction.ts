@@ -24,7 +24,10 @@ type ApiAuctionEvent =
     }
   | {
       type: "auction_event_bid";
-      payload: ApiAuctionBid;
+      payload: {
+        auction_bid: ApiAuctionBid;
+        last_auction_bid: ApiAuctionBid;
+      };
     }
   | {
       type: "auction_event_completed";
