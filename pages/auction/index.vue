@@ -4,7 +4,7 @@
       class="row-span-1 flex items-center gap-x-4 border-b-2 border-app-secondary overflow-x-scroll px-2"
     >
       <div class="grow overflow-x-auto no-scrollbar">
-        <div v-if="loadingAlbums" class="text-center">
+        <div v-if="loadingAlbums && !albums.length" class="text-center">
           <Icon name="i-svg-spinners:3-dots-fade" size="28" />
         </div>
         <AppSelectButton
@@ -32,19 +32,35 @@
     <AppModalCreateAuctionOffer
       v-model:visible="showAuctionCreateModal"
     ></AppModalCreateAuctionOffer>
+
+    <!-- Progress bar -->
+    <div class="fixed bottom-0 left-0 right-0 h-[2px]">
+      <AppSyncBar v-model="dataSyncProgress"></AppSyncBar>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
   import type { DataTableSortEvent } from "primevue/datatable";
   import type { SelectButtonChangeEvent } from "primevue/selectbutton";
+  import { useAuctionStore } from "~/stores/auction";
 
   const userStore = useUserStore();
+  const auctionStore = useAuctionStore();
 
+  const dataSyncProgress = ref(0);
   onMounted(() => {
+    auctionOffers.value = auctionStore.auctionOffers;
+    albums.value = auctionStore.albums;
+
     fetchAuctionOffers();
     fetchAlbums();
     startWS();
+
+    // need to add a timeout, otherwise we don't get the transition effect
+    setTimeout(() => {
+      dataSyncProgress.value += 50;
+    }, 1);
   });
 
   const limit = ref(8);
@@ -85,11 +101,15 @@
 
         // sort offers
         sortAuctionOffers();
+
+        auctionStore.auctionOffers = auctionOffers.value;
       }
     } catch (error) {
       console.log("error", error);
     }
     loadingAuctionOffers.value = false;
+
+    dataSyncProgress.value += 25;
   };
 
   const onLazyLoad = () => {
@@ -223,11 +243,14 @@
 
       if (response.albums) {
         albums.value = response.albums;
+        auctionStore.albums = response.albums;
       }
     } catch (error) {
       console.log("error", error);
     }
     loadingAlbums.value = false;
+
+    dataSyncProgress.value += 25;
   };
 
   const onAlbumSelect = (e: SelectButtonChangeEvent) => {

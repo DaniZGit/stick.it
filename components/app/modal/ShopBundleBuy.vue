@@ -103,8 +103,7 @@
 
   const props = defineProps({
     bundle: {
-      type: Object as PropType<ApiBundle | null>,
-      required: true,
+      type: Object as PropType<ApiBundle> | null,
     },
   });
 
