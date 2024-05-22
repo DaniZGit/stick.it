@@ -4,7 +4,11 @@
       class="row-span-1 flex items-center gap-x-4 border-b-2 border-app-secondary overflow-x-scroll px-2"
     >
       <div class="grow overflow-x-auto no-scrollbar">
+        <div v-if="loadingAlbums" class="text-center">
+          <Icon name="i-svg-spinners:3-dots-fade" size="28" />
+        </div>
         <AppSelectButton
+          v-else
           v-model="selectedAlbum"
           :options="albums"
           optionLabel="title"
@@ -33,30 +37,13 @@
 
 <script setup lang="ts">
   import type { DataTableSortEvent } from "primevue/datatable";
+  import type { SelectButtonChangeEvent } from "primevue/selectbutton";
 
   const userStore = useUserStore();
-  const selectedAlbum = ref<ApiAlbum | null>(null);
-  const albums = ref<Array<Object>>([
-    {
-      id: "ad",
-      title: "Album 1",
-    },
-    {
-      id: "ad",
-      title: "Album 2",
-    },
-    {
-      id: "ad",
-      title: "Album 3",
-    },
-    {
-      id: "ad",
-      title: "Album 4",
-    },
-  ]);
 
   onMounted(() => {
     fetchAuctionOffers();
+    fetchAlbums();
     startWS();
   });
 
@@ -78,6 +65,7 @@
           page: page.value,
           sort_field: sortField.value,
           sort_order: sortOrder.value == 1 ? "ASC" : "DESC",
+          album_id: selectedAlbum.value?.id ?? "asdd",
         },
       });
 
@@ -107,10 +95,6 @@
   const onLazyLoad = () => {
     page.value += 1;
     fetchAuctionOffers(true);
-  };
-
-  const onAlbumSelect = (e: any) => {
-    console.log(e);
   };
 
   const onSort = (e: DataTableSortEvent) => {
@@ -221,6 +205,34 @@
     ) {
       userStore.user.tokens += auctionEvent.payload.bid;
     }
+  };
+
+  const albums = ref<Array<ApiAlbum>>([]);
+  const selectedAlbum = ref<ApiAlbum | null>(null);
+  const loadingAlbums = ref(false);
+  const fetchAlbums = async () => {
+    loadingAlbums.value = true;
+    try {
+      const response = await useApi<{
+        albums: Array<ApiAlbum>;
+      }>(`/v1/albums`, {
+        params: {
+          limit: 99,
+        },
+      });
+
+      if (response.albums) {
+        albums.value = response.albums;
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+    loadingAlbums.value = false;
+  };
+
+  const onAlbumSelect = (e: SelectButtonChangeEvent) => {
+    selectedAlbum.value = e.value as ApiAlbum | null;
+    fetchAuctionOffers();
   };
 
   const websocketConn = ref<WebSocket | null>(null);

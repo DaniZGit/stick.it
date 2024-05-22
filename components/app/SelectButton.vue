@@ -17,7 +17,7 @@
     }),
     button: ({ context }) => ({
       class: [
-        "!bg-app-primary !hover:bg-app-tertiary !text-app-secondary text-nowrap overflow-visible border-2 border-app-primary hover:ring-0 focus:ring-0",
+        "!bg-app-primary !hover:bg-app-tertiary !text-app-secondary text-nowrap overflow-visible border-2 border-app-primary hover:ring-0 focus:ring-0 !ring-0 ",
         {
           "border-app-secondary": context.active,
         },
