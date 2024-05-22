@@ -15,7 +15,10 @@
             <Icon
               name="i-mdi:bell-notification"
               size="18"
-              class="text-app-gold stroke-app-secondary"
+              class="text-app-gold stroke-app-secondary animate-wiggle"
+              :class="{
+                'opacity-0': props.album.user_packs_amount <= 0,
+              }"
             />
           </div>
           <div
@@ -24,23 +27,33 @@
             {{ album.title }}
           </div>
           <div
-            class="text-sm bg-app-tertiary bg-opacity-50 rounded-b-md text-app-secondary"
+            class="text-sm bg-app-tertiary bg-opacity-50 rounded-b-md text-app-secondary font-semibold"
           >
             <div class="flex justify-between items-center px-1 py-1">
               <div class="flex items-center gap-x-1">
-                <Icon name="i-ri:red-packet-line" size="18" />
-                <span>5</span>
+                <Icon name="i-ri:red-packet-line" size="16" />
+                <span>{{ props.album.user_packs_amount }}</span>
               </div>
               <div class="flex items-center gap-x-1">
-                <span class="underline underline-offset-2">17</span>
+                <span class="underline underline-offset-2">{{
+                  props.album.user_stickers_amount
+                }}</span>
                 /
-                <span>20</span>
+                <span>{{ props.album.stickers_amount }}</span>
                 <Icon name="i-mdi:cards-outline" size="18" />
               </div>
             </div>
-            <div class="w-full flex">
-              <hr class="border-2 border-app-gold w-2/6 rounded-bl-md" />
-              <hr class="border-2 border-app-primary w-4/6 rounded-br-md" />
+            <div class="w-full flex bg-app-primary rounded-b-md">
+              <hr
+                class="border-2 border-app-gold rounded-bl-md rounded-br-md w-0 transition-[width] duration-1000"
+                :style="`
+                  width: ${
+                    (props.album.user_stickers_amount /
+                      props.album.stickers_amount) *
+                    100
+                  }%;
+                `"
+              />
             </div>
           </div>
         </div>
@@ -51,7 +64,7 @@
 
 <script lang="ts" setup>
   const props = defineProps<{
-    album: ApiAlbum;
+    album: ApiUserAlbum;
   }>();
 </script>
 

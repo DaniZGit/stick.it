@@ -40,11 +40,11 @@
 
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
+  const userStore = useUserStore();
   const albumsStore = useAlbumsStore();
 
-  const albums = ref<Array<ApiAlbum>>();
-
   // fetch albums on load
+  const albums = ref<Array<ApiUserAlbum>>();
   const dataSyncProgress = ref(0);
   onMounted(() => {
     albums.value = albumsStore.albums;
@@ -61,12 +61,8 @@
     loading.value = true;
     try {
       const response = await useApi<{
-        albums: Array<ApiAlbum>;
-      }>("/v1/albums", {
-        params: {
-          limit: 12,
-        },
-      });
+        albums: Array<ApiUserAlbum>;
+      }>(`/v1/users/${userStore.user.id}/albums`);
 
       if (response.albums) {
         albums.value = response.albums;
