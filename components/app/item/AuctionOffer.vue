@@ -22,7 +22,7 @@
         >
           <span class="text-sm">{{ auctionBid.user.username }}</span>
           <NuxtImg
-            :src="useUrl(auctionBid.user.file?.url)"
+            :src="useUrl(auctionBid.user.avatar?.file?.url)"
             class="w-1/2 aspect-square rounded-full shrink"
           ></NuxtImg>
           <div class="flex items-center gap-x-1">

@@ -7,7 +7,8 @@ interface ApiUser {
   tokens: number;
   available_free_packs: number;
   last_free_pack_obtain_date: string;
-  file: ApiFile | null;
+  avatar_id: string;
+  avatar: ApiAvatar | null;
 }
 
 type ApiUserPack = {

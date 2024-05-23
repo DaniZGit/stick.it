@@ -55,6 +55,7 @@
   const { t } = useI18n();
   const toast = useToast();
   const isVisible = defineModel("visible", { type: Boolean });
+  const userStore = useUserStore();
 
   const props = defineProps({
     pack: {
@@ -78,7 +79,7 @@
       });
 
       if (response.user_pack) {
-        console.log("bought pack:", response.user_pack);
+        userStore.user.tokens -= props.pack.price * amount;
         toast.add({
           severity: "buy",
           detail: `${amount} ${amount > 1 ? "Packs" : "Pack"} bought`,

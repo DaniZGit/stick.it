@@ -4,7 +4,7 @@
   >
     <div class="flex items-center gap-x-2 p-2">
       <NuxtImg
-        :src="useUrl(undefined)"
+        :src="useUrl(userStore.user.avatar?.file?.url)"
         class="h-full w-auto aspect-square rounded-full"
       ></NuxtImg>
       <div class="flex flex-col text-app-secondary">
