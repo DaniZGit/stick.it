@@ -76,9 +76,11 @@
       default: 0,
     },
     paginator: Boolean,
+    headerTitle: String,
   });
 
   const emit = defineEmits<{
+    create: [];
     edit: [item: any];
     delete: [item: any];
     page: [page: any];

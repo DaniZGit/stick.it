@@ -293,6 +293,24 @@ export const useFormSchema = () => {
     })
   );
 
+  const AvatarCreateSchema = toTypedSchema(
+    zod.object({
+      file: zod
+        .any()
+        .refine((file) => {
+          if (!file || file.size <= MAX_FILE_SIZE) return true;
+        }, t("validation-file-max-size"))
+        .refine((file) => {
+          if (!file || ACCEPTED_IMAGE_TYPES.includes(file?.type)) return true;
+        }, t("validation-file-accepted-types")),
+      title: zod
+        .string({
+          required_error: t("validation-required", { field: "title" }),
+        })
+        .min(3, t("validation-min-length", { field: "Title", min: 3 })),
+    })
+  );
+
   return {
     RegisterSchema,
     LoginSchema,
@@ -304,5 +322,6 @@ export const useFormSchema = () => {
     RarityCreateSchema,
     PackCreateSchema,
     BundleCreateSchema,
+    AvatarCreateSchema,
   };
 };

@@ -86,7 +86,7 @@
     {
       label: "Shop",
       icon: "i-ic:outline-storefront",
-      to: "/dashboard/shop",
+      to: "/dashboard/shop/bundles",
       items: [
         {
           label: "Bundles",
@@ -104,12 +104,17 @@
     {
       label: "Users",
       icon: "i-ic:baseline-people-outline",
-      to: "/dashboard/roles",
+      to: "/dashboard/users/roles",
       items: [
         {
           label: "Roles",
           icon: "i-oui:app-users-roles",
-          to: "/dashboard/roles",
+          to: "/dashboard/users/roles",
+        },
+        {
+          label: "Avatars",
+          icon: "i-mdi:face-man-profile",
+          to: "/dashboard/users/avatars",
         },
       ],
     },
