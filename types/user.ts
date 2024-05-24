@@ -29,3 +29,8 @@ type ApiUserSticker = {
   sticker: ApiSticker;
   album: ApiAlbum | null;
 };
+
+type ApiUserProgress = {
+  completed_albums_count: number;
+  found_stickers_count: number;
+};

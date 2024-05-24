@@ -27,9 +27,10 @@
         </p>
         <textarea
           v-else
+          id="description-textarea"
           v-model="description"
           name="description"
-          class="w-full bg-app-primary border-2 border-app-secondary outline-none p-2 text-center"
+          class="w-full bg-app-primary border-2 border-app-secondary outline-none p-2 text-center rounded-md"
         ></textarea>
       </div>
       <div class="flex justify-center gap-x-2">
@@ -67,25 +68,26 @@
         <h2
           class="inline-block text-lg font-semibold border-t-2 border-app-secondary px-4 uppercase"
         >
-          Progress
+          Collector's Progress
         </h2>
       </div>
-      <div class="grid grid-cols-2">
-        <div class="flex flex-col items-center">
-          <span>Albums completed</span>
-          <span class="font-bold">0</span>
+      <div>
+        <div v-if="fetchingUserProgress">
+          <Icon name="i-svg-spinners:bars-fade" size="64" />
         </div>
-        <div class="flex flex-col items-center">
-          <span>Packs opened</span>
-          <span class="font-bold">0</span>
-        </div>
-        <div class="flex flex-col items-center">
-          <span>Stickers found</span>
-          <span class="font-bold">0</span>
-        </div>
-        <div class="flex flex-col items-center">
-          <span>Stickers sticked</span>
-          <span class="font-bold">0</span>
+        <div v-else class="grid grid-cols-1">
+          <div class="flex flex-col items-center">
+            <span>Albums completed</span>
+            <span class="font-bold">{{
+              userProgress?.completed_albums_count ?? "∞"
+            }}</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <span>Stickers found</span>
+            <span class="font-bold">{{
+              userProgress?.found_stickers_count ?? "∞"
+            }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -105,10 +107,12 @@
 
   onMounted(() => {
     description.value = userStore.user.description;
+
+    fetchUserProgress();
   });
 
   const userDescription = () => {
-    if (!userStore.user.description) return "User has no description";
+    if (!userStore.user.description) return "User has no bio.";
     return userStore.user.description;
   };
 
@@ -130,6 +134,15 @@
       description.value == userStore.user.description
     ) {
       editDescription.value = !editDescription.value;
+
+      // set focus on textarea
+      if (editDescription.value == true) {
+        // at this time tetarea tag is still not rendered in the dom so we need to wait for vdom to update
+        nextTick(() => {
+          const textareaEl = document.getElementById("description-textarea");
+          textareaEl?.focus();
+        });
+      }
       return;
     }
 
@@ -158,6 +171,24 @@
   const onEditCancel = () => {
     editDescription.value = false;
     description.value = userStore.user.description;
+  };
+
+  const userProgress = ref<ApiUserProgress | null>(null);
+  const fetchingUserProgress = ref(false);
+  const fetchUserProgress = async () => {
+    fetchingUserProgress.value = true;
+    try {
+      const response = await useApi<{
+        progress: ApiUserProgress;
+      }>(`/v1/users/${userStore.user.id}/progress`);
+
+      if (response.progress) {
+        userProgress.value = response.progress;
+      }
+    } catch (error) {
+      // toast.value?.show("error", t("user-unexpected-error"));
+    }
+    fetchingUserProgress.value = false;
   };
 </script>
 
