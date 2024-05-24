@@ -83,6 +83,7 @@
       }>(`/v1/users/${userStore.user.id}`, {
         method: "PUT",
         body: {
+          description: userStore.user.description,
           avatar_id: selectedAvatar.value.id,
         },
       });

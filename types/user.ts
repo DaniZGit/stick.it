@@ -3,6 +3,7 @@ interface ApiUser {
   created_at: string;
   username: string;
   email: string;
+  description: string | null;
   token: string;
   tokens: number;
   available_free_packs: number;
