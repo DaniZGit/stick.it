@@ -4,12 +4,17 @@
       <h1 class="text-4xl font-bold uppercase">Login</h1>
     </div>
     <VeeForm
-      class="w-full flex flex-col gap-4"
+      class="w-5/6 flex flex-col gap-4 6"
       method="post"
       @submit="onSubmit"
     >
-      <InputGroup>
-        <InputGroupAddon>
+      <InputGroup
+        class="hover:ring-2 ring-app-secondary bg-app-primary ring-offset-4 ring-offset-app-primary rounded-md transition-all"
+      >
+        <InputGroupAddon
+          :pt="inputGroupAddonPreset"
+          :pt-options="{ mergeProps: true }"
+        >
           <Icon name="ic:outline-email" />
         </InputGroupAddon>
         <InputText
@@ -17,47 +22,41 @@
           name="email"
           placeholder="Email"
           v-model="email"
+          :pt="inputTextPreset"
+          :pt-options="{ mergeProps: true }"
         />
       </InputGroup>
       <InlineMessage
         v-if="errors.email"
         icon="none"
         severity="error"
-        :pt="{
-          root: {
-            class: 'justify-end',
-          },
-          text: {
-            class: 'text-xs',
-          },
-        }"
+        :pt="inlineMessagePreset"
         >{{ errors.email }}</InlineMessage
       >
 
-      <InputGroup>
-        <InputGroupAddon>
+      <InputGroup
+        class="hover:ring-2 ring-app-secondary bg-app-primary ring-offset-4 ring-offset-app-primary rounded-md transition-all"
+      >
+        <InputGroupAddon
+          :pt="inputGroupAddonPreset"
+          :pt-options="{ mergeProps: true }"
+        >
           <Icon name="mdi:password-off-outline" />
         </InputGroupAddon>
-        <Password
+        <InputText
+          type="password"
           name="password"
           placeholder="Password"
           v-model="password"
-          :toggle-mask="true"
-          :feedback="false"
+          :pt="inputTextPreset"
+          :pt-options="{ mergeProps: true }"
         />
       </InputGroup>
       <InlineMessage
         v-if="errors.password"
         icon="none"
         severity="error"
-        :pt="{
-          root: {
-            class: 'justify-end',
-          },
-          text: {
-            class: 'text-xs',
-          },
-        }"
+        :pt="inlineMessagePreset"
         >{{ errors.password }}</InlineMessage
       >
 
@@ -84,6 +83,9 @@
 
 <script setup lang="ts">
   import { FetchError } from "ofetch";
+  import type { InlineMessagePassThroughOptions } from "primevue/inlinemessage";
+  import type { InputGroupAddonPassThroughOptions } from "primevue/inputgroupaddon";
+  import type { InputTextPassThroughOptions } from "primevue/inputtext";
   import type CustomToast from "~/components/CustomToast.vue";
 
   setPageLayout("guest");
@@ -146,6 +148,17 @@
         toast.value?.show("error", t("login-invalid-credentials")); //LOGIN_INVALID_CREDENTIALS);
       }
     }
+  });
+
+  const inputTextPreset = ref<InputTextPassThroughOptions>({
+    root: "!w-full  !bg-app-primary !border-0 !ring-2 !ring-app-secondary rounded-l-none !placeholder-app-tertiary",
+  });
+  const inputGroupAddonPreset = ref<InputGroupAddonPassThroughOptions>({
+    root: "!bg-app-primary !text-app-secondary !border-0 ring-2 !ring-app-secondary !p-0 !m-0",
+  });
+  const inlineMessagePreset = ref<InlineMessagePassThroughOptions>({
+    root: "",
+    text: "text-xs text-app-severity-error font-medium",
   });
 </script>
 
