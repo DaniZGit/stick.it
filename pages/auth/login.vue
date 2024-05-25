@@ -61,13 +61,13 @@
       >
 
       <div class="flex flex-col items-center gap-y-2">
-        <Button
+        <AppButton
           type="submit"
-          class="self-center px-16"
+          class="self-center !px-16"
           :disabled="isSubmitting"
         >
           Login
-        </Button>
+        </AppButton>
         <span>
           No account yet?
           <NuxtLink to="/auth/register" class="underline"
