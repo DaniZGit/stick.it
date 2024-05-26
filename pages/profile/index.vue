@@ -100,6 +100,7 @@
 </template>
 
 <script lang="ts" setup>
+  definePageMeta({ auth: true });
   const userStore = useUserStore();
 
   const editDescription = ref(false);

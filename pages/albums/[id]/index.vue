@@ -136,6 +136,8 @@
   import CustomToast from "~/components/CustomToast.vue";
   import { useAlbumStore } from "~/stores/album";
 
+  definePageMeta({ auth: true });
+
   const route = useRoute();
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);

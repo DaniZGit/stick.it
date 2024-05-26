@@ -21,7 +21,7 @@ export const useApi = <
 
       // redirect to login page if we get an 401(unauthorized) error
       if (route.name != "auth-login" && response.status == 401) {
-        // userStore.logout();
+        userStore.logout();
         navigateTo("/auth/login");
       }
     },

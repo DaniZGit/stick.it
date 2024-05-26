@@ -93,14 +93,9 @@
   const { t } = useI18n();
   const route = useRoute();
   const userStore = useUserStore();
+  const { $auth } = useNuxtApp();
 
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
-
-  onMounted(() => {
-    if (userStore.isLoggedIn()) {
-      navigateTo({ path: "/home" }, { redirectCode: 301 });
-    }
-  });
 
   // form stuff
   const { LoginSchema } = useFormSchema();
@@ -125,14 +120,10 @@
         userStore.setUser(response.user);
       }
 
-      const next = route.query.next as string;
-      if (next) {
-        // redirect to whatever the next parameter is set to - /login?next=/path
-        return navigateTo({ path: next }, { redirectCode: 301 });
-      }
-
-      // redirect to homepage
-      navigateTo({ path: "/home" }, { redirectCode: 301 });
+      navigateTo(
+        { path: $auth.redirectTo.value || "/home" },
+        { redirectCode: 301 }
+      );
     } catch (error) {
       if (error instanceof FetchError && error.statusCode == 401) {
         // check if Unauthorized - wrong email || pass

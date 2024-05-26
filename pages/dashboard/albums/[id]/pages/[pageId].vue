@@ -101,6 +101,8 @@
   import type { FetchError } from "ofetch";
 
   definePageMeta({
+    auth: true,
+    adminAuth: true,
     layout: "dashboard",
   });
 

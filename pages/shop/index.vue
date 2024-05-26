@@ -70,6 +70,7 @@
   import CustomToast from "~/components/CustomToast.vue";
   import { useShopStore } from "~/stores/shop";
 
+  definePageMeta({ auth: true });
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
   const shopStore = useShopStore();

@@ -14,7 +14,6 @@ export default defineNuxtConfig({
       apiWebsocketUrl: process.env.API_WS_URL ?? "ws://127.0.0.1:8000",
     },
   },
-
   // modules stuff
   modules: [
     // this installs @nuxtjs/tailwindcss, @nuxtjs/color-mode and nuxt-icon modules

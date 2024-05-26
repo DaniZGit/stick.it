@@ -80,6 +80,7 @@
 
 <script lang="ts" setup>
   setPageLayout("default");
+  definePageMeta({ auth: true });
 
   const albumsStore = useAlbumsStore();
   const swiperRef = ref(null);

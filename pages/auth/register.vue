@@ -89,13 +89,6 @@
         >
           Register
         </AppButton>
-        <!-- <Button
-          type="submit"
-          class="self-center px-16"
-          :disabled="isSubmitting"
-        >
-          Register
-        </Button> -->
         <span>
           Already have an account?
           <NuxtLink to="/auth/login" class="underline"> Login here </NuxtLink>

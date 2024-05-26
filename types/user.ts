@@ -10,6 +10,7 @@ interface ApiUser {
   last_free_pack_obtain_date: string;
   avatar_id: string;
   avatar: ApiAvatar | null;
+  role_id: string | null;
 }
 
 type ApiUserPack = {

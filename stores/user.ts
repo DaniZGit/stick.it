@@ -7,11 +7,15 @@ export const useUserStore = defineStore(
       id: "",
       username: "",
       email: "",
+      description: null,
       token: "",
       tokens: 0,
       created_at: "",
       available_free_packs: 0,
       last_free_pack_obtain_date: "",
+      role_id: null,
+      avatar: null,
+      avatar_id: "",
     });
 
     const getUser = () => {
@@ -31,8 +35,15 @@ export const useUserStore = defineStore(
         id: "",
         username: "",
         email: "",
+        description: null,
         token: "",
+        tokens: 0,
         created_at: "",
+        available_free_packs: 0,
+        last_free_pack_obtain_date: "",
+        avatar: null,
+        avatar_id: "",
+        role_id: null,
       };
     };
 

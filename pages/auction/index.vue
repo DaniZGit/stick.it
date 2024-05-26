@@ -45,6 +45,8 @@
   import type { SelectButtonChangeEvent } from "primevue/selectbutton";
   import { useAuctionStore } from "~/stores/auction";
 
+  definePageMeta({ auth: true });
+
   const userStore = useUserStore();
   const auctionStore = useAuctionStore();
 

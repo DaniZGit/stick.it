@@ -275,6 +275,8 @@
   import type CustomToast from "~/components/CustomToast.vue";
 
   definePageMeta({
+    auth: true,
+    adminAuth: true,
     layout: "dashboard",
   });
 
