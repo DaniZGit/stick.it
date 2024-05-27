@@ -80,7 +80,16 @@
 
 <script lang="ts" setup>
   setPageLayout("default");
-  definePageMeta({ auth: true });
+  definePageMeta({
+    auth: true,
+    pageTransition: {
+      name: "slide-right",
+      mode: "out-in",
+    },
+    middleware(to, from) {
+      setTransition(from, to);
+    },
+  });
 
   const albumsStore = useAlbumsStore();
   const swiperRef = ref(null);

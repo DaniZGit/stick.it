@@ -102,7 +102,7 @@
     userPack: Object as PropType<ApiUserPack>,
     userStickers: Array as PropType<Array<ApiUserSticker>>,
     loading: {
-      type: boolean,
+      type: Boolean,
       default: true,
     },
   });

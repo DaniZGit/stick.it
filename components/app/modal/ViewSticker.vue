@@ -3,7 +3,7 @@
     <div class="h-full w-full flex flex-col">
       <div class="w-full aspect-thumbnail p-2 rounded-md">
         <NuxtImg
-          :src="useUrl(props.sticker.file?.url)"
+          :src="useUrl(props.sticker?.file?.url)"
           class="w-full h-full aspect-thumbnail rounded-md ring-app-secondary group-hover:ring-2 group-focus:ring-2 duration-100"
         ></NuxtImg>
       </div>
@@ -12,11 +12,11 @@
       >
         <div class="flex flex-col items-center">
           <span class="text-center font-bold text-xl">{{
-            props.sticker.title
+            props.sticker?.title
           }}</span>
           <span class="text-xs">
             (
-            {{ props.sticker.rarity?.title ?? "base" }}
+            {{ props.sticker?.rarity?.title ?? "base" }}
             )
           </span>
         </div>
@@ -35,10 +35,7 @@
   const isVisible = defineModel("visible", { type: Boolean });
 
   const props = defineProps({
-    sticker: {
-      type: Object as PropType<ApiSticker>,
-      required: true,
-    },
+    sticker: Object as PropType<ApiSticker>,
   });
 </script>
 

@@ -70,7 +70,16 @@
   import CustomToast from "~/components/CustomToast.vue";
   import { useShopStore } from "~/stores/shop";
 
-  definePageMeta({ auth: true });
+  definePageMeta({
+    auth: true,
+    pageTransition: {
+      name: "slide-right",
+      mode: "out-in",
+    },
+    middleware(to, from) {
+      setTransition(from, to);
+    },
+  });
   const { t } = useI18n();
   const toast = ref<InstanceType<typeof CustomToast> | null>(null);
   const shopStore = useShopStore();

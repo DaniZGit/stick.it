@@ -2,7 +2,7 @@
   <div
     class="bg-app-primary border-b-2 border-app-secondary flex justify-between"
   >
-    <div class="flex items-center gap-x-2 p-2">
+    <NuxtLink to="/profile" class="flex items-center gap-x-2 p-2">
       <NuxtImg
         :src="useUrl(userStore.user.avatar?.file?.url)"
         class="h-full w-auto aspect-square rounded-full"
@@ -20,7 +20,7 @@
           />
         </div>
       </div>
-    </div>
+    </NuxtLink>
     <div class="flex flex-col justify-center items-end text-app-secondary p-2">
       <div class="flex">
         <span

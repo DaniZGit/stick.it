@@ -100,7 +100,16 @@
 </template>
 
 <script lang="ts" setup>
-  definePageMeta({ auth: true });
+  definePageMeta({
+    auth: true,
+    pageTransition: {
+      name: "slide-right",
+      mode: "out-in",
+    },
+    middleware(to, from) {
+      setTransition(from, to);
+    },
+  });
   const userStore = useUserStore();
 
   const editDescription = ref(false);

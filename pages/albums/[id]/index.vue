@@ -136,7 +136,16 @@
   import CustomToast from "~/components/CustomToast.vue";
   import { useAlbumStore } from "~/stores/album";
 
-  definePageMeta({ auth: true });
+  definePageMeta({
+    auth: true,
+    pageTransition: {
+      name: "slide-right",
+      mode: "out-in",
+    },
+    middleware(to, from) {
+      setTransition(from, to);
+    },
+  });
 
   const route = useRoute();
   const { t } = useI18n();
