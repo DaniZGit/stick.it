@@ -28,6 +28,12 @@ export default defineNuxtConfig({
     "@nuxt/fonts",
     "@nuxtjs/i18n",
     "nuxt-swiper",
+    [
+      "@/modules/spa-loading-template/module",
+      {
+        delay: 0,
+      },
+    ],
   ],
   devtools: { enabled: true },
   tailwindcss: {
