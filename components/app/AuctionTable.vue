@@ -28,7 +28,7 @@
       </Column>
       <Column field="name" :pt="columnPreset">
         <template #body="{ data }">
-          {{ data.user_sticker.sticker.title }}
+          <span class="text-xs">{{ data.user_sticker.sticker.title }}</span>
         </template>
       </Column>
       <Column field="rarity" class="text-center" :pt="columnPreset">
@@ -36,7 +36,9 @@
           <Icon name="i-mdi:christmas-star-outline" size="18" class="mx-auto" />
         </template>
         <template #body="{ data }">
-          {{ data.user_sticker.sticker.rarity?.title ?? "null" }}
+          <span class="text-xs">{{
+            data.user_sticker.sticker.rarity?.title.at(0) ?? "null"
+          }}</span>
         </template>
       </Column>
       <Column
@@ -50,7 +52,7 @@
           <Icon name="i-akar-icons:coin" size="16" class="mx-auto" />
         </template>
         <template #body="{ data }">
-          {{ data.latest_bid }}
+          <span class="text-xs">{{ data.latest_bid }}</span>
         </template>
       </Column>
       <Column
@@ -63,7 +65,7 @@
           <Icon name="i-mdi:timer-outline" size="18" class="mx-auto" />
         </template>
         <template #body="{ data }">
-          {{ getTimeLeft(data) }}
+          <span class="text-xs">{{ getTimeLeft(data) }}</span>
         </template>
       </Column>
       <Column expander :pt="columnPreset" />

@@ -95,7 +95,7 @@
             </div>
             <div>
               <span class="font-bold">Album: </span>
-              <span> Fifa 1991 </span>
+              <span> {{ props.auctionOffer.user_sticker.album?.title }} </span>
             </div>
             <div>
               <span class="font-bold">Rarity: </span>
