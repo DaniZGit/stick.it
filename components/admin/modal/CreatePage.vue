@@ -22,7 +22,7 @@
         </div>
 
         <AdminButton type="submit" class="self-center rounded-md w-1/2">
-          Create {{ sortOrder }} {{ albumId }}
+          Create
         </AdminButton>
       </VeeForm>
     </div>
