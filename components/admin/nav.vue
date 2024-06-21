@@ -93,11 +93,11 @@
           icon: "i-ic:round-shopping-bag",
           to: "/dashboard/shop/bundles",
         },
-        {
-          label: "Battle passes",
-          icon: "i-ic:outline-view-carousel",
-          to: "/dashboard/shop/battle-passes",
-        },
+        // {
+        //   label: "Battle passes",
+        //   icon: "i-ic:outline-view-carousel",
+        //   to: "/dashboard/shop/battle-passes",
+        // },
       ],
       expanded: false,
     },
