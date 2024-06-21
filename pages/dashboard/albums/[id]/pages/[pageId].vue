@@ -32,7 +32,7 @@
               />
             </div>
           </div>
-          <div>
+          <!-- <div>
             <div class="bg-base-white rounded-md">
               <Icon
                 name="i-mdi:cancel-box-outline"
@@ -40,7 +40,7 @@
                 class="border-2 border-transparent rounded-md hover:border-red-700 hover:cursor-pointer hover:text-red-700"
               />
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -119,18 +119,18 @@
       icon: "i-fluent:sticker-add-20-filled",
       description: t("admin-sticker-add-option"),
     },
-    {
-      icon: "i-mdi:file-gif-box",
-      description: t("admin-sticker-add-gif-option"),
-    },
-    {
-      icon: "i-mage:sound-waves",
-      description: t("admin-sticker-add-audio-option"),
-    },
-    {
-      icon: "i-fluent:sticker-20-filled",
-      description: t("admin-sticker-remove-option"),
-    },
+    // {
+    //   icon: "i-mdi:file-gif-box",
+    //   description: t("admin-sticker-add-gif-option"),
+    // },
+    // {
+    //   icon: "i-mage:sound-waves",
+    //   description: t("admin-sticker-add-audio-option"),
+    // },
+    // {
+    //   icon: "i-fluent:sticker-20-filled",
+    //   description: t("admin-sticker-remove-option"),
+    // },
   ];
 
   onMounted(async () => {
