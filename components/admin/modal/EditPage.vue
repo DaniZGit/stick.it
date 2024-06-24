@@ -1,7 +1,7 @@
 <template>
   <AdminDialog
     v-model:visible="isVisible"
-    header="Edit album"
+    header="Edit page"
     :modal="true"
     :draggable="false"
     @hide="resetForm"
