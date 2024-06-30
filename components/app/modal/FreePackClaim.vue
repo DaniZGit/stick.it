@@ -149,7 +149,7 @@
 
   const claimingFreePack = ref(false);
   const onPackClaim = async () => {
-    if (!swiper.instance.value?.activeIndex || !packs.value) return;
+    if (swiper.instance.value?.activeIndex == undefined || !packs.value) return;
 
     claimingFreePack.value = true;
     const selectedPack = packs.value[swiper.instance.value?.activeIndex];
