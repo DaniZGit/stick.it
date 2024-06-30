@@ -40,6 +40,15 @@
         <span>Time left:</span>
         <span class="font-bold">{{ getTimeLeft() }}</span>
       </div>
+      <AppInputNumber
+        id="bidAmount"
+        v-model="bidAmount"
+        placeholder="Type tokens amount, ex. 125"
+        :min="getBidAmount()"
+        :max-fraction-digits="0"
+        class="!text-center !w-5/6 mb-1"
+        inputClass="text-center"
+      ></AppInputNumber>
       <AppButton class="w-1/2 py-1" :disabled="!canBid()" @click="onBid">
         <div v-if="bidding">
           <Icon name="i-svg-spinners:6-dots-scale-middle" size="28" />
@@ -47,7 +56,7 @@
         <div v-else class="flex gap-x-1 font-bold text-lg">
           <span>BID</span>
           <div class="flex items-center gap-x-1">
-            <span>{{ getBidAmount() }}</span>
+            <span>{{ bidAmount }}</span>
             <Icon name="i-akar-icons:coin" size="22" />
           </div>
         </div>
@@ -114,6 +123,7 @@
   import type { PropType } from "vue";
 
   const showDetail = ref(false);
+  const bidAmount = ref(0);
   const userStore = useUserStore();
 
   const props = defineProps({
@@ -135,6 +145,7 @@
 
   onMounted(() => {
     fetchAuctionBidders();
+    bidAmount.value = getBidAmount();
   });
 
   const fetchingBidders = ref(false);
@@ -200,6 +211,7 @@
         method: "POST",
         body: {
           auction_offer_id: props.auctionOffer.id,
+          bid: bidAmount.value,
         },
       });
 
