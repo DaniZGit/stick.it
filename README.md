@@ -1,75 +1,9 @@
-# Nuxt 3 Minimal Starter
+# Stick.it
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+The goal is to create an application that provides appropriate funcitonality for easy access to albums and stickers for users while preserving the experience and sensation of manual collection and sticker placement to albums. Key steps in the development process include designing the administrative part of the application for albums and stickers addition as well as developing a responsive and user-friendly interface that offers an experience comparable to manual collection. Additionally, a server is developed to handle data exchange between the application components and the database. Modern frameworks are used in the development process including Echo for server development, PostgreSQL for data storage and Nuxt for designing the user interface. The final prototype of the application is functional and in addition to editorial adding and editing of albums, it also enables easier, faster, and more accessible collection of stickers.
 
-## Setup
+Check the [Live website]([https://termini-si.vercel.app](https://stick-it-teal.vercel.)), designed for mobile **only**.
 
-Make sure to install the dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Account example:
+ - username: tester123
+ - password: Tester123!
