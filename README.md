@@ -5,5 +5,5 @@ The goal is to create an application that provides appropriate funcitonality for
 Check the [Live website](https://termini-si.vercel.app), designed for mobile **only**.
 
 Account example:
- - username: tester123
- - password: Tester123!
+ - username: **tester123**
+ - password: **Tester123!**
